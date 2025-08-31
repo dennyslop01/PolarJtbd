@@ -51,7 +51,7 @@ namespace Jtbd.Api.Controllers
 
         // POST: api/Employee
         [HttpPost]
-        public async Task<ActionResult> CrearEmployee([FromBody] Employee nuevo)
+        public async Task<ActionResult> CrearEmployee([FromBody] CreateEmployee nuevo)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace Jtbd.Api.Controllers
 
         // PUT: api/Employee/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> ActualizarEmployee(int id, [FromBody] Employee Employee)
+        public async Task<ActionResult> ActualizarEmployee(int id, [FromBody] CreateEmployee Employee)
         {
             if (id != Employee.Id)
             {

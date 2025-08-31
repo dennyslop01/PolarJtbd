@@ -34,6 +34,16 @@ builder.Services.AddScoped<IStories, StoriesRepository>();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
+string webApp = builder.Configuration.GetSection("WebApp").Value.ToString();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrings", policy =>
+    {
+        policy.WithOrigins(webApp).AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -45,6 +55,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowSpecificOrings");
 
 app.UseAuthorization();
 

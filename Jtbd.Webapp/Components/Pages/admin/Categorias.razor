@@ -1,0 +1,173 @@
+﻿@page "/admin/categorias"
+@rendermode InteractiveServer
+@using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Services
+@inject IConfiguration configuration
+@inject IJSRuntime JSRuntime
+@inject IConfiguration configuration
+
+<PageTitle>Categorias</PageTitle>
+    <div class="row align-content-center">
+        <div class="col-lg-6">
+            <h3 class="text-center mt-4">Gestión de Categorías</h3>
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" @onclick="MostrarFormulario">
+                    <i class="fas fa-plus"></i> Agregar Categoria
+                </button>
+            </div>
+
+            @if (mostrarAlerta)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @mensajeAlerta
+                    <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+                </div>
+            }
+
+
+            @if (categorias is null)
+            {
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p>Cargando datos...</p>
+                </div>
+            }
+            else if (!categorias.Any())
+            {
+                <div class="alert alert-info text-center">No hay categorias disponibles.</div>
+            }
+            else
+            {
+                <table class="table table-striped table-hover">
+                    <thead class="table-secondary bg-opacity-25">
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (p, index) in categorias.Select((p, i) => (p, i + 1)))
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@p.Name</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.Id)">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+    </div>
+</div>
+
+@if (mostrarFormulario)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(categoriaActual.Id == 0 ? "Agregar" : "Editar")</h5>
+                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="categoriaActual" OnValidSubmit="GuardarEntidad">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre:</label>
+                            <InputText class="form-control" @bind-Value="categoriaActual.Name" required  />
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Categories> categorias = new();
+    private Categories categoriaActual = new();
+    private bool mostrarFormulario = false;
+    private string? mensajeAlerta;
+    private bool mostrarAlerta = false;
+
+    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var urlbase = configuration.GetSection("ApiBack").Value.ToString();
+        var url1 = "/api/categories";
+
+        categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url1));
+    }
+
+    private void MostrarFormulario()
+    {
+
+        categoriaActual = new Categories();
+        mostrarFormulario = true;
+    }
+
+    private void EditarEntidad(Categories categoria)
+    {
+        categoriaActual = new Categories
+        {
+            Id = categoria.Id,
+            Name = categoria.Name,
+        };
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarEntidad()
+    {
+        var urlbase = configuration.GetSection("ApiBack").Value.ToString();
+        var url1 = "/api/categories/";
+        var url2 = $"/api/categories/{categoriaActual.Id}";
+
+        if (categoriaActual.Id == 0)
+            await repository.PostAsync(string.Concat(urlbase, url1), categoriaActual);
+        else
+            await repository.PutAsync(string.Concat(urlbase, url2), categoriaActual);
+
+        categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url1));
+        mostrarFormulario = false;
+        mensajeAlerta = "Categoria guardada exitosamente.";
+        mostrarAlerta = true;
+    }
+
+    private async Task EliminarEntidad(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+        if (confirmed)
+        {
+            var urlbase = configuration.GetSection("ApiBack").Value.ToString();
+            var url1 = "/api/categories/";
+            var url2 = $"/api/categories/{categoriaActual.Id}";
+
+            await repository.DeleteAsync(string.Concat(urlbase, url2));
+            categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url1));
+            mensajeAlerta = "Categoria eliminada exitosamente.";
+            mostrarAlerta = true;
+        }
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+}

@@ -1,4 +1,5 @@
 using Jtbd.Webapp.Components;
+using Jtbd.Webapp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+string apiBack = builder.Configuration.GetSection("ApiBack").Value.ToString();
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBack) });
+builder.Services.AddScoped<IRepositoryGeneric, RepositoryGeneric>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

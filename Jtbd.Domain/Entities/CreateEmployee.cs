@@ -7,14 +7,19 @@ using System.Threading.Tasks;
 
 namespace Jtbd.Domain.Entities
 {
-    public class Employee
+    public class CreateEmployee
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
         [MaxLength(500)]
         public string EmployeeName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El rol es obligatorio.")]
         public int EmployeeRol { get; set; }
-        public Deparments? Deparments { get; set; }
+
+        [Required(ErrorMessage = "El departamento es obligatorio.")]
+        public int IdDeparment { get; set; }
         public int StatusEmployee { get; set; } = 1;
     }
 }

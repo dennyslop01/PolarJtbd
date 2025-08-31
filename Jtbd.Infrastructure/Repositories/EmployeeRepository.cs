@@ -13,18 +13,23 @@ namespace Jtbd.Infrastructure.Repositories
     public class EmployeeRepository(JtbdDbContext context) : IEmployee
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(Employee employee)
+        public async Task<bool> CreateAsync(CreateEmployee employee)
         {
-            var deparment = await _context.Deparments.FindAsync(employee.Deparments!.Id);
+            Employee emplee = new Employee();
+            emplee.EmployeeName = employee.EmployeeName;
+            emplee.EmployeeRol = employee.EmployeeRol;
+            emplee.StatusEmployee = employee.StatusEmployee;
+
+            Deparments? deparment = _context.Deparments.Where(x => x.Id == employee.IdDeparment).FirstOrDefault();
             if (deparment != null)
             {
-                employee.Deparments = deparment;
+                emplee.Deparments = deparment;
             }
             else
             {
                 throw new InvalidOperationException("El departamento no existe.");
             }
-            await _context.Employees.AddAsync(employee);
+            await _context.Employees.AddAsync(emplee);
             await _context.SaveChangesAsync();
 
             return true;
@@ -57,19 +62,25 @@ namespace Jtbd.Infrastructure.Repositories
             return employee!;
         }
 
-        public async Task<bool> UpdateAsync(Employee employee)
+        public async Task<bool> UpdateAsync(CreateEmployee employee)
         {
-            var deparment = await _context.Deparments.FindAsync(employee.Deparments!.Id);
+            Employee emplee = new Employee();
+            emplee.Id = employee.Id;
+            emplee.EmployeeName = employee.EmployeeName;
+            emplee.EmployeeRol = employee.EmployeeRol;
+            emplee.StatusEmployee = employee.StatusEmployee;
+
+            Deparments? deparment = _context.Deparments.Where(x => x.Id == employee.IdDeparment).FirstOrDefault();
             if (deparment != null)
             {
-                employee.Deparments = deparment;
+                emplee.Deparments = deparment;
             }
             else
             {
                 throw new InvalidOperationException("El departamento no existe.");
             }
 
-            _context.Employees.Update(employee);
+            _context.Employees.Update(emplee);
             await _context.SaveChangesAsync();
             return true;
         }

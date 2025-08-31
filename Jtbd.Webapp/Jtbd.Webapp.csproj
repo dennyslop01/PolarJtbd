@@ -6,4 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="BootstrapBlazor" Version="9.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jtbd.Domain\Jtbd.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

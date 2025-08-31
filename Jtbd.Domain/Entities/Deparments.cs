@@ -6,7 +6,7 @@ namespace Jtbd.Domain.Entities
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
         [MaxLength(100)] 
         public string Name { get; set; } = string.Empty;
     }
