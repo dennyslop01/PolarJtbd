@@ -7,6 +7,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddDistributedMemoryCache(); // Or another distributed cache provider
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(300); // Customize session timeout
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddHttpContextAccessor();
+
 string apiBack = builder.Configuration.GetSection("ApiBack").Value.ToString();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBack) });
 builder.Services.AddScoped<IRepositoryGeneric, RepositoryGeneric>();
@@ -20,6 +29,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseSession();
 app.UseHttpsRedirection();
 
 

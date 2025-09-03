@@ -1,4 +1,7 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 <PageTitle>Home</PageTitle>
 
@@ -20,3 +23,21 @@
     Este proceso se basa en las agrupaciones previas de Pushes y Pulls, lo que permite organizar los datos de manera jerárquica y minimizar 
     la varianza dentro de cada grupo, asegurando que los elementos dentro de cada clúster sean lo más similares posible entre sí.
 </p>
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        var session = HttpContextAccessor.HttpContext.Session;
+        if (user.Identity.IsAuthenticated)
+        {
+            session.SetString("WindowsUser", user.Identity.Name);
+        }
+        else
+        {
+            session.SetString("WindowsUser", "Auxiliar");
+        }
+    }
+}

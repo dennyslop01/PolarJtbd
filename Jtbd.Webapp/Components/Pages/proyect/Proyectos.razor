@@ -1,10 +1,274 @@
 ﻿@page "/proyect/proyectos"
-@attribute [StreamRendering]
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@rendermode InteractiveServer
+@using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Services
+@inject IJSRuntime JSRuntime
+@inject IConfiguration configuration
 
 <PageTitle>Proyectos</PageTitle>
+<div class="row align-content-center">
+    <div class="col-lg-8">
+        <h3 class="text-center mt-4">Gestión de proyectos</h3>
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-primary" @onclick="MostrarFormulario">
+                <i class="fas fa-plus"></i> Agregar Proyecto
+            </button>
+        </div>
 
-<h3>Proyectos</h3>
+        @if (mostrarAlerta)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @mensajeAlerta
+                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+            </div>
+        }
+
+
+        @if (proyectos is null)
+        {
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Cargando datos...</p>
+            </div>
+        }
+        else if (!proyectos.Any())
+        {
+            <div class="alert alert-info text-center">No hay proyectos disponibles.</div>
+        }
+        else
+        {
+            <table class="table table-striped table-hover">
+                <thead class="table-secondary bg-opacity-25">
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Fecha</th>
+                        <th>Departamento</th>
+                        <th>Categoria</th>
+                        <th>Estatus</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (p, index) in proyectos.Select((p, i) => (p, i + 1)))
+                    {
+                        <tr>
+                            <td>@p.IdProject</td>
+                            <td>@p.ProjectName</td>
+                            <td>@p.ProjectDate</td>
+                            <td>@p.Deparment.Name</td>
+                            <td>@p.Categories.Name</td>
+                            @switch (p.StatusProject)
+                            {
+                                case 0:
+                                    <td>Inactivo</td>
+                                    break;
+                                case 1:
+                                    <td>Activo</td>
+                                    break;
+                            }
+                            <td>
+                                <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.IdProject)">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@if (mostrarFormulario)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(proyectoActual.IdProject == 0 ? "Agregar" : "Editar")</h5>
+                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@proyectoActual" OnValidSubmit="GuardarEntidad">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre:</label>
+                            <InputText class="form-control" @bind-Value="proyectoActual.ProjectName" />
+                            <ValidationMessage For="@(() => proyectoActual.ProjectName)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha:</label>
+                            <InputDate class="form-control" @bind-Value="proyectoActual.ProjectDate" />
+                            <ValidationMessage For="@(() => proyectoActual.ProjectDate)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Departamentos:</label>
+                            <InputSelect class="form-select" @bind-Value="proyectoActual.IdDeparmento">
+                                <option value="-1">-- Seleccione uno --</option>
+                                @foreach (var item in departamento)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => proyectoActual.IdDeparmento)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Categorías:</label>
+                            <InputSelect class="form-select" @bind-Value="proyectoActual.idCategoria">
+                                <option value="-1">-- Seleccione uno --</option>
+                                @foreach (var item in categorias)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => proyectoActual.idCategoria)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripcion:</label>
+                            <InputText class="form-control" @bind-Value="proyectoActual.ProjectDescription" />
+                            <ValidationMessage For="@(() => proyectoActual.ProjectDescription)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Max Puches:</label>
+                            <InputNumber class="form-control" @bind-Value="proyectoActual.MaxPushes" />
+                            <ValidationMessage For="@(() => proyectoActual.MaxPushes)" />
+                        </div><div class="mb-3">
+                            <label class="form-label">Max Pulls:</label>
+                            <InputNumber class="form-control" @bind-Value="proyectoActual.MaxPulls" />
+                            <ValidationMessage For="@(() => proyectoActual.MaxPulls)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Estatus:</label>
+                            <InputSelect class="form-select" @bind-Value="proyectoActual.StatusProject">
+                                <option value="-1">-- Seleccione uno --</option>
+                                <option value="1">Activo</option>
+                                <option value="0">Inactivo</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => proyectoActual.StatusProject)" />
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    private List<Deparments> departamento = new();
+    private List<Categories> categorias = new();
+    private List<Projects> proyectos = new();
+    private CreateProject proyectoActual = new();
+    private bool mostrarFormulario = false;
+    private string? mensajeAlerta;
+    private bool mostrarAlerta = false;
+    private string username = string.Empty;
 
+    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = HttpContextAccessor.HttpContext.Session;
+        username = session.GetString("WindowsUser");
+
+        var urlbase = configuration.GetSection("ApiBack").Value.ToString();
+        var url1 = "/api/projects";
+
+        proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url1));
+
+        var url2 = "/api/deparments";
+        departamento = await repository.GetAsync<List<Deparments>>(string.Concat(urlbase, url2));
+        var url3 = "/api/categories";
+        categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url3));
+    }
+
+    private void MostrarFormulario()
+    {
+        proyectoActual = new CreateProject();
+        proyectoActual.IdDeparmento = -1;
+        proyectoActual.idCategoria = -1;
+        proyectoActual.StatusProject = -1;
+        proyectoActual.ProjectDate = DateTime.Now;
+        proyectoActual.CreatedDate = DateTime.Now;
+        proyectoActual.CreatedUser = username;
+        proyectoActual.UpdatedDate = DateTime.Now;
+        proyectoActual.UpdatedUser = username;
+
+        mostrarFormulario = true;
+    }
+
+    private void EditarEntidad(Projects proyecto)
+    {
+        proyectoActual = new CreateProject
+        {
+            IdProject = proyecto.IdProject,
+            ProjectName = proyecto.ProjectName,
+            ProjectDate = proyecto.ProjectDate,
+            IdDeparmento = proyecto.Deparment.Id,
+            idCategoria = proyecto.Categories.Id,
+            ProjectDescription = proyecto.ProjectDescription,
+            MaxPushes = proyecto.MaxPushes,
+            MaxPulls = proyecto.MaxPulls,
+            RutaImage = proyecto.RutaImage,
+            CreatedDate = proyecto.CreatedDate,
+            CreatedUser = proyecto.CreatedUser,
+            UpdatedDate = DateTime.Now,
+            UpdatedUser = username,
+            StatusProject = proyecto.StatusProject
+        };
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarEntidad()
+    {
+        var urlbase = configuration.GetSection("ApiBack").Value.ToString();
+        var url1 = "/api/projects/";
+        var url2 = $"/api/projects/{proyectoActual.IdProject}";
+
+        if (proyectoActual.IdProject == 0)
+            await repository.PostAsync(string.Concat(urlbase, url1), proyectoActual);
+        else
+            await repository.PutAsync(string.Concat(urlbase, url2), proyectoActual);
+
+        proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url1));
+        mostrarFormulario = false;
+        mensajeAlerta = "Proyecto guardado exitosamente.";
+        mostrarAlerta = true;
+    }
+
+    private async Task EliminarEntidad(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+        if (confirmed)
+        {
+            var urlbase = configuration.GetSection("ApiBack").Value.ToString();
+            var url1 = "/api/projects/";
+            var url2 = $"/api/projects/{id}";
+
+            await repository.DeleteAsync(string.Concat(urlbase, url2));
+            proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url1));
+            mensajeAlerta = "Proyecto eliminado exitosamente.";
+            mostrarAlerta = true;
+        }
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
 }

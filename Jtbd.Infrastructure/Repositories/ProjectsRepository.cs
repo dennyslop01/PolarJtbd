@@ -13,27 +13,42 @@ namespace Jtbd.Infrastructure.Repositories
     public class ProjectsRepository(JtbdDbContext context) : IProjects
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(Projects project)
+        public async Task<bool> CreateAsync(CreateProject project)
         {
-            var categoria = await _context.Categories.FindAsync(project.Categories!.Id);
+            Projects auxpro = new Projects();
+
+            var categoria = _context.Categories.Where(x => x.Id == project.idCategoria).FirstOrDefault();
             if (categoria != null)
             {
-                project.Categories = categoria;
+                auxpro.Categories = categoria;
             }
             else
             {
                 throw new InvalidOperationException("La categoría no existe.");
             }
-            var deparment = await _context.Deparments.FindAsync(project.Deparment!.Id);
+            var deparment = _context.Deparments.Where(x => x.Id == project.IdDeparmento).FirstOrDefault();
             if (deparment != null)
             {
-                project.Deparment = deparment;
+                auxpro.Deparment = deparment;
             }
             else
             {
                 throw new InvalidOperationException("El departamento no existe.");
             }
-            await _context.Projects.AddAsync(project);
+
+            auxpro.ProjectName = project.ProjectName;
+            auxpro.ProjectDate = project.ProjectDate;
+            auxpro.ProjectDescription = project.ProjectDescription;
+            auxpro.MaxPushes = project.MaxPushes;
+            auxpro.MaxPulls = project.MaxPulls;
+            auxpro.RutaImage = project.RutaImage;
+            auxpro.CreatedDate = project.CreatedDate;
+            auxpro.CreatedUser = project.CreatedUser;
+            auxpro.UpdatedDate = project.UpdatedDate;
+            auxpro.UpdatedUser = project.UpdatedUser;
+            auxpro.StatusProject = project.StatusProject;
+
+            await _context.Projects.AddAsync(auxpro);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -76,27 +91,43 @@ namespace Jtbd.Infrastructure.Repositories
             return producto!;
         }
 
-        public async Task<bool> UpdateAsync(Projects project)
+        public async Task<bool> UpdateAsync(CreateProject project)
         {
-            var categoria = await _context.Categories.FindAsync(project.Categories!.Id);
+            Projects auxpro = new Projects();
+
+            var categoria = _context.Categories.Where(x => x.Id == project.idCategoria).FirstOrDefault();
             if (categoria != null)
             {
-                project.Categories = categoria;
+                auxpro.Categories = categoria;
             }
             else
             {
                 throw new InvalidOperationException("La categoría no existe.");
             }
-            var deparment = await _context.Deparments.FindAsync(project.Deparment!.Id);
+            var deparment = _context.Deparments.Where(x => x.Id == project.IdDeparmento).FirstOrDefault();
             if (deparment != null)
             {
-                project.Deparment = deparment;
+                auxpro.Deparment = deparment;
             }
             else
             {
                 throw new InvalidOperationException("El departamento no existe.");
             }
-            _context.Projects.Update(project);
+
+            auxpro.IdProject = project.IdProject;
+            auxpro.ProjectName = project.ProjectName;
+            auxpro.ProjectDate = project.ProjectDate;
+            auxpro.ProjectDescription = project.ProjectDescription;
+            auxpro.MaxPushes = project.MaxPushes;
+            auxpro.MaxPulls = project.MaxPulls;
+            auxpro.RutaImage = project.RutaImage;
+            auxpro.CreatedDate = project.CreatedDate;
+            auxpro.CreatedUser = project.CreatedUser;
+            auxpro.UpdatedDate = project.UpdatedDate;
+            auxpro.UpdatedUser = project.UpdatedUser;
+            auxpro.StatusProject = project.StatusProject;
+
+            _context.Projects.Update(auxpro);
             await _context.SaveChangesAsync();
             return true;
         }

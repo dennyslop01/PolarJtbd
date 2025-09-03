@@ -49,7 +49,7 @@
                     @foreach (var (p, index) in departamento.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td>@index</td>
+                            <td>@p.Id</td>
                             <td>@p.Name</td>
                             <td>
                                 <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
@@ -80,7 +80,8 @@
                     <EditForm Model="departamentoActual" OnValidSubmit="GuardarEntidad">
                         <div class="mb-3">
                             <label class="form-label">Nombre:</label>
-                            <InputText class="form-control" @bind-Value="departamentoActual.Name" required />
+                            <InputText class="form-control" @bind-Value="departamentoActual.Name" />
+                            <ValidationMessage For="@(() => departamentoActual.Name)" />
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success me-2">
@@ -156,7 +157,7 @@
         {
             var urlbase = configuration.GetSection("ApiBack").Value.ToString();
             var url1 = "/api/deparments/";
-            var url2 = $"/api/deparments/{departamentoActual.Id}";
+            var url2 = $"/api/deparments/{id}";
 
             await repository.DeleteAsync(string.Concat(urlbase, url2));
             departamento = await repository.GetAsync<List<Deparments>>(string.Concat(urlbase, url1));

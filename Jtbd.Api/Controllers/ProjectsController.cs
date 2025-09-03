@@ -67,7 +67,7 @@ namespace Jtbd.Api.Controllers
 
         // POST: api/Projects
         [HttpPost]
-        public async Task<ActionResult> CrearProjects([FromBody] Projects nuevo)
+        public async Task<ActionResult> CrearProjects([FromBody] CreateProject nuevo)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace Jtbd.Api.Controllers
 
         // PUT: api/Projects/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> ActualizarProjects(int id, [FromBody] Projects Projects)
+        public async Task<ActionResult> ActualizarProjects(int id, [FromBody] CreateProject Projects)
         {
             if (id != Projects.IdProject)
             {

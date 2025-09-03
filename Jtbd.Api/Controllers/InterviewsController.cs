@@ -52,7 +52,7 @@ namespace Jtbd.Api.Controllers
 
         // POST: api/Interviews
         [HttpPost]
-        public async Task<ActionResult> CrearInterviews([FromBody] Interviews nuevo)
+        public async Task<ActionResult> CrearInterviews([FromBody] CreateInterview nuevo)
         {
             try
             {
@@ -61,7 +61,18 @@ namespace Jtbd.Api.Controllers
                     return BadRequest();
                 }
 
-                await _repository.CreateAsync(nuevo);
+                Interviews inter = new Interviews()
+                {
+                    InterName = nuevo.InterName,
+                    DateInter = nuevo.DateInter,
+                    InterAge = nuevo.InterAge,
+                    InterGender = nuevo.InterGender,
+                    InterNickname=nuevo.InterNickname,
+                    InterNSE = nuevo.InterNSE,
+                    InterOccupation = nuevo.InterOccupation
+
+                };
+                await _repository.CreateAsync(inter);
 
                 return CreatedAtAction(nameof(GetInterviews), new { id = nuevo.IdInter }, nuevo);
             }
@@ -74,7 +85,7 @@ namespace Jtbd.Api.Controllers
 
         // PUT: api/Interviews/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> ActualizarInterviews(int id, [FromBody] Interviews Interviews)
+        public async Task<ActionResult> ActualizarInterviews(int id, [FromBody] CreateInterview Interviews)
         {
             if (id != Interviews.IdInter)
             {
@@ -83,7 +94,20 @@ namespace Jtbd.Api.Controllers
 
             try
             {
-                await _repository.UpdateAsync(Interviews);
+                Interviews inter = new Interviews()
+                {
+                    IdInter = Interviews.IdInter,
+                    InterName = Interviews.InterName,
+                    DateInter = Interviews.DateInter,
+                    InterAge = Interviews.InterAge,
+                    InterGender = Interviews.InterGender,
+                    InterNickname = Interviews.InterNickname,
+                    InterNSE = Interviews.InterNSE,
+                    InterOccupation = Interviews.InterOccupation
+
+                };
+
+                await _repository.UpdateAsync(inter);
                 return NoContent();
             }
             catch (KeyNotFoundException)

@@ -11,6 +11,7 @@ namespace Jtbd.Domain.Entities
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
         [MaxLength(500)]
         public string EmployeeName { get; set; } = string.Empty;
         public int EmployeeRol { get; set; }

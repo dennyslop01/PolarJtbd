@@ -16,10 +16,15 @@ namespace Jtbd.Domain.Entities
         public string EmployeeName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El rol es obligatorio.")]
+        [Range(0, 1000, ErrorMessage = "El rol es obligatorio.")]
         public int EmployeeRol { get; set; }
 
         [Required(ErrorMessage = "El departamento es obligatorio.")]
+        [Range(0, 1000, ErrorMessage = "El departamento es obligatorio.")]
         public int IdDeparment { get; set; }
+
+        [Required(ErrorMessage = "El estatus es obligatorio.")]
+        [Range(0, 1000, ErrorMessage = "El estatus es obligatorio.")]
         public int StatusEmployee { get; set; } = 1;
     }
 }

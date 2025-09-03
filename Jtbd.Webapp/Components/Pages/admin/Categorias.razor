@@ -2,7 +2,6 @@
 @rendermode InteractiveServer
 @using Jtbd.Domain.Entities
 @using Jtbd.Webapp.Services
-@inject IConfiguration configuration
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 
@@ -50,7 +49,7 @@
                         @foreach (var (p, index) in categorias.Select((p, i) => (p, i + 1)))
                         {
                             <tr>
-                                <td>@index</td>
+                                <td>@p.Id</td>
                                 <td>@p.Name</td>
                                 <td>
                                     <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
@@ -79,9 +78,12 @@
                 </div>
                 <div class="modal-body">
                     <EditForm Model="categoriaActual" OnValidSubmit="GuardarEntidad">
+                        <DataAnnotationsValidator />
+
                         <div class="mb-3">
                             <label class="form-label">Nombre:</label>
-                            <InputText class="form-control" @bind-Value="categoriaActual.Name" required  />
+                            <InputText class="form-control" @bind-Value="categoriaActual.Name"  />
+                            <ValidationMessage For="@(() => categoriaActual.Name)" />
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success me-2">
@@ -157,7 +159,7 @@
         {
             var urlbase = configuration.GetSection("ApiBack").Value.ToString();
             var url1 = "/api/categories/";
-            var url2 = $"/api/categories/{categoriaActual.Id}";
+            var url2 = $"/api/categories/{id}";
 
             await repository.DeleteAsync(string.Concat(urlbase, url2));
             categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url1));
