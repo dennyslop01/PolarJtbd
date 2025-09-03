@@ -13,18 +13,27 @@ namespace Jtbd.Infrastructure.Repositories
     public class PushesGroupsRepository(JtbdDbContext context) : IPushesGroups
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(PushesGroups push)
+        public async Task<bool> CreateAsync(CreatePushes push)
         {
-            var project = await _context.Projects.FindAsync(push.Project!.IdProject);
+            PushesGroups auxPushes = new PushesGroups();
+            auxPushes.PushName = push.PushName;
+            auxPushes.PushDescription = push.PushDescription;
+            auxPushes.StatusPush = push.StatusPush;
+            auxPushes.CreatedUser = push.CreatedUser;
+            auxPushes.CreatedDate = push.CreatedDate;
+            auxPushes.UpdatedDate = push.UpdatedDate;
+            auxPushes.UpdatedUser = push.UpdatedUser;
+            
+            var project = _context.Projects.Where(x => x.IdProject == push.IdProject).FirstOrDefault();
             if (project != null)
             {
-                push.Project = project;
+                auxPushes.Project = project;
             }
             else
             {
                 throw new InvalidOperationException("El proyecto no existe.");
             }
-            await _context.PushesGroups.AddAsync(push);
+            await _context.PushesGroups.AddAsync(auxPushes);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -56,26 +65,36 @@ namespace Jtbd.Infrastructure.Repositories
             return push!;
         }
 
-        public async Task<PushesGroups> GetByProjectIdAsync(int id)
+        public async Task<IEnumerable<PushesGroups>> GetByProjectIdAsync(int id)
         {
             var push = await _context.PushesGroups
                  .Include(x => x.Project)
-                 .FirstOrDefaultAsync(x => x.Project.IdProject == id);
+                 .Where(x => x.Project.IdProject == id).ToListAsync();
             return push!;
         }
 
-        public async Task<bool> UpdateAsync(PushesGroups push)
+        public async Task<bool> UpdateAsync(CreatePushes push)
         {
-            var project = await _context.Projects.FindAsync(push.Project!.IdProject);
+            PushesGroups auxPushes = new PushesGroups();
+            auxPushes.IdPush = push.IdPush;
+            auxPushes.PushName = push.PushName;
+            auxPushes.PushDescription = push.PushDescription;
+            auxPushes.StatusPush = push.StatusPush;
+            auxPushes.CreatedUser = push.CreatedUser;
+            auxPushes.CreatedDate = push.CreatedDate;
+            auxPushes.UpdatedDate = push.UpdatedDate;
+            auxPushes.UpdatedUser = push.UpdatedUser;
+
+            var project = _context.Projects.Where(x => x.IdProject == push.IdProject).FirstOrDefault();
             if (project != null)
             {
-                push.Project = project;
+                auxPushes.Project = project;
             }
             else
             {
                 throw new InvalidOperationException("El proyecto no existe.");
             }
-            _context.PushesGroups.Update(push);
+            _context.PushesGroups.Update(auxPushes);
             await _context.SaveChangesAsync();
             return true;
         }

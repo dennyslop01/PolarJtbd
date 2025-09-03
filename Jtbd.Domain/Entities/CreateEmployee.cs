@@ -24,7 +24,7 @@ namespace Jtbd.Domain.Entities
         public int IdDeparment { get; set; }
 
         [Required(ErrorMessage = "El estatus es obligatorio.")]
-        [Range(0, 1000, ErrorMessage = "El estatus es obligatorio.")]
+        [Range(0, 1, ErrorMessage = "El estatus es obligatorio.")]
         public int StatusEmployee { get; set; } = 1;
     }
 }

@@ -106,13 +106,14 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private string urlbase = string.Empty;
 
     [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        var urlbase = configuration.GetSection("ApiBack").Value.ToString();
+        urlbase = configuration.GetSection("ApiBack").Value.ToString();
         var url1 = "/api/categories";
 
         categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url1));
@@ -137,7 +138,6 @@
 
     private async Task GuardarEntidad()
     {
-        var urlbase = configuration.GetSection("ApiBack").Value.ToString();
         var url1 = "/api/categories/";
         var url2 = $"/api/categories/{categoriaActual.Id}";
 
@@ -157,7 +157,6 @@
         bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
         if (confirmed)
         {
-            var urlbase = configuration.GetSection("ApiBack").Value.ToString();
             var url1 = "/api/categories/";
             var url2 = $"/api/categories/{id}";
 

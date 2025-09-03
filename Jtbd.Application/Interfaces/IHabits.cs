@@ -11,7 +11,7 @@ namespace Jtbd.Application.Interfaces
     {
         Task<IEnumerable<Habits>> GetAllAsync();
         Task<Habits> GetByIdAsync(int id);
-        Task<Habits> GetByProjectIdAsync(int id);
+        Task<IEnumerable<Habits>> GetByProjectIdAsync(int id);
         Task<bool> CreateAsync(Habits habits);
         Task<bool> UpdateAsync(Habits habits);
         Task<bool> DeleteAsync(int id);

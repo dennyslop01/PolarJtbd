@@ -11,9 +11,9 @@ namespace Jtbd.Application.Interfaces
     {
         Task<IEnumerable<PushesGroups>> GetAllAsync();
         Task<PushesGroups> GetByIdAsync(int id);
-        Task<PushesGroups> GetByProjectIdAsync(int id);
-        Task<bool> CreateAsync(PushesGroups push);
-        Task<bool> UpdateAsync(PushesGroups push);
+        Task<IEnumerable<PushesGroups>> GetByProjectIdAsync(int id);
+        Task<bool> CreateAsync(CreatePushes push);
+        Task<bool> UpdateAsync(CreatePushes push);
         Task<bool> DeleteAsync(int id);
     }
 }

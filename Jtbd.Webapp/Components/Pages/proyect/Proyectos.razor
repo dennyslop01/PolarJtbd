@@ -177,6 +177,7 @@
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private string username = string.Empty;
+    private string urlbase = string.Empty;
 
     [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -186,7 +187,7 @@
         var session = HttpContextAccessor.HttpContext.Session;
         username = session.GetString("WindowsUser");
 
-        var urlbase = configuration.GetSection("ApiBack").Value.ToString();
+        urlbase = configuration.GetSection("ApiBack").Value.ToString();
         var url1 = "/api/projects";
 
         proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url1));
@@ -236,7 +237,6 @@
 
     private async Task GuardarEntidad()
     {
-        var urlbase = configuration.GetSection("ApiBack").Value.ToString();
         var url1 = "/api/projects/";
         var url2 = $"/api/projects/{proyectoActual.IdProject}";
 
@@ -256,7 +256,6 @@
         bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
         if (confirmed)
         {
-            var urlbase = configuration.GetSection("ApiBack").Value.ToString();
             var url1 = "/api/projects/";
             var url2 = $"/api/projects/{id}";
 

@@ -67,7 +67,7 @@ namespace Jtbd.Api.Controllers
 
         // POST: api/PushesGroups
         [HttpPost]
-        public async Task<ActionResult> CrearPushesGroups([FromBody] PushesGroups nuevo)
+        public async Task<ActionResult> CrearPushesGroups([FromBody] CreatePushes nuevo)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace Jtbd.Api.Controllers
 
         // PUT: api/PushesGroups/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> ActualizarPushesGroups(int id, [FromBody] PushesGroups PushesGroups)
+        public async Task<ActionResult> ActualizarPushesGroups(int id, [FromBody] CreatePushes PushesGroups)
         {
             if (id != PushesGroups.IdPush)
             {

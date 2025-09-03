@@ -56,11 +56,11 @@ namespace Jtbd.Infrastructure.Repositories
             return pull!;
         }
 
-        public async Task<PullGroups> GetByProjectIdAsync(int id)
+        public async Task<IEnumerable<PullGroups>> GetByProjectIdAsync(int id)
         {
             var pull = await _context.PullGroups
                  .Include(x => x.Project)
-                 .FirstOrDefaultAsync(x => x.Project.IdProject == id);
+                 .Where(x => x.Project.IdProject == id).ToListAsync();
             return pull!;
         }
 

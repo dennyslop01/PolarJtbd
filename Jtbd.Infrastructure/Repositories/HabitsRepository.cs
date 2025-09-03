@@ -56,11 +56,11 @@ namespace Jtbd.Infrastructure.Repositories
             return habbit!;
         }
 
-        public async Task<Habits> GetByProjectIdAsync(int id)
+        public async Task<IEnumerable<Habits>> GetByProjectIdAsync(int id)
         {
             var habbit = await _context.Habits
                  .Include(x => x.Project)
-                 .FirstOrDefaultAsync(x => x.Project.IdProject == id);
+                 .Where(x => x.Project.IdProject == id).ToListAsync();
             return habbit!;
         }
 
