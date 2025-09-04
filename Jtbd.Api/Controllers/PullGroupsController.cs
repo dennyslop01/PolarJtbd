@@ -67,7 +67,7 @@ namespace Jtbd.Api.Controllers
 
         // POST: api/PullGroups
         [HttpPost]
-        public async Task<ActionResult> CrearPullGroups([FromBody] PullGroups nuevo)
+        public async Task<ActionResult> CrearPullGroups([FromBody] CreatePull nuevo)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace Jtbd.Api.Controllers
 
         // PUT: api/PullGroups/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> ActualizarPullGroups(int id, [FromBody] PullGroups PullGroups)
+        public async Task<ActionResult> ActualizarPullGroups(int id, [FromBody] CreatePull PullGroups)
         {
             if (id != PullGroups.IdPull)
             {

@@ -67,7 +67,7 @@ namespace Jtbd.Api.Controllers
 
         // POST: api/Anxieties
         [HttpPost]
-        public async Task<ActionResult> CrearAnxieties([FromBody] Anxieties nuevo)
+        public async Task<ActionResult> CrearAnxieties([FromBody] CreateAnxietie nuevo)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace Jtbd.Api.Controllers
 
         // PUT: api/Anxieties/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> ActualizarAnxieties(int id, [FromBody] Anxieties anxieties)
+        public async Task<ActionResult> ActualizarAnxieties(int id, [FromBody] CreateAnxietie anxieties)
         {
             if (id != anxieties.IdAnxie)
             {

@@ -13,18 +13,27 @@ namespace Jtbd.Infrastructure.Repositories
     public class AnxietiesRepository(JtbdDbContext context) : IAnxieties
     {
         private readonly JtbdDbContext _context = context;
-        public async Task<bool> CreateAsync(Anxieties anxieties)
+        public async Task<bool> CreateAsync(CreateAnxietie anxieties)
         {
-            var project = await _context.Projects.FindAsync(anxieties.Project!.IdProject);
+            Anxieties auxAnxie = new Anxieties();
+            auxAnxie.AnxieName = anxieties.AnxieName;
+            //auxHabbit.ha = habits.PullDescription;
+            auxAnxie.StatusAnxie = anxieties.StatusAnxie;
+            auxAnxie.CreatedUser = anxieties.CreatedUser;
+            auxAnxie.CreatedDate = anxieties.CreatedDate;
+            auxAnxie.UpdatedDate = anxieties.UpdatedDate;
+            auxAnxie.UpdatedUser = anxieties.UpdatedUser;
+
+            var project = _context.Projects.Where(x => x.IdProject == anxieties.IdProject).FirstOrDefault();
             if (project != null)
             {
-                anxieties.Project = project;
+                auxAnxie.Project = project;
             }
             else
             {
                 throw new InvalidOperationException("El proyecto no existe.");
             }
-            await _context.Anxieties.AddAsync(anxieties);
+            await _context.Anxieties.AddAsync(auxAnxie);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -64,18 +73,28 @@ namespace Jtbd.Infrastructure.Repositories
             return anxies!;
         }
 
-        public async Task<bool> UpdateAsync(Anxieties anxieties)
+        public async Task<bool> UpdateAsync(CreateAnxietie anxieties)
         {
-            var project = await _context.Projects.FindAsync(anxieties.Project!.IdProject);
+            Anxieties auxAnxie = new Anxieties();
+            auxAnxie.IdAnxie = anxieties.IdAnxie;
+            auxAnxie.AnxieName = anxieties.AnxieName;
+            //auxHabbit.ha = habits.PullDescription;
+            auxAnxie.StatusAnxie = anxieties.StatusAnxie;
+            auxAnxie.CreatedUser = anxieties.CreatedUser;
+            auxAnxie.CreatedDate = anxieties.CreatedDate;
+            auxAnxie.UpdatedDate = anxieties.UpdatedDate;
+            auxAnxie.UpdatedUser = anxieties.UpdatedUser;
+
+            var project = _context.Projects.Where(x => x.IdProject == anxieties.IdProject).FirstOrDefault();
             if (project != null)
             {
-                anxieties.Project = project;
+                auxAnxie.Project = project;
             }
             else
             {
                 throw new InvalidOperationException("El proyecto no existe.");
             }
-            _context.Anxieties.Update(anxieties);
+            _context.Anxieties.Update(auxAnxie);
             await _context.SaveChangesAsync();
             return true;
         }

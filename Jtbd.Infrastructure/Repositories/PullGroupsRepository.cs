@@ -13,18 +13,27 @@ namespace Jtbd.Infrastructure.Repositories
     public class PullGroupsRepository(JtbdDbContext context) : IPullGroups
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(PullGroups pull)
+        public async Task<bool> CreateAsync(CreatePull pull)
         {
-            var project = await _context.Projects.FindAsync(pull.Project!.IdProject);
+            PullGroups auxPull = new PullGroups();
+            auxPull.PullName = pull.PullName;
+            auxPull.PullDescription = pull.PullDescription;
+            auxPull.StatusPull = pull.StatusPull;
+            auxPull.CreatedUser = pull.CreatedUser;
+            auxPull.CreatedDate = pull.CreatedDate;
+            auxPull.UpdatedDate = pull.UpdatedDate;
+            auxPull.UpdatedUser = pull.UpdatedUser;
+
+            var project = _context.Projects.Where(x => x.IdProject == pull.IdProject).FirstOrDefault();
             if (project != null)
             {
-                pull.Project = project;
+                auxPull.Project = project;
             }
             else
             {
                 throw new InvalidOperationException("El proyecto no existe.");
             }
-            await _context.PullGroups.AddAsync(pull);
+            await _context.PullGroups.AddAsync(auxPull);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -64,18 +73,28 @@ namespace Jtbd.Infrastructure.Repositories
             return pull!;
         }
 
-        public async Task<bool> UpdateAsync(PullGroups pull)
+        public async Task<bool> UpdateAsync(CreatePull pull)
         {
-            var project = await _context.Projects.FindAsync(pull.Project!.IdProject);
+            PullGroups auxPull = new PullGroups();
+            auxPull.IdPull = pull.IdPull;
+            auxPull.PullName = pull.PullName;
+            auxPull.PullDescription = pull.PullDescription;
+            auxPull.StatusPull = pull.StatusPull;
+            auxPull.CreatedUser = pull.CreatedUser;
+            auxPull.CreatedDate = pull.CreatedDate;
+            auxPull.UpdatedDate = pull.UpdatedDate;
+            auxPull.UpdatedUser = pull.UpdatedUser;
+
+            var project = _context.Projects.Where(x => x.IdProject == pull.IdProject).FirstOrDefault();
             if (project != null)
             {
-                pull.Project = project;
+                auxPull.Project = project;
             }
             else
             {
                 throw new InvalidOperationException("El proyecto no existe.");
             }
-            _context.PullGroups.Update(pull);
+            _context.PullGroups.Update(auxPull);
             await _context.SaveChangesAsync();
             return true;
         }

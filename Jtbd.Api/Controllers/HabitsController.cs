@@ -67,7 +67,7 @@ namespace Jtbd.Api.Controllers
 
         // POST: api/Habits
         [HttpPost]
-        public async Task<ActionResult> CrearHabits([FromBody] Habits nuevo)
+        public async Task<ActionResult> CrearHabits([FromBody] CreateHabits nuevo)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace Jtbd.Api.Controllers
 
         // PUT: api/Habits/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> ActualizarHabits(int id, [FromBody] Habits Habits)
+        public async Task<ActionResult> ActualizarHabits(int id, [FromBody] CreateHabits Habits)
         {
             if (id != Habits.IdHabit)
             {

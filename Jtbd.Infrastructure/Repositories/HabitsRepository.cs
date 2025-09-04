@@ -13,18 +13,27 @@ namespace Jtbd.Infrastructure.Repositories
     public class HabitsRepository(JtbdDbContext context) : IHabits
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(Habits habits)
+        public async Task<bool> CreateAsync(CreateHabits habits)
         {
-            var project = await _context.Projects.FindAsync(habits.Project!.IdProject);
+            Habits auxHabbit = new Habits();
+            auxHabbit.HabitName = habits.HabitName;
+            //auxHabbit.ha = habits.PullDescription;
+            auxHabbit.StatusHabit = habits.StatusHabit;
+            auxHabbit.CreatedUser = habits.CreatedUser;
+            auxHabbit.CreatedDate = habits.CreatedDate;
+            auxHabbit.UpdatedDate = habits.UpdatedDate;
+            auxHabbit.UpdatedUser = habits.UpdatedUser;
+
+            var project = _context.Projects.Where(x => x.IdProject == habits.IdProject).FirstOrDefault();
             if (project != null)
             {
-                habits.Project = project;
+                auxHabbit.Project = project;
             }
             else
             {
                 throw new InvalidOperationException("El proyecto no existe.");
             }
-            await _context.Habits.AddAsync(habits);
+            await _context.Habits.AddAsync(auxHabbit);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -64,18 +73,28 @@ namespace Jtbd.Infrastructure.Repositories
             return habbit!;
         }
 
-        public async Task<bool> UpdateAsync(Habits habits)
+        public async Task<bool> UpdateAsync(CreateHabits habits)
         {
-            var project = await _context.Projects.FindAsync(habits.Project!.IdProject);
+            Habits auxHabbit = new Habits();
+            auxHabbit.IdHabit = habits.IdHabit;
+            auxHabbit.HabitName = habits.HabitName;
+            //auxHabbit.ha = habits.PullDescription;
+            auxHabbit.StatusHabit = habits.StatusHabit;
+            auxHabbit.CreatedUser = habits.CreatedUser;
+            auxHabbit.CreatedDate = habits.CreatedDate;
+            auxHabbit.UpdatedDate = habits.UpdatedDate;
+            auxHabbit.UpdatedUser = habits.UpdatedUser;
+
+            var project = _context.Projects.Where(x => x.IdProject == habits.IdProject).FirstOrDefault();
             if (project != null)
             {
-                habits.Project = project;
+                auxHabbit.Project = project;
             }
             else
             {
                 throw new InvalidOperationException("El proyecto no existe.");
             }
-            _context.Habits.Update(habits);
+            _context.Habits.Update(auxHabbit);
             await _context.SaveChangesAsync();
             return true;
         }

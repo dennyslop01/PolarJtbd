@@ -12,8 +12,8 @@ namespace Jtbd.Application.Interfaces
         Task<IEnumerable<PullGroups>> GetAllAsync();
         Task<PullGroups> GetByIdAsync(int id);
         Task<IEnumerable<PullGroups>> GetByProjectIdAsync(int id);
-        Task<bool> CreateAsync(PullGroups pull);
-        Task<bool> UpdateAsync(PullGroups pull);
+        Task<bool> CreateAsync(CreatePull pull);
+        Task<bool> UpdateAsync(CreatePull pull);
         Task<bool> DeleteAsync(int id);
     }
 }

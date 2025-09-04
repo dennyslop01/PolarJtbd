@@ -1,0 +1,248 @@
+﻿@page "/proyect/proyecanxiets"
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@rendermode InteractiveServer
+@using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Services
+@inject IJSRuntime JSRuntime
+@inject IConfiguration configuration
+
+<PageTitle>Proyectos Ansiedades</PageTitle>
+<div class="row align-content-center">
+    <div class="col-lg-6">
+        <h3 class="text-center mt-4">Gestión de proyectos Ansiedades</h3>
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-primary" @onclick="MostrarFormulario">
+                <i class="fas fa-plus"></i> Agregar Ansiedades
+            </button>
+        </div>
+        <EditForm Model="@Model">
+            <div class="mb-3">
+                <label class="form-label">Proyectos:</label>
+                <InputSelect class="form-select" Value="Model.idProyecto" ValueChanged="@((int value) => OnProyectChanged(value))" ValueExpression="@(() => Model.idProyecto)">
+                    <option value="-1">-- Seleccione uno --</option>
+                    @foreach (var item in proyectos)
+                    {
+                        <option value="@item.IdProject">@item.ProjectName</option>
+                    }
+                </InputSelect>
+            </div>
+        </EditForm>
+
+        @if (mostrarAlerta)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @mensajeAlerta
+                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+            </div>
+        }
+
+
+        @if (anxiets is null)
+        {
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Cargando datos...</p>
+            </div>
+        }
+        else if (!anxiets.Any())
+        {
+            <div class="alert alert-info text-center">No hay ansiedades disponibles.</div>
+        }
+        else
+        {
+            <table class="table table-striped table-hover">
+                <thead class="table-secondary bg-opacity-25">
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Estatus</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (p, index) in anxiets.Select((p, i) => (p, i + 1)))
+                    {
+                        <tr>
+                            <td>@p.IdAnxie</td>
+                            <td>@p.AnxieName</td>
+                            @switch (p.StatusAnxie)
+                            {
+                                case 0:
+                                    <td>Inactivo</td>
+                                    break;
+                                case 1:
+                                    <td>Activo</td>
+                                    break;
+                            }
+                            <td>
+                                <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.IdAnxie)">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@if (mostrarFormulario)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(entidadActual.IdProject == 0 ? "Agregar" : "Editar")</h5>
+                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@entidadActual" OnValidSubmit="GuardarEntidad">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre:</label>
+                            <InputText class="form-control" @bind-Value="entidadActual.AnxieName" />
+                            <ValidationMessage For="@(() => entidadActual.AnxieName)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Estatus:</label>
+                            <InputSelect class="form-select" @bind-Value="entidadActual.StatusAnxie">
+                                <option value="-1">-- Seleccione uno --</option>
+                                <option value="1">Activo</option>
+                                <option value="0">Inactivo</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => entidadActual.StatusAnxie)" />
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public class Proyecto
+    {
+        public int idProyecto { get; set; }
+    }
+
+    public Proyecto Model { get; set; } = new Proyecto();
+    private List<Projects> proyectos = new();
+    private List<Anxieties> anxiets = new();
+    private CreateAnxietie entidadActual = new();
+    private bool mostrarFormulario = false;
+    private string? mensajeAlerta;
+    private bool mostrarAlerta = false;
+    private string username = string.Empty;
+    private string urlbase = string.Empty;
+
+    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = HttpContextAccessor.HttpContext.Session;
+        username = session.GetString("WindowsUser");
+
+        urlbase = configuration.GetSection("ApiBack").Value.ToString();
+
+        var url2 = "/api/projects";
+        proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url2));
+    }
+
+    private void MostrarFormulario()
+    {
+        if (Model.idProyecto > 0)
+        {
+            entidadActual = new CreateAnxietie();
+            entidadActual.IdProject = Model.idProyecto;
+            entidadActual.StatusAnxie = -1;
+            entidadActual.CreatedDate = DateTime.Now;
+            entidadActual.CreatedUser = username;
+            entidadActual.UpdatedDate = DateTime.Now;
+            entidadActual.UpdatedUser = username;
+
+            mostrarFormulario = true;
+        }
+    }
+
+    private void EditarEntidad(Anxieties entidad)
+    {
+        if (Model.idProyecto > 0)
+        {
+            entidadActual = new CreateAnxietie
+            {
+                IdProject = entidad.Project.IdProject,
+                IdAnxie = entidad.IdAnxie,
+                AnxieName = entidad.AnxieName,
+                CreatedDate = entidad.CreatedDate,
+                CreatedUser = entidad.CreatedUser,
+                UpdatedDate = DateTime.Now,
+                UpdatedUser = username,
+                StatusAnxie = entidad.StatusAnxie
+            };
+            mostrarFormulario = true;
+        }
+    }
+
+    private async Task GuardarEntidad()
+    {
+        var url1 = "/api/anxieties/";
+        var url2 = $"/api/anxieties/{entidadActual.IdProject}";
+
+        if (entidadActual.IdAnxie == 0)
+            await repository.PostAsync(string.Concat(urlbase, url1), entidadActual);
+        else
+            await repository.PutAsync(string.Concat(urlbase, url2), entidadActual);
+
+
+        url1 = $"/api/anxieties/anxietiesProject/{Model.idProyecto}";
+        anxiets = await repository.GetAsync<List<Anxieties>>(string.Concat(urlbase, url1));
+
+        mostrarFormulario = false;
+        mensajeAlerta = "Ansiedad guardado exitosamente.";
+        mostrarAlerta = true;
+    }
+
+    private async Task EliminarEntidad(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+        if (confirmed)
+        {
+            var url1 = "/api/anxieties/";
+            var url2 = $"/api/anxieties/{id}";
+
+            await repository.DeleteAsync(string.Concat(urlbase, url2));
+            url1 = $"/api/anxieties/anxietiesProject/{Model.idProyecto}";
+            anxiets = await repository.GetAsync<List<Anxieties>>(string.Concat(urlbase, url1));
+
+            mensajeAlerta = "Ansiedad eliminado exitosamente.";
+            mostrarAlerta = true;
+        }
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task OnProyectChanged(int value)
+    {
+        Model.idProyecto = value;
+        var url1 = $"/api/anxieties/anxietiesProject/{value}";
+        anxiets = await repository.GetAsync<List<Anxieties>>(string.Concat(urlbase, url1));
+    }
+}

@@ -12,8 +12,8 @@ namespace Jtbd.Application.Interfaces
         Task<IEnumerable<Anxieties>> GetAllAsync();
         Task<Anxieties> GetByIdAsync(int id);
         Task<IEnumerable<Anxieties>> GetByProjectIdAsync(int id);
-        Task<bool> CreateAsync(Anxieties anxieties);
-        Task<bool> UpdateAsync(Anxieties anxieties);
+        Task<bool> CreateAsync(CreateAnxietie anxieties);
+        Task<bool> UpdateAsync(CreateAnxietie anxieties);
         Task<bool> DeleteAsync(int id);
     }
 }
