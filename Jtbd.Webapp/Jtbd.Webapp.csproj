@@ -7,11 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\lib\bootstrap\**" />
+    <Content Remove="wwwroot\lib\bootstrap\**" />
+    <EmbeddedResource Remove="wwwroot\lib\bootstrap\**" />
+    <None Remove="wwwroot\lib\bootstrap\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BootstrapBlazor" Version="9.10.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Jtbd.Application\Jtbd.Application.csproj" />
     <ProjectReference Include="..\Jtbd.Domain\Jtbd.Domain.csproj" />
+    <ProjectReference Include="..\Jtbd.Infrastructure\Jtbd.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

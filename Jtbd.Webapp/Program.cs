@@ -1,5 +1,9 @@
+using Jtbd.Application.Interfaces;
+using Jtbd.Infrastructure.DataContext;
+using Jtbd.Infrastructure.Repositories;
 using Jtbd.Webapp.Components;
 using Jtbd.Webapp.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,11 +18,24 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddDbContext<JtbdDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConn")));
+
 builder.Services.AddHttpContextAccessor();
 
 string apiBack = builder.Configuration.GetSection("ApiBack").Value.ToString();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBack) });
 builder.Services.AddScoped<IRepositoryGeneric, RepositoryGeneric>();
+builder.Services.AddScoped<IAnxieties, AnxietiesRepository>();
+builder.Services.AddScoped<ICategories, CategoriesRepository>();
+builder.Services.AddScoped<IDeparments, DeparmentsRepository>();
+builder.Services.AddScoped<IEmployee, EmployeeRepository>();
+builder.Services.AddScoped<IHabits, HabitsRepository>();
+builder.Services.AddScoped<IInterviews, InterviewsRepository>();
+builder.Services.AddScoped<IProjects, ProjectsRepository>();
+builder.Services.AddScoped<IPullGroups, PullGroupsRepository>();
+builder.Services.AddScoped<IPushesGroups, PushesGroupsRepository>();
+builder.Services.AddScoped<IStories, StoriesRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,7 +47,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseSession();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 
 app.UseAntiforgery();

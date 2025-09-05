@@ -1,8 +1,10 @@
 ﻿@rendermode InteractiveServer
 
 <div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Jtbd.Webapp</a>
+    <div class="container-fluid align-content-center">
+        <a class="navbar-brand" href="">
+            <img src="logoinnova.png" />
+        </a>
     </div>
 </div>
 
@@ -52,6 +54,11 @@
                     <li class="nav-item px-3">
                         <NavLink class="nav-link" href="proyect/proyecanxiets" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
                             <p><i class="bi bi-grid-3x2-gap m-1"></i> Ansiedades</p>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="proyect/proyecstories" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
+                            <p><i class="bi bi-list-columns-reverse m-1"></i> Historias</p>
                         </NavLink>
                     </li>
                 </ul>

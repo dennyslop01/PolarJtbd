@@ -1,5 +1,6 @@
 ﻿@page "/admin/categorias"
 @rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
@@ -108,7 +109,7 @@
     private bool mostrarAlerta = false;
     private string urlbase = string.Empty;
 
-    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
+    [Inject] private ICategories repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
@@ -116,7 +117,7 @@
         urlbase = configuration.GetSection("ApiBack").Value.ToString();
         var url1 = "/api/categories";
 
-        categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url1));
+        categorias = (List<Categories>)await repository.GetAllAsync();
     }
 
     private void MostrarFormulario()
@@ -142,11 +143,11 @@
         var url2 = $"/api/categories/{categoriaActual.Id}";
 
         if (categoriaActual.Id == 0)
-            await repository.PostAsync(string.Concat(urlbase, url1), categoriaActual);
+            await repository.CreateAsync(categoriaActual);
         else
-            await repository.PutAsync(string.Concat(urlbase, url2), categoriaActual);
+            await repository.UpdateAsync(categoriaActual);
 
-        categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url1));
+        categorias = (List<Categories>)await repository.GetAllAsync();
         mostrarFormulario = false;
         mensajeAlerta = "Categoria guardada exitosamente.";
         mostrarAlerta = true;
@@ -160,8 +161,8 @@
             var url1 = "/api/categories/";
             var url2 = $"/api/categories/{id}";
 
-            await repository.DeleteAsync(string.Concat(urlbase, url2));
-            categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url1));
+            //await repository.DeleteAsync(string.Concat(urlbase, url2));
+            categorias = (List<Categories>)await repository.GetAllAsync();
             mensajeAlerta = "Categoria eliminada exitosamente.";
             mostrarAlerta = true;
         }

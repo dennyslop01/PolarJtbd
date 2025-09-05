@@ -7,21 +7,22 @@ using System.Threading.Tasks;
 
 namespace Jtbd.Domain.Entities
 {
-    public class Stories
+    public class CreateStorie
     {
-        [Key] 
         public int IdStorie { get; set; }
-        public Projects? Project { get; set; }
+        public int IdProject { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El titulo es obligatorio.")]
         [MaxLength(100)]
         public string TitleStorie { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "El contexto es obligatorio.")]
         [MaxLength(4000)]
-        public string ContextStorie { get;set; } = string.Empty;
+        public string ContextStorie { get; set; } = string.Empty;
 
-        public Interviews? Interviews { get; set; }
+
+        [Range(0, 10000, ErrorMessage = "El entrevistado es obligatorio.")] 
+        public int IdInter { get; set; }
         public string CreatedUser { get; set; } = string.Empty;
         public string UpdatedUser { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
