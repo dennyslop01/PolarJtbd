@@ -1,9 +1,10 @@
 ﻿@page "/admin/departamentos"
 @rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
+@inject ILogger<Departamentos> Logger
 
 <PageTitle>Departamentos</PageTitle>
 <div class="row align-content-center">
@@ -104,64 +105,88 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string urlbase = string.Empty;
 
-    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IDeparments repository { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        urlbase = configuration.GetSection("ApiBack").Value.ToString();
-        var url1 = "/api/deparments";
-
-        departamento = await repository.GetAsync<List<Deparments>>(string.Concat(urlbase, url1));
+        try
+        {
+            departamento = (List<Deparments>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void MostrarFormulario()
     {
-
-        departamentoActual = new Deparments();
-        mostrarFormulario = true;
+        try
+        {
+            departamentoActual = new Deparments();
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void EditarEntidad(Deparments deparmento)
     {
-        departamentoActual = new Deparments
+        try
         {
-            Id = deparmento.Id,
-            Name = deparmento.Name,
-        };
-        mostrarFormulario = true;
+            departamentoActual = new Deparments
+                {
+                    Id = deparmento.Id,
+                    Name = deparmento.Name,
+                };
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task GuardarEntidad()
     {
-        var url1 = "/api/deparments/";
-        var url2 = $"/api/deparments/{departamentoActual.Id}";
+        try
+        {
+            if (departamentoActual.Id == 0)
+                await repository.CreateAsync(departamentoActual);
+            else
+                await repository.UpdateAsync(departamentoActual);
 
-        if (departamentoActual.Id == 0)
-            await repository.PostAsync(string.Concat(urlbase, url1), departamentoActual);
-        else
-            await repository.PutAsync(string.Concat(urlbase, url2), departamentoActual);
-
-        departamento = await repository.GetAsync<List<Deparments>>(string.Concat(urlbase, url1));
-        mostrarFormulario = false;
-        mensajeAlerta = "Deparmento guardad0 exitosamente.";
-        mostrarAlerta = true;
+            departamento = (List<Deparments>)await repository.GetAllAsync();
+            mostrarFormulario = false;
+            mensajeAlerta = "Deparmento guardad0 exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task EliminarEntidad(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
-        if (confirmed)
+        try
         {
-            var url1 = "/api/deparments/";
-            var url2 = $"/api/deparments/{id}";
-
-            await repository.DeleteAsync(string.Concat(urlbase, url2));
-            departamento = await repository.GetAsync<List<Deparments>>(string.Concat(urlbase, url1));
-            mensajeAlerta = "Deparmento eliminad0 exitosamente.";
-            mostrarAlerta = true;
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
+                await repository.DeleteAsync(id);
+                departamento = (List<Deparments>)await repository.GetAllAsync();
+                mensajeAlerta = "Deparmento eliminad0 exitosamente.";
+                mostrarAlerta = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 

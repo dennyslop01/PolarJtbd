@@ -1,9 +1,10 @@
 ﻿@page "/admin/usuarios"
 @rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
+@inject ILogger<Usuarios> Logger
 
 <PageTitle>Usuarios</PageTitle>
 <div class="row align-content-center">
@@ -163,72 +164,95 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string urlbase = string.Empty;
 
-    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IEmployee repository { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        urlbase = configuration.GetSection("ApiBack").Value.ToString();
-        var url1 = "/api/employee";
-
-        usuarios = await repository.GetAsync<List<Employee>>(string.Concat(urlbase, url1));
-
-        var url2 = "/api/deparments";
-        departamento = await repository.GetAsync<List<Deparments>>(string.Concat(urlbase, url2));
+        try
+        {
+            usuarios = (List<Employee>)await repository.GetAllAsync();
+            departamento = (List<Deparments>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void MostrarFormulario()
     {
-        usuarioActual = new CreateEmployee();
-        usuarioActual.IdDeparment = -1;
-        usuarioActual.EmployeeRol = -1;
-        usuarioActual.StatusEmployee = -1;
-        mostrarFormulario = true;
+        try
+        {
+            usuarioActual = new CreateEmployee();
+            usuarioActual.IdDeparment = -1;
+            usuarioActual.EmployeeRol = -1;
+            usuarioActual.StatusEmployee = -1;
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void EditarEntidad(Employee usuario)
     {
-        usuarioActual = new CreateEmployee
+        try
         {
-            Id = usuario.Id,
-            EmployeeName = usuario.EmployeeName,
-            EmployeeRol = usuario.EmployeeRol,
-            IdDeparment = usuario.Deparments.Id,
-            StatusEmployee = usuario.StatusEmployee
-        };
-        mostrarFormulario = true;
+            usuarioActual = new CreateEmployee
+                {
+                    Id = usuario.Id,
+                    EmployeeName = usuario.EmployeeName,
+                    EmployeeRol = usuario.EmployeeRol,
+                    IdDeparment = usuario.Deparments.Id,
+                    StatusEmployee = usuario.StatusEmployee
+                };
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task GuardarEntidad()
     {
-        var url1 = "/api/employee/";
-        var url2 = $"/api/employee/{usuarioActual.Id}";
+        try
+        {
+            if (usuarioActual.Id == 0)
+                await repository.CreateAsync( usuarioActual);
+            else
+                await repository.UpdateAsync( usuarioActual);
 
-        if (usuarioActual.Id == 0)
-            await repository.PostAsync(string.Concat(urlbase, url1), usuarioActual);
-        else
-            await repository.PutAsync(string.Concat(urlbase, url2), usuarioActual);
-
-        usuarios = await repository.GetAsync<List<Employee>>(string.Concat(urlbase, url1));
-        mostrarFormulario = false;
-        mensajeAlerta = "Usuario guardado exitosamente.";
-        mostrarAlerta = true;
+            usuarios = (List<Employee>) await repository.GetAllAsync();
+            mostrarFormulario = false;
+            mensajeAlerta = "Usuario guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task EliminarEntidad(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
-        if (confirmed)
+        try
         {
-            var url1 = "/api/employee/";
-            var url2 = $"/api/employee/{id}";
-
-            await repository.DeleteAsync(string.Concat(urlbase, url2));
-            usuarios = await repository.GetAsync<List<Employee>>(string.Concat(urlbase, url1));
-            mensajeAlerta = "Usuario eliminado exitosamente.";
-            mostrarAlerta = true;
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
+                await repository.DeleteAsync(id);
+                usuarios = (List<Employee>)await repository.GetAllAsync();
+                mensajeAlerta = "Usuario eliminado exitosamente.";
+                mostrarAlerta = true;
+            }
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 

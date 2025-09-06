@@ -2,10 +2,11 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
+@inject ILogger<Proyechabits> Logger
 
 <PageTitle>Proyectos Hábitos</PageTitle>
 <div class="row align-content-center">
@@ -147,90 +148,112 @@
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private string username = string.Empty;
-    private string urlbase = string.Empty;
 
-    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IHabits repository { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        var session = HttpContextAccessor.HttpContext.Session;
-        username = session.GetString("WindowsUser");
+        try
+        {
+            var session = HttpContextAccessor.HttpContext.Session;
+            username = session.GetString("WindowsUser");
 
-        urlbase = configuration.GetSection("ApiBack").Value.ToString();
-
-        var url2 = "/api/projects";
-        proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url2));
+            proyectos = (List<Projects>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void MostrarFormulario()
     {
-        if (Model.idProyecto > 0)
+        try
         {
-            entidadActual = new CreateHabits();
-            entidadActual.IdProject = Model.idProyecto;
-            entidadActual.StatusHabit = -1;
-            entidadActual.CreatedDate = DateTime.Now;
-            entidadActual.CreatedUser = username;
-            entidadActual.UpdatedDate = DateTime.Now;
-            entidadActual.UpdatedUser = username;
+            if (Model.idProyecto > 0)
+            {
+                entidadActual = new CreateHabits();
+                entidadActual.IdProject = Model.idProyecto;
+                entidadActual.StatusHabit = -1;
+                entidadActual.CreatedDate = DateTime.Now;
+                entidadActual.CreatedUser = username;
+                entidadActual.UpdatedDate = DateTime.Now;
+                entidadActual.UpdatedUser = username;
 
-            mostrarFormulario = true;
+                mostrarFormulario = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
     private void EditarEntidad(Habits entidad)
     {
-        if (Model.idProyecto > 0)
+        try
         {
-            entidadActual = new CreateHabits
+            if (Model.idProyecto > 0)
             {
-                IdProject = entidad.Project.IdProject,
-                IdHabit = entidad.IdHabit,
-                HabitName = entidad.HabitName,
-                CreatedDate = entidad.CreatedDate,
-                CreatedUser = entidad.CreatedUser,
-                UpdatedDate = DateTime.Now,
-                UpdatedUser = username,
-                StatusHabit = entidad.StatusHabit
-            };
-            mostrarFormulario = true;
+                entidadActual = new CreateHabits
+                    {
+                        IdProject = entidad.Project.IdProject,
+                        IdHabit = entidad.IdHabit,
+                        HabitName = entidad.HabitName,
+                        CreatedDate = entidad.CreatedDate,
+                        CreatedUser = entidad.CreatedUser,
+                        UpdatedDate = DateTime.Now,
+                        UpdatedUser = username,
+                        StatusHabit = entidad.StatusHabit
+                    };
+                mostrarFormulario = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
     private async Task GuardarEntidad()
     {
-        var url1 = "/api/habits/";
-        var url2 = $"/api/habits/{entidadActual.IdProject}";
+        try
+        {
+            if (entidadActual.IdHabit == 0)
+                await repository.CreateAsync(entidadActual);
+            else
+                await repository.UpdateAsync(entidadActual);
 
-        if (entidadActual.IdHabit == 0)
-            await repository.PostAsync(string.Concat(urlbase, url1), entidadActual);
-        else
-            await repository.PutAsync(string.Concat(urlbase, url2), entidadActual);
+            habits = (List<Habits>)await repository.GetAllAsync();
 
-
-        url1 = $"/api/habits/habitsproject/{Model.idProyecto}";
-        habits = await repository.GetAsync<List<Habits>>(string.Concat(urlbase, url1));
-
-        mostrarFormulario = false;
-        mensajeAlerta = "Hábito guardado exitosamente.";
-        mostrarAlerta = true;
+            mostrarFormulario = false;
+            mensajeAlerta = "Hábito guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task EliminarEntidad(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
-        if (confirmed)
+        try
         {
-            var url1 = "/api/habits/";
-            var url2 = $"/api/habits/{id}";
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
+                await repository.DeleteAsync(id);
+                habits = (List<Habits>)await repository.GetAllAsync();
 
-            await repository.DeleteAsync(string.Concat(urlbase, url2));
-            url1 = $"/api/habits/habitsproject/{Model.idProyecto}";
-            habits = await repository.GetAsync<List<Habits>>(string.Concat(urlbase, url1));
-
-            mensajeAlerta = "Hábito eliminado exitosamente.";
-            mostrarAlerta = true;
+                mensajeAlerta = "Hábito eliminado exitosamente.";
+                mostrarAlerta = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
@@ -241,8 +264,14 @@
 
     private async Task OnProyectChanged(int value)
     {
-        Model.idProyecto = value;
-        var url1 = $"/api/habits/habitsproject/{value}";
-        habits = await repository.GetAsync<List<Habits>>(string.Concat(urlbase, url1));
+        try
+        {
+            Model.idProyecto = value;
+            habits = (List<Habits>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 }

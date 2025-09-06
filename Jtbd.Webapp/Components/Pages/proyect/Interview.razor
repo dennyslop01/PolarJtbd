@@ -1,9 +1,10 @@
 ﻿@page "/proyect/interview"
 @rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
+@inject ILogger<Interview> Logger
 
 <PageTitle>Entrevistados</PageTitle>
 <div class="row align-content-center">
@@ -160,71 +161,96 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string urlbase = string.Empty;
 
-    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IInterviews repository { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        urlbase = configuration.GetSection("ApiBack").Value.ToString();
-        var url1 = "/api/interviews";
-
-        entrevistados = await repository.GetAsync<List<Interviews>>(string.Concat(urlbase, url1));
+        try
+        {
+            entrevistados = (List<Interviews>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void MostrarFormulario()
     {
-        entrevistadoActual = new CreateInterview();
-        entrevistadoActual.InterGender = -1;
-        entrevistadoActual.DateInter = DateTime.Now;
-        mostrarFormulario = true;
+        try
+        {
+            entrevistadoActual = new CreateInterview();
+            entrevistadoActual.InterGender = -1;
+            entrevistadoActual.DateInter = DateTime.Now;
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void EditarEntidad(Interviews entrevistado)
     {
-        entrevistadoActual = new CreateInterview
+        try
         {
-            IdInter = entrevistado.IdInter,
-            InterName = entrevistado.InterName,
-            InterAge = entrevistado.InterAge,
-            InterGender = entrevistado.InterGender,
-            InterOccupation = entrevistado.InterOccupation,
-            InterNickname = entrevistado.InterNickname,
-            InterNSE = entrevistado.InterNSE,
-            DateInter = entrevistado.DateInter
-        };
-        mostrarFormulario = true;
+            entrevistadoActual = new CreateInterview
+                {
+                    IdInter = entrevistado.IdInter,
+                    InterName = entrevistado.InterName,
+                    InterAge = entrevistado.InterAge,
+                    InterGender = entrevistado.InterGender,
+                    InterOccupation = entrevistado.InterOccupation,
+                    InterNickname = entrevistado.InterNickname,
+                    InterNSE = entrevistado.InterNSE,
+                    DateInter = entrevistado.DateInter
+                };
+            mostrarFormulario = true;
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task GuardarEntidad()
     {
-        var url1 = "/api/interviews/";
-        var url2 = $"/api/interviews/{entrevistadoActual.IdInter}";
+        try
+        {
+            if (entrevistadoActual.IdInter == 0)
+                await repository.CreateAsync(entrevistadoActual);
+            else
+                await repository.UpdateAsync(entrevistadoActual);
 
-        if (entrevistadoActual.IdInter == 0)
-            await repository.PostAsync(string.Concat(urlbase, url1), entrevistadoActual);
-        else
-            await repository.PutAsync(string.Concat(urlbase, url2), entrevistadoActual);
-
-        entrevistados = await repository.GetAsync<List<Interviews>>(string.Concat(urlbase, url1));
-        mostrarFormulario = false;
-        mensajeAlerta = "Usuario guardado exitosamente.";
-        mostrarAlerta = true;
+            entrevistados = (List<Interviews>)await repository.GetAllAsync();
+            mostrarFormulario = false;
+            mensajeAlerta = "Usuario guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task EliminarEntidad(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
-        if (confirmed)
+        try
         {
-            var url1 = "/api/interviews/";
-            var url2 = $"/api/interviews/{id}";
-
-            await repository.DeleteAsync(string.Concat(urlbase, url2));
-            entrevistados = await repository.GetAsync<List<Interviews>>(string.Concat(urlbase, url1));
-            mensajeAlerta = "Usuario eliminado exitosamente.";
-            mostrarAlerta = true;
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
+                await repository.DeleteAsync(id);
+                entrevistados = (List<Interviews>)await repository.GetAllAsync();
+                mensajeAlerta = "Usuario eliminado exitosamente.";
+                mostrarAlerta = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 

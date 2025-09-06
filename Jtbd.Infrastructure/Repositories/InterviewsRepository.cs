@@ -13,9 +13,20 @@ namespace Jtbd.Infrastructure.Repositories
     public class InterviewsRepository(JtbdDbContext context) : IInterviews
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(Interviews interviews)
+        public async Task<bool> CreateAsync(CreateInterview interviews)
         {
-            await _context.Interviews.AddAsync(interviews);
+            Interviews auxInter = new Interviews()
+            {
+                IdInter = interviews.IdInter,
+                InterName = interviews.InterName,
+                InterAge = interviews.InterAge,
+                InterGender = interviews.InterGender,
+                InterOccupation = interviews.InterOccupation,
+                InterNickname = interviews.InterNickname,
+                InterNSE = interviews.InterNSE,
+                DateInter = interviews.DateInter
+            };
+            await _context.Interviews.AddAsync(auxInter);
             await _context.SaveChangesAsync();
 
             return true;
@@ -45,9 +56,20 @@ namespace Jtbd.Infrastructure.Repositories
             return categoria!;
         }
 
-        public async Task<bool> UpdateAsync(Interviews interviews)
+        public async Task<bool> UpdateAsync(CreateInterview interviews)
         {
-            _context.Interviews.Update(interviews);
+            Interviews auxInter = new Interviews()
+            {
+                IdInter = interviews.IdInter,
+                InterName = interviews.InterName,
+                InterAge = interviews.InterAge,
+                InterGender = interviews.InterGender,
+                InterOccupation = interviews.InterOccupation,
+                InterNickname = interviews.InterNickname,
+                InterNSE = interviews.InterNSE,
+                DateInter = interviews.DateInter
+            }; 
+            _context.Interviews.Update(auxInter);
             await _context.SaveChangesAsync();
             return true;
         }

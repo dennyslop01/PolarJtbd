@@ -61,18 +61,7 @@ namespace Jtbd.Api.Controllers
                     return BadRequest();
                 }
 
-                Interviews inter = new Interviews()
-                {
-                    InterName = nuevo.InterName,
-                    DateInter = nuevo.DateInter,
-                    InterAge = nuevo.InterAge,
-                    InterGender = nuevo.InterGender,
-                    InterNickname=nuevo.InterNickname,
-                    InterNSE = nuevo.InterNSE,
-                    InterOccupation = nuevo.InterOccupation
-
-                };
-                await _repository.CreateAsync(inter);
+                await _repository.CreateAsync(nuevo);
 
                 return CreatedAtAction(nameof(GetInterviews), new { id = nuevo.IdInter }, nuevo);
             }
@@ -85,29 +74,16 @@ namespace Jtbd.Api.Controllers
 
         // PUT: api/Interviews/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> ActualizarInterviews(int id, [FromBody] CreateInterview Interviews)
+        public async Task<ActionResult> ActualizarInterviews(int id, [FromBody] CreateInterview interviews)
         {
-            if (id != Interviews.IdInter)
+            if (id != interviews.IdInter)
             {
                 return BadRequest("El ID del Entrevistado no coincide.");
             }
 
             try
             {
-                Interviews inter = new Interviews()
-                {
-                    IdInter = Interviews.IdInter,
-                    InterName = Interviews.InterName,
-                    DateInter = Interviews.DateInter,
-                    InterAge = Interviews.InterAge,
-                    InterGender = Interviews.InterGender,
-                    InterNickname = Interviews.InterNickname,
-                    InterNSE = Interviews.InterNSE,
-                    InterOccupation = Interviews.InterOccupation
-
-                };
-
-                await _repository.UpdateAsync(inter);
+                await _repository.UpdateAsync(interviews);
                 return NoContent();
             }
             catch (KeyNotFoundException)

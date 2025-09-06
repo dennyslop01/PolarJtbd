@@ -2,9 +2,9 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
+@inject ILogger<Categorias> Logger
 
 <PageTitle>Categorias</PageTitle>
     <div class="row align-content-center">
@@ -107,64 +107,88 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string urlbase = string.Empty;
 
     [Inject] private ICategories repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        urlbase = configuration.GetSection("ApiBack").Value.ToString();
-        var url1 = "/api/categories";
-
-        categorias = (List<Categories>)await repository.GetAllAsync();
+        try
+        {
+            categorias = (List<Categories>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void MostrarFormulario()
     {
-
-        categoriaActual = new Categories();
-        mostrarFormulario = true;
+        try
+        {
+            categoriaActual = new Categories();
+            mostrarFormulario = true;
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void EditarEntidad(Categories categoria)
     {
-        categoriaActual = new Categories
+        try
         {
-            Id = categoria.Id,
-            Name = categoria.Name,
-        };
-        mostrarFormulario = true;
+            categoriaActual = new Categories
+                {
+                    Id = categoria.Id,
+                    Name = categoria.Name,
+                };
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task GuardarEntidad()
     {
-        var url1 = "/api/categories/";
-        var url2 = $"/api/categories/{categoriaActual.Id}";
+        try
+        {
+            if (categoriaActual.Id == 0)
+                await repository.CreateAsync(categoriaActual);
+            else
+                await repository.UpdateAsync(categoriaActual);
 
-        if (categoriaActual.Id == 0)
-            await repository.CreateAsync(categoriaActual);
-        else
-            await repository.UpdateAsync(categoriaActual);
-
-        categorias = (List<Categories>)await repository.GetAllAsync();
-        mostrarFormulario = false;
-        mensajeAlerta = "Categoria guardada exitosamente.";
-        mostrarAlerta = true;
+            categorias = (List<Categories>)await repository.GetAllAsync();
+            mostrarFormulario = false;
+            mensajeAlerta = "Categoria guardada exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task EliminarEntidad(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
-        if (confirmed)
+        try
         {
-            var url1 = "/api/categories/";
-            var url2 = $"/api/categories/{id}";
-
-            //await repository.DeleteAsync(string.Concat(urlbase, url2));
-            categorias = (List<Categories>)await repository.GetAllAsync();
-            mensajeAlerta = "Categoria eliminada exitosamente.";
-            mostrarAlerta = true;
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
+                await repository.DeleteAsync(id);
+                categorias = (List<Categories>)await repository.GetAllAsync();
+                mensajeAlerta = "Categoria eliminada exitosamente.";
+                mostrarAlerta = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 

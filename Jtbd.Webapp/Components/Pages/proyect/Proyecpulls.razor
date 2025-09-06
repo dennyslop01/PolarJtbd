@@ -2,10 +2,11 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
+@inject ILogger<Proyecpulls> Logger
 
 <PageTitle>Proyectos Pulls</PageTitle>
 <div class="row align-content-center">
@@ -154,96 +155,113 @@
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private string username = string.Empty;
-    private string urlbase = string.Empty;
 
-    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IPullGroups repository { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        var session = HttpContextAccessor.HttpContext.Session;
-        username = session.GetString("WindowsUser");
+        try
+        {
+            var session = HttpContextAccessor.HttpContext.Session;
+            username = session.GetString("WindowsUser");
 
-        urlbase = configuration.GetSection("ApiBack").Value.ToString();
-        //var url1 = "/api/pullgroups";
-
-        //pulls = await repository.GetAsync<List<pullgroups>>(string.Concat(urlbase, url1));
-
-        var url2 = "/api/projects";
-        proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url2));
+            proyectos = (List<Projects>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void MostrarFormulario()
     {
-        if (Model.idProyecto > 0)
+        try
         {
-            entidadActual = new CreatePull();
-            entidadActual.IdProject = Model.idProyecto;
-            entidadActual.StatusPull = -1;
-            entidadActual.CreatedDate = DateTime.Now;
-            entidadActual.CreatedUser = username;
-            entidadActual.UpdatedDate = DateTime.Now;
-            entidadActual.UpdatedUser = username;
+            if (Model.idProyecto > 0)
+            {
+                entidadActual = new CreatePull();
+                entidadActual.IdProject = Model.idProyecto;
+                entidadActual.StatusPull = -1;
+                entidadActual.CreatedDate = DateTime.Now;
+                entidadActual.CreatedUser = username;
+                entidadActual.UpdatedDate = DateTime.Now;
+                entidadActual.UpdatedUser = username;
 
-            mostrarFormulario = true;
+                mostrarFormulario = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
     private void EditarEntidad(PullGroups entidad)
     {
-        if (Model.idProyecto > 0)
+        try
         {
-            entidadActual = new CreatePull
+            if (Model.idProyecto > 0)
             {
-                IdProject = entidad.Project.IdProject,
-                IdPull = entidad.IdPull,
-                PullName = entidad.PullName,
-                PullDescription = entidad.PullDescription,
-                CreatedDate = entidad.CreatedDate,
-                CreatedUser = entidad.CreatedUser,
-                UpdatedDate = DateTime.Now,
-                UpdatedUser = username,
-                StatusPull = entidad.StatusPull
-            };
-            mostrarFormulario = true;
+                entidadActual = new CreatePull
+                    {
+                        IdProject = entidad.Project.IdProject,
+                        IdPull = entidad.IdPull,
+                        PullName = entidad.PullName,
+                        PullDescription = entidad.PullDescription,
+                        CreatedDate = entidad.CreatedDate,
+                        CreatedUser = entidad.CreatedUser,
+                        UpdatedDate = DateTime.Now,
+                        UpdatedUser = username,
+                        StatusPull = entidad.StatusPull
+                    };
+                mostrarFormulario = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
     private async Task GuardarEntidad()
     {
-        var url1 = "/api/pullgroups/";
-        var url2 = $"/api/pullgroups/{entidadActual.IdProject}";
-
-        if (entidadActual.IdPull == 0)
-            await repository.PostAsync(string.Concat(urlbase, url1), entidadActual);
-        else
-            await repository.PutAsync(string.Concat(urlbase, url2), entidadActual);
+        try{
+            if (entidadActual.IdPull == 0)
+                await repository.CreateAsync( entidadActual);
+            else
+                await repository.UpdateAsync( entidadActual);
 
 
-        //pulls = await repository.GetAsync<List<pullgroups>>(string.Concat(urlbase, url1));
-        url1 = $"/api/pullgroups/pullgroupsproject/{Model.idProyecto}";
-        pulls = await repository.GetAsync<List<PullGroups>>(string.Concat(urlbase, url1));
+            pulls = (List<PullGroups>) await repository.GetAllAsync();
 
-        mostrarFormulario = false;
-        mensajeAlerta = "Pulls guardado exitosamente.";
-        mostrarAlerta = true;
+            mostrarFormulario = false;
+            mensajeAlerta = "Pulls guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task EliminarEntidad(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
-        if (confirmed)
+        try
         {
-            var url1 = "/api/pullgroups/";
-            var url2 = $"/api/pullgroups/{id}";
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
 
-            await repository.DeleteAsync(string.Concat(urlbase, url2));
-            //pulls = await repository.GetAsync<List<pullgroups>>(string.Concat(urlbase, url1));
-            url1 = $"/api/pullgroups/pullgroupsproject/{Model.idProyecto}";
-            pulls = await repository.GetAsync<List<PullGroups>>(string.Concat(urlbase, url1));
+                await repository.DeleteAsync(id);
+                pulls = (List<PullGroups>)await repository.GetAllAsync();
 
-            mensajeAlerta = "Pulls eliminado exitosamente.";
-            mostrarAlerta = true;
+                mensajeAlerta = "Pulls eliminado exitosamente.";
+                mostrarAlerta = true;
+            }
+        }catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
@@ -254,8 +272,14 @@
 
     private async Task OnProyectChanged(int value)
     {
-        Model.idProyecto = value;
-        var url1 = $"/api/pullgroups/pullgroupsproject/{value}";
-        pulls = await repository.GetAsync<List<PullGroups>>(string.Concat(urlbase, url1));
+        try
+        {
+            Model.idProyecto = value;
+            pulls = (List<PullGroups>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 }

@@ -2,10 +2,11 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
+@inject ILogger<Proyecanxiets> Logger
 
 <PageTitle>Proyectos Ansiedades</PageTitle>
 <div class="row align-content-center">
@@ -147,90 +148,112 @@
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private string username = string.Empty;
-    private string urlbase = string.Empty;
 
-    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IAnxieties repository { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        var session = HttpContextAccessor.HttpContext.Session;
-        username = session.GetString("WindowsUser");
+        try
+        {
+            var session = HttpContextAccessor.HttpContext.Session;
+            username = session.GetString("WindowsUser");
 
-        urlbase = configuration.GetSection("ApiBack").Value.ToString();
-
-        var url2 = "/api/projects";
-        proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url2));
+            proyectos = (List<Projects>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void MostrarFormulario()
     {
-        if (Model.idProyecto > 0)
+        try
         {
-            entidadActual = new CreateAnxietie();
-            entidadActual.IdProject = Model.idProyecto;
-            entidadActual.StatusAnxie = -1;
-            entidadActual.CreatedDate = DateTime.Now;
-            entidadActual.CreatedUser = username;
-            entidadActual.UpdatedDate = DateTime.Now;
-            entidadActual.UpdatedUser = username;
+            if (Model.idProyecto > 0)
+            {
+                entidadActual = new CreateAnxietie();
+                entidadActual.IdProject = Model.idProyecto;
+                entidadActual.StatusAnxie = -1;
+                entidadActual.CreatedDate = DateTime.Now;
+                entidadActual.CreatedUser = username;
+                entidadActual.UpdatedDate = DateTime.Now;
+                entidadActual.UpdatedUser = username;
 
-            mostrarFormulario = true;
+                mostrarFormulario = true;
+            }
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
     private void EditarEntidad(Anxieties entidad)
     {
-        if (Model.idProyecto > 0)
+        try
         {
-            entidadActual = new CreateAnxietie
+            if (Model.idProyecto > 0)
             {
-                IdProject = entidad.Project.IdProject,
-                IdAnxie = entidad.IdAnxie,
-                AnxieName = entidad.AnxieName,
-                CreatedDate = entidad.CreatedDate,
-                CreatedUser = entidad.CreatedUser,
-                UpdatedDate = DateTime.Now,
-                UpdatedUser = username,
-                StatusAnxie = entidad.StatusAnxie
-            };
-            mostrarFormulario = true;
+                entidadActual = new CreateAnxietie
+                    {
+                        IdProject = entidad.Project.IdProject,
+                        IdAnxie = entidad.IdAnxie,
+                        AnxieName = entidad.AnxieName,
+                        CreatedDate = entidad.CreatedDate,
+                        CreatedUser = entidad.CreatedUser,
+                        UpdatedDate = DateTime.Now,
+                        UpdatedUser = username,
+                        StatusAnxie = entidad.StatusAnxie
+                    };
+                mostrarFormulario = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
     private async Task GuardarEntidad()
     {
-        var url1 = "/api/anxieties/";
-        var url2 = $"/api/anxieties/{entidadActual.IdProject}";
+        try
+        {
+            if (entidadActual.IdAnxie == 0)
+                await repository.CreateAsync(entidadActual);
+            else
+                await repository.UpdateAsync(entidadActual);
 
-        if (entidadActual.IdAnxie == 0)
-            await repository.PostAsync(string.Concat(urlbase, url1), entidadActual);
-        else
-            await repository.PutAsync(string.Concat(urlbase, url2), entidadActual);
 
+            anxiets = (List<Anxieties>)await repository.GetAllAsync();
 
-        url1 = $"/api/anxieties/anxietiesProject/{Model.idProyecto}";
-        anxiets = await repository.GetAsync<List<Anxieties>>(string.Concat(urlbase, url1));
-
-        mostrarFormulario = false;
-        mensajeAlerta = "Ansiedad guardado exitosamente.";
-        mostrarAlerta = true;
+            mostrarFormulario = false;
+            mensajeAlerta = "Ansiedad guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task EliminarEntidad(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
-        if (confirmed)
+        try
         {
-            var url1 = "/api/anxieties/";
-            var url2 = $"/api/anxieties/{id}";
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
+                await repository.DeleteAsync(id);
+                anxiets = (List<Anxieties>)await repository.GetAllAsync();
 
-            await repository.DeleteAsync(string.Concat(urlbase, url2));
-            url1 = $"/api/anxieties/anxietiesProject/{Model.idProyecto}";
-            anxiets = await repository.GetAsync<List<Anxieties>>(string.Concat(urlbase, url1));
-
-            mensajeAlerta = "Ansiedad eliminado exitosamente.";
-            mostrarAlerta = true;
+                mensajeAlerta = "Ansiedad eliminado exitosamente.";
+                mostrarAlerta = true;
+            }
+        }catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
@@ -241,8 +264,14 @@
 
     private async Task OnProyectChanged(int value)
     {
-        Model.idProyecto = value;
-        var url1 = $"/api/anxieties/anxietiesProject/{value}";
-        anxiets = await repository.GetAsync<List<Anxieties>>(string.Concat(urlbase, url1));
+        try
+        {
+            Model.idProyecto = value;
+            anxiets = (List<Anxieties>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 }

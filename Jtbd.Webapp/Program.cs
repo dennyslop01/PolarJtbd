@@ -2,7 +2,6 @@ using Jtbd.Application.Interfaces;
 using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Repositories;
 using Jtbd.Webapp.Components;
-using Jtbd.Webapp.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,9 +22,9 @@ builder.Services.AddDbContext<JtbdDbContext>(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-string apiBack = builder.Configuration.GetSection("ApiBack").Value.ToString();
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBack) });
-builder.Services.AddScoped<IRepositoryGeneric, RepositoryGeneric>();
+//string apiBack = builder.Configuration.GetSection("ApiBack").Value.ToString();
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBack) });
+
 builder.Services.AddScoped<IAnxieties, AnxietiesRepository>();
 builder.Services.AddScoped<ICategories, CategoriesRepository>();
 builder.Services.AddScoped<IDeparments, DeparmentsRepository>();

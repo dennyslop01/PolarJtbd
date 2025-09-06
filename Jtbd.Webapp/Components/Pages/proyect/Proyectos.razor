@@ -2,10 +2,11 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Services
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
+@inject ILogger<Proyectos> Logger
 
 <PageTitle>Proyectos</PageTitle>
 <div class="row align-content-center">
@@ -177,92 +178,115 @@
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private string username = string.Empty;
-    private string urlbase = string.Empty;
 
-    [Inject] private IRepositoryGeneric repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IProjects repository { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        var session = HttpContextAccessor.HttpContext.Session;
-        username = session.GetString("WindowsUser");
+        try
+        {
+            var session = HttpContextAccessor.HttpContext.Session;
+            username = session.GetString("WindowsUser");
 
-        urlbase = configuration.GetSection("ApiBack").Value.ToString();
-        var url1 = "/api/projects";
+            proyectos = (List<Projects>)await repository.GetAllAsync();
 
-        proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url1));
-
-        var url2 = "/api/deparments";
-        departamento = await repository.GetAsync<List<Deparments>>(string.Concat(urlbase, url2));
-        var url3 = "/api/categories";
-        categorias = await repository.GetAsync<List<Categories>>(string.Concat(urlbase, url3));
+            departamento = (List<Deparments>)await repository.GetAllAsync();
+            categorias = (List<Categories>)await repository.GetAllAsync();
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void MostrarFormulario()
     {
-        proyectoActual = new CreateProject();
-        proyectoActual.IdDeparmento = -1;
-        proyectoActual.idCategoria = -1;
-        proyectoActual.StatusProject = -1;
-        proyectoActual.ProjectDate = DateTime.Now;
-        proyectoActual.CreatedDate = DateTime.Now;
-        proyectoActual.CreatedUser = username;
-        proyectoActual.UpdatedDate = DateTime.Now;
-        proyectoActual.UpdatedUser = username;
+        try
+        {
+            proyectoActual = new CreateProject();
+            proyectoActual.IdDeparmento = -1;
+            proyectoActual.idCategoria = -1;
+            proyectoActual.StatusProject = -1;
+            proyectoActual.ProjectDate = DateTime.Now;
+            proyectoActual.CreatedDate = DateTime.Now;
+            proyectoActual.CreatedUser = username;
+            proyectoActual.UpdatedDate = DateTime.Now;
+            proyectoActual.UpdatedUser = username;
 
-        mostrarFormulario = true;
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private void EditarEntidad(Projects proyecto)
     {
-        proyectoActual = new CreateProject
+        try
         {
-            IdProject = proyecto.IdProject,
-            ProjectName = proyecto.ProjectName,
-            ProjectDate = proyecto.ProjectDate,
-            IdDeparmento = proyecto.Deparment.Id,
-            idCategoria = proyecto.Categories.Id,
-            ProjectDescription = proyecto.ProjectDescription,
-            MaxPushes = proyecto.MaxPushes,
-            MaxPulls = proyecto.MaxPulls,
-            RutaImage = proyecto.RutaImage,
-            CreatedDate = proyecto.CreatedDate,
-            CreatedUser = proyecto.CreatedUser,
-            UpdatedDate = DateTime.Now,
-            UpdatedUser = username,
-            StatusProject = proyecto.StatusProject
-        };
-        mostrarFormulario = true;
+            proyectoActual = new CreateProject
+                {
+                    IdProject = proyecto.IdProject,
+                    ProjectName = proyecto.ProjectName,
+                    ProjectDate = proyecto.ProjectDate,
+                    IdDeparmento = proyecto.Deparment.Id,
+                    idCategoria = proyecto.Categories.Id,
+                    ProjectDescription = proyecto.ProjectDescription,
+                    MaxPushes = proyecto.MaxPushes,
+                    MaxPulls = proyecto.MaxPulls,
+                    RutaImage = proyecto.RutaImage,
+                    CreatedDate = proyecto.CreatedDate,
+                    CreatedUser = proyecto.CreatedUser,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedUser = username,
+                    StatusProject = proyecto.StatusProject
+                };
+            mostrarFormulario = true;
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task GuardarEntidad()
     {
-        var url1 = "/api/projects/";
-        var url2 = $"/api/projects/{proyectoActual.IdProject}";
+        try
+        {
+            if (proyectoActual.IdProject == 0)
+                await repository.CreateAsync(proyectoActual);
+            else
+                await repository.UpdateAsync(proyectoActual);
 
-        if (proyectoActual.IdProject == 0)
-            await repository.PostAsync(string.Concat(urlbase, url1), proyectoActual);
-        else
-            await repository.PutAsync(string.Concat(urlbase, url2), proyectoActual);
-
-        proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url1));
-        mostrarFormulario = false;
-        mensajeAlerta = "Proyecto guardado exitosamente.";
-        mostrarAlerta = true;
+            proyectos = (List<Projects>)await repository.GetAllAsync();
+            mostrarFormulario = false;
+            mensajeAlerta = "Proyecto guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
     private async Task EliminarEntidad(int id)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
-        if (confirmed)
+        try
         {
-            var url1 = "/api/projects/";
-            var url2 = $"/api/projects/{id}";
-
-            await repository.DeleteAsync(string.Concat(urlbase, url2));
-            proyectos = await repository.GetAsync<List<Projects>>(string.Concat(urlbase, url1));
-            mensajeAlerta = "Proyecto eliminado exitosamente.";
-            mostrarAlerta = true;
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
+                await repository.DeleteAsync(id);
+                proyectos = (List<Projects>)await repository.GetAllAsync();
+                mensajeAlerta = "Proyecto eliminado exitosamente.";
+                mostrarAlerta = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 
