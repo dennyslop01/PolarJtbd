@@ -1,0 +1,87 @@
+﻿@page "/proyect/detalle/{IdStorie}"
+@using Jtbd.Application.Interfaces
+@using Jtbd.Domain.Entities
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IJSRuntime JSRuntime
+@inject IConfiguration configuration
+@inject ILogger<Proyecstories> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
+
+<PageTitle>Historia Detalle</PageTitle>
+
+<div class="row align-content-center">
+    <div class="col-lg-10">
+        <h3 class="text-center mt-4">Gestión de Historias Característica</h3>
+    </div>
+</div>
+
+<div class="row align-content-center">
+    <div class="col-lg-6">
+        <table class="table table-striped table-hover">
+            <thead class="table-secondary bg-opacity-25">
+                <tr>
+                    <th>#</th>
+                    <th>Titulo</th>
+                </tr>
+            </thead>
+            <tbody>
+               <tr>
+                    <td>@entidadStorie.IdStorie</td>
+                    <td>@entidadStorie.TitleStorie</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-lg-10">
+        <table class="table table-striped table-hover">
+            <thead class="table-secondary bg-opacity-25">
+                <tr>
+                    <th>Contexto</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@entidadStorie.ContextStorie</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+    [Parameter] 
+    public string idStorie { get; set; }
+
+    private Stories entidadStorie = new Stories();
+    private string username = "Auxiliar";
+    [Inject] private IStories repostorie { get; set; } = null!;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+
+        }
+        catch (Exception ex)
+        {
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+        }
+
+        try
+        {
+            entidadStorie = (Stories)await repostorie.GetByIdAsync(int.Parse(idStorie));
+        }
+        catch (Exception ex)
+        {
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+        }
+    }
+}
