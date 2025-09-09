@@ -3,6 +3,7 @@ using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Repositories;
 using Jtbd.Webapp.Components;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,10 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddDbContext<JtbdDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConn")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConn"));
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 
 builder.Services.AddHttpContextAccessor();
 

@@ -24,7 +24,7 @@ namespace Jtbd.Infrastructure.Repositories
             auxStorie.UpdatedDate = stories.UpdatedDate;
             auxStorie.UpdatedUser = stories.UpdatedUser;
 
-            var project = _context.Projects.Where(x => x.IdProject == stories.IdProject).FirstOrDefault();
+            var project = _context.Projects.Where(x => x.IdProject == stories.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
             {
                 auxStorie.Project = project;
@@ -34,7 +34,7 @@ namespace Jtbd.Infrastructure.Repositories
                 throw new InvalidOperationException("El proyecto no existe.");
             }
 
-            var interview = _context.Interviews.Where(x => x.IdInter == stories.IdInter).FirstOrDefault();
+            var interview = _context.Interviews.Where(x => x.IdInter == stories.IdInter).AsQueryable().AsNoTracking().FirstOrDefault();
             if (interview != null)
             {
                 auxStorie.Interviews = interview;
@@ -45,17 +45,25 @@ namespace Jtbd.Infrastructure.Repositories
             }
 
             await _context.Stories.AddAsync(auxStorie);
+            _context.Entry(auxStorie.Project).State = EntityState.Unchanged;
+            _context.Entry(auxStorie.Interviews).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
+            _context.Entry(auxStorie).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+            _context.Entry(interview).State = EntityState.Detached;
+
             return true;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var anxiet = await _context.Stories.FindAsync(id);
-            if (anxiet != null)
+            var storie = await _context.Stories.FindAsync(id);
+            if (storie != null)
             {
-                _context.Stories.Remove(anxiet);
+                _context.Stories.Remove(storie);
                 await _context.SaveChangesAsync();
+                _context.Entry(storie).State = EntityState.Detached;
                 return true;
             }
             return false;
@@ -65,7 +73,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             return await _context.Stories
                .Include(x => x.Project)
-               .ToListAsync();
+               .AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<Stories> GetByIdAsync(int id)
@@ -80,7 +88,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var stories = await _context.Stories
                  .Include(x => x.Project)
-                 .Where(x => x.Project.IdProject == id).ToListAsync();
+                 .Where(x => x.Project.IdProject == id).AsQueryable().AsNoTracking().ToListAsync();
             return stories!;
         }
 
@@ -95,7 +103,7 @@ namespace Jtbd.Infrastructure.Repositories
             auxStorie.UpdatedDate = stories.UpdatedDate;
             auxStorie.UpdatedUser = stories.UpdatedUser;
 
-            var project = _context.Projects.Where(x => x.IdProject == stories.IdProject).FirstOrDefault();
+            var project = _context.Projects.Where(x => x.IdProject == stories.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
             {
                 auxStorie.Project = project;
@@ -105,7 +113,7 @@ namespace Jtbd.Infrastructure.Repositories
                 throw new InvalidOperationException("El proyecto no existe.");
             }
 
-            var interview = _context.Interviews.Where(x => x.IdInter == stories.IdInter).FirstOrDefault();
+            var interview = _context.Interviews.Where(x => x.IdInter == stories.IdInter).AsQueryable().AsNoTracking().FirstOrDefault();
             if (interview != null)
             {
                 auxStorie.Interviews = interview;
@@ -116,7 +124,13 @@ namespace Jtbd.Infrastructure.Repositories
             }
 
             _context.Stories.Update(auxStorie);
+            _context.Entry(auxStorie.Project).State = EntityState.Unchanged;
+            _context.Entry(auxStorie.Interviews).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
+            _context.Entry(auxStorie).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+            _context.Entry(interview).State = EntityState.Detached;
             return true;
         }
     }

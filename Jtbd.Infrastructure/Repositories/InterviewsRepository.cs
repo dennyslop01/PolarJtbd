@@ -28,7 +28,7 @@ namespace Jtbd.Infrastructure.Repositories
             };
             await _context.Interviews.AddAsync(auxInter);
             await _context.SaveChangesAsync();
-
+            _context.Entry(auxInter).State = EntityState.Detached;
             return true;
         }
 
@@ -39,6 +39,7 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 _context.Interviews.Remove(interview);
                 await _context.SaveChangesAsync();
+                _context.Entry(interview).State = EntityState.Detached;
                 return true;
             }
             return false;
@@ -46,7 +47,7 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<IEnumerable<Interviews>> GetAllAsync()
         {
-            return await _context.Interviews.ToListAsync();
+            return await _context.Interviews.AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<Interviews> GetByIdAsync(int id)
@@ -71,6 +72,7 @@ namespace Jtbd.Infrastructure.Repositories
             }; 
             _context.Interviews.Update(auxInter);
             await _context.SaveChangesAsync();
+            _context.Entry(auxInter).State = EntityState.Detached;
             return true;
         }
     }

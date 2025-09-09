@@ -19,8 +19,7 @@ namespace Jtbd.Infrastructure.Repositories
             emplee.EmployeeName = employee.EmployeeName;
             emplee.EmployeeRol = employee.EmployeeRol;
             emplee.StatusEmployee = employee.StatusEmployee;
-
-            Deparments? deparment = _context.Deparments.Where(x => x.Id == employee.IdDeparment).FirstOrDefault();
+            Deparments? deparment = _context.Deparments.Where(x => x.Id == employee.IdDeparment).AsQueryable().AsNoTracking().FirstOrDefault();
             if (deparment != null)
             {
                 emplee.Deparments = deparment;
@@ -29,9 +28,12 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 throw new InvalidOperationException("El departamento no existe.");
             }
-            await _context.Employees.AddAsync(emplee);
-            await _context.SaveChangesAsync();
 
+            await _context.Employees.AddAsync(emplee);
+            _context.Entry(emplee.Deparments).State = EntityState.Unchanged;
+            await _context.SaveChangesAsync();
+            _context.Entry(emplee).State = EntityState.Detached;
+            _context.Entry(deparment).State = EntityState.Detached;
             return true;
         }
 
@@ -42,6 +44,7 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 _context.Employees.Remove(employee);
                 await _context.SaveChangesAsync();
+                _context.Entry(employee).State = EntityState.Detached;
                 return true;
             }
             return false;
@@ -51,7 +54,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             return await _context.Employees
                 .Include(x => x.Deparments)
-                .ToListAsync();
+                .AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<Employee> GetByIdAsync(int id)
@@ -70,7 +73,7 @@ namespace Jtbd.Infrastructure.Repositories
             emplee.EmployeeRol = employee.EmployeeRol;
             emplee.StatusEmployee = employee.StatusEmployee;
 
-            Deparments? deparment = _context.Deparments.Where(x => x.Id == employee.IdDeparment).FirstOrDefault();
+            Deparments? deparment = _context.Deparments.Where(x => x.Id == employee.IdDeparment).AsQueryable().AsNoTracking().FirstOrDefault();
             if (deparment != null)
             {
                 emplee.Deparments = deparment;
@@ -81,7 +84,10 @@ namespace Jtbd.Infrastructure.Repositories
             }
 
             _context.Employees.Update(emplee);
+            _context.Entry(emplee.Deparments).State = EntityState.Unchanged;
             await _context.SaveChangesAsync();
+            _context.Entry(emplee).State = EntityState.Detached;
+            _context.Entry(deparment).State = EntityState.Detached;
             return true;
         }
     }

@@ -24,7 +24,7 @@ namespace Jtbd.Infrastructure.Repositories
             auxHabbit.UpdatedDate = habits.UpdatedDate;
             auxHabbit.UpdatedUser = habits.UpdatedUser;
 
-            var project = _context.Projects.Where(x => x.IdProject == habits.IdProject).FirstOrDefault();
+            var project = _context.Projects.Where(x => x.IdProject == habits.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
             {
                 auxHabbit.Project = project;
@@ -34,7 +34,12 @@ namespace Jtbd.Infrastructure.Repositories
                 throw new InvalidOperationException("El proyecto no existe.");
             }
             await _context.Habits.AddAsync(auxHabbit);
+            _context.Entry(auxHabbit.Project).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
+            _context.Entry(auxHabbit).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+
             return true;
         }
 
@@ -45,6 +50,7 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 _context.Habits.Remove(habbit);
                 await _context.SaveChangesAsync();
+                _context.Entry(habbit).State = EntityState.Detached;
                 return true;
             }
             return false;
@@ -54,7 +60,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             return await _context.Habits
                .Include(x => x.Project)
-               .ToListAsync();
+               .AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<Habits> GetByIdAsync(int id)
@@ -69,7 +75,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var habbit = await _context.Habits
                  .Include(x => x.Project)
-                 .Where(x => x.Project.IdProject == id).ToListAsync();
+                 .Where(x => x.Project.IdProject == id).AsQueryable().AsNoTracking().ToListAsync();
             return habbit!;
         }
 
@@ -85,7 +91,7 @@ namespace Jtbd.Infrastructure.Repositories
             auxHabbit.UpdatedDate = habits.UpdatedDate;
             auxHabbit.UpdatedUser = habits.UpdatedUser;
 
-            var project = _context.Projects.Where(x => x.IdProject == habits.IdProject).FirstOrDefault();
+            var project = _context.Projects.Where(x => x.IdProject == habits.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
             {
                 auxHabbit.Project = project;
@@ -95,7 +101,12 @@ namespace Jtbd.Infrastructure.Repositories
                 throw new InvalidOperationException("El proyecto no existe.");
             }
             _context.Habits.Update(auxHabbit);
+            _context.Entry(auxHabbit.Project).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
+            _context.Entry(auxHabbit).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+
             return true;
         }
     }

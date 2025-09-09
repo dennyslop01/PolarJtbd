@@ -146,11 +146,12 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string username = string.Empty;
+    private string username = "Auxiliar";
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IStories repository { get; set; } = null!;
     [Inject] private IProjects repoproyec { get; set; } = null!;
+    [Inject] private IInterviews repointer { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -158,12 +159,22 @@
         {
             var session = HttpContextAccessor.HttpContext.Session;
             username = session.GetString("WindowsUser");
-
-            proyectos = (List<Projects>)await repoproyec.GetAllAsync();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            Logger.LogError(ex.Message);
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+        }
+
+        try
+        {
+            proyectos = (List<Projects>)await repository.GetAllAsync();
+            entrevistados = (List<Interviews>)await repointer.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
         }
     }
 

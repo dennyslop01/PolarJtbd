@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @inject ILogger<Home> Logger
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
 
@@ -46,7 +47,8 @@
         }
         catch(Exception ex)
         {
-            Logger.LogError(ex.Message);
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
             session.SetString("WindowsUser", "Auxiliar");
             session.SetString("RolUser", "1");
         }

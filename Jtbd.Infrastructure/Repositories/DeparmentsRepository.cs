@@ -17,7 +17,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             await _context.Deparments.AddAsync(deparments);
             await _context.SaveChangesAsync();
-
+            _context.Entry(deparments).State = EntityState.Detached;
             return true;
         }
 
@@ -28,6 +28,7 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 _context.Deparments.Remove(department);
                 await _context.SaveChangesAsync();
+                _context.Entry(department).State = EntityState.Detached;
                 return true;
             }
             return false;
@@ -35,7 +36,7 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<IEnumerable<Deparments>> GetAllAsync()
         {
-            return await _context.Deparments.ToListAsync();
+            return await _context.Deparments.AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<Deparments> GetByIdAsync(int id)
@@ -49,6 +50,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             _context.Deparments.Update(deparments);
             await _context.SaveChangesAsync();
+            _context.Entry(deparments).State = EntityState.Detached;
             return true;
         }
     }

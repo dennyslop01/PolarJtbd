@@ -10,7 +10,7 @@
 
 <PageTitle>Proyectos</PageTitle>
 <div class="row align-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-12">
         <h3 class="text-center mt-4">Gestión de proyectos</h3>
         <div class="d-flex justify-content-end mb-3">
             <button class="btn btn-primary" @onclick="MostrarFormulario">
@@ -177,10 +177,12 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string username = string.Empty;
+    private string username = "Auxiliar";
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IProjects repository { get; set; } = null!;
+    [Inject] private IDeparments repodepart { get; set; } = null!;
+    [Inject] private ICategories repocategoria { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -188,15 +190,23 @@
         {
             var session = HttpContextAccessor.HttpContext.Session;
             username = session.GetString("WindowsUser");
-
-            proyectos = (List<Projects>)await repository.GetAllAsync();
-
-            departamento = (List<Deparments>)await repository.GetAllAsync();
-            categorias = (List<Categories>)await repository.GetAllAsync();
         }
         catch(Exception ex)
         {
-            Logger.LogError(ex.Message);
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+        }
+        
+        try
+        {
+            departamento = (List<Deparments>)await repodepart.GetAllAsync();
+            categorias = (List<Categories>)await repocategoria.GetAllAsync();
+            proyectos = (List<Projects>)await repository.GetAllAsync();
+        }
+        catch(Exception ex)
+        {
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
         }
     }
 

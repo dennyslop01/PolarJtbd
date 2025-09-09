@@ -154,7 +154,7 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string username = string.Empty;
+    private string username = "Auxiliar";
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IPullGroups repository { get; set; } = null!;
@@ -166,12 +166,21 @@
         {
             var session = HttpContextAccessor.HttpContext.Session;
             username = session.GetString("WindowsUser");
-
-            proyectos = (List<Projects>)await repoproyec.GetAllAsync();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex.Message);
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+        }
+
+        try
+        {
+            proyectos = (List<Projects>)await repository.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            //Logger.LogError(ex.Message);
+            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
         }
     }
 
@@ -276,7 +285,7 @@
         try
         {
             Model.idProyecto = value;
-            pulls = (List<PullGroups>)await repository.GetAllAsync();
+            pulls = (List<PullGroups>)await repository.GetByProjectIdAsync(value);
         }
         catch (Exception ex)
         {

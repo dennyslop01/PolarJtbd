@@ -24,7 +24,7 @@ namespace Jtbd.Infrastructure.Repositories
             auxPushes.UpdatedDate = push.UpdatedDate;
             auxPushes.UpdatedUser = push.UpdatedUser;
             
-            var project = _context.Projects.Where(x => x.IdProject == push.IdProject).FirstOrDefault();
+            var project = _context.Projects.Where(x => x.IdProject == push.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
             {
                 auxPushes.Project = project;
@@ -34,7 +34,12 @@ namespace Jtbd.Infrastructure.Repositories
                 throw new InvalidOperationException("El proyecto no existe.");
             }
             await _context.PushesGroups.AddAsync(auxPushes);
+            _context.Entry(auxPushes.Project).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
+            _context.Entry(auxPushes).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+
             return true;
         }
 
@@ -45,6 +50,7 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 _context.PushesGroups.Remove(push);
                 await _context.SaveChangesAsync();
+                _context.Entry(push).State = EntityState.Detached;
                 return true;
             }
             return false;
@@ -54,7 +60,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             return await _context.PushesGroups
                .Include(x => x.Project)
-               .ToListAsync();
+               .AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<PushesGroups> GetByIdAsync(int id)
@@ -69,7 +75,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var push = await _context.PushesGroups
                  .Include(x => x.Project)
-                 .Where(x => x.Project.IdProject == id).ToListAsync();
+                 .Where(x => x.Project.IdProject == id).AsQueryable().AsNoTracking().ToListAsync();
             return push!;
         }
 
@@ -85,7 +91,7 @@ namespace Jtbd.Infrastructure.Repositories
             auxPushes.UpdatedDate = push.UpdatedDate;
             auxPushes.UpdatedUser = push.UpdatedUser;
 
-            var project = _context.Projects.Where(x => x.IdProject == push.IdProject).FirstOrDefault();
+            var project = _context.Projects.Where(x => x.IdProject == push.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
             {
                 auxPushes.Project = project;
@@ -95,7 +101,12 @@ namespace Jtbd.Infrastructure.Repositories
                 throw new InvalidOperationException("El proyecto no existe.");
             }
             _context.PushesGroups.Update(auxPushes);
+            _context.Entry(auxPushes.Project).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
+            _context.Entry(auxPushes).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+
             return true;
         }
     }

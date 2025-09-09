@@ -17,7 +17,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             Projects auxpro = new Projects();
 
-            var categoria = _context.Categories.Where(x => x.Id == project.idCategoria).FirstOrDefault();
+            var categoria = _context.Categories.Where(x => x.Id == project.idCategoria).AsQueryable().AsNoTracking().FirstOrDefault();
             if (categoria != null)
             {
                 auxpro.Categories = categoria;
@@ -26,7 +26,7 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 throw new InvalidOperationException("La categoría no existe.");
             }
-            var deparment = _context.Deparments.Where(x => x.Id == project.IdDeparmento).FirstOrDefault();
+            var deparment = _context.Deparments.Where(x => x.Id == project.IdDeparmento).AsQueryable().AsNoTracking().FirstOrDefault();
             if (deparment != null)
             {
                 auxpro.Deparment = deparment;
@@ -49,7 +49,13 @@ namespace Jtbd.Infrastructure.Repositories
             auxpro.StatusProject = project.StatusProject;
 
             await _context.Projects.AddAsync(auxpro);
+            _context.Entry(auxpro.Categories).State = EntityState.Unchanged;
+            _context.Entry(auxpro.Deparment).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
+            _context.Entry(auxpro).State = EntityState.Detached;
+            _context.Entry(deparment).State = EntityState.Detached;
+            _context.Entry(categoria).State = EntityState.Detached;
             return true;
         }
 
@@ -60,6 +66,7 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 _context.Projects.Remove(project);
                 await _context.SaveChangesAsync();
+                _context.Entry(project).State = EntityState.Detached;
                 return true;
             }
             return false;
@@ -70,7 +77,7 @@ namespace Jtbd.Infrastructure.Repositories
             return await _context.Projects
                 .Include(x => x.Categories)
                 .Include(x => x.Deparment)
-                .ToListAsync();
+                .AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<Projects> GetByIdAsync(int id)
@@ -95,7 +102,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             Projects auxpro = new Projects();
 
-            var categoria = _context.Categories.Where(x => x.Id == project.idCategoria).FirstOrDefault();
+            var categoria = _context.Categories.Where(x => x.Id == project.idCategoria).AsQueryable().AsNoTracking().FirstOrDefault();
             if (categoria != null)
             {
                 auxpro.Categories = categoria;
@@ -104,7 +111,7 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 throw new InvalidOperationException("La categoría no existe.");
             }
-            var deparment = _context.Deparments.Where(x => x.Id == project.IdDeparmento).FirstOrDefault();
+            var deparment = _context.Deparments.Where(x => x.Id == project.IdDeparmento).AsQueryable().AsNoTracking().FirstOrDefault();
             if (deparment != null)
             {
                 auxpro.Deparment = deparment;
@@ -128,7 +135,13 @@ namespace Jtbd.Infrastructure.Repositories
             auxpro.StatusProject = project.StatusProject;
 
             _context.Projects.Update(auxpro);
+            _context.Entry(auxpro.Categories).State = EntityState.Unchanged;
+            _context.Entry(auxpro.Deparment).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
+            _context.Entry(auxpro).State = EntityState.Detached;
+            _context.Entry(deparment).State = EntityState.Detached;
+            _context.Entry(categoria).State = EntityState.Detached;
             return true;
         }
     }
