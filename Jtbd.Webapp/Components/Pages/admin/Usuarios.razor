@@ -167,13 +167,14 @@
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IEmployee repository { get; set; } = null!;
+    [Inject] private IDeparments repodepart { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             usuarios = (List<Employee>)await repository.GetAllAsync();
-            departamento = (List<Deparments>)await repository.GetAllAsync();
+            departamento = (List<Deparments>)await repodepart.GetAllAsync();
         }
         catch (Exception ex)
         {

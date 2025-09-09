@@ -35,6 +35,9 @@ builder.Services.AddScoped<IProjects, ProjectsRepository>();
 builder.Services.AddScoped<IPullGroups, PullGroupsRepository>();
 builder.Services.AddScoped<IPushesGroups, PushesGroupsRepository>();
 builder.Services.AddScoped<IStories, StoriesRepository>();
+
+builder.WebHost.UseStaticWebAssets();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -48,11 +51,13 @@ if (!app.Environment.IsDevelopment())
 app.UseSession();
 //app.UseHttpsRedirection();
 
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.UsePathBase("/JTBD/");
+app.UseStaticFiles();
 
 app.Run();

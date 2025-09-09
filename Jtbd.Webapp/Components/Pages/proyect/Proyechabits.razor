@@ -151,6 +151,7 @@
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IHabits repository { get; set; } = null!;
+    [Inject] private IProjects repoproyec { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -159,7 +160,7 @@
             var session = HttpContextAccessor.HttpContext.Session;
             username = session.GetString("WindowsUser");
 
-            proyectos = (List<Projects>)await repository.GetAllAsync();
+            proyectos = (List<Projects>)await repoproyec.GetAllAsync();
         }
         catch (Exception ex)
         {
