@@ -1,5 +1,6 @@
 ﻿@page "/proyect/proyecstories"
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@using Microsoft.AspNetCore.Components.Authorization
 
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
@@ -7,6 +8,7 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Historias</PageTitle>
 <div class="row align-content-center">
@@ -67,7 +69,7 @@
                         <tr>
                             <td>@p.IdStorie</td>
                             <td>@p.TitleStorie</td>
-                            <td>@p.Interviews.InterName</td>
+                            <td>@p.IdInter.InterName</td>
                             <td>
                                 <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
                                     <i class="fas fa-edit"></i> Editar
@@ -157,8 +159,10 @@
     {
         try
         {
-            var session = HttpContextAccessor.HttpContext.Session;
-            username = session.GetString("WindowsUser");
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+
         }
         catch (Exception ex)
         {
@@ -168,7 +172,7 @@
 
         try
         {
-            proyectos = (List<Projects>)await repository.GetAllAsync();
+            proyectos = (List<Projects>)await repoproyec.GetAllAsync();
             entrevistados = (List<Interviews>)await repointer.GetAllAsync();
         }
         catch (Exception ex)
@@ -210,7 +214,7 @@
                 entidadActual = new CreateStorie
                     {
                         IdProject = entidad.Project.IdProject,
-                        IdInter = entidad.Interviews.IdInter,
+                        IdInter = entidad.IdInter.IdInter,
                         TitleStorie = entidad.TitleStorie,
                         ContextStorie = entidad.ContextStorie,
                         CreatedDate = entidad.CreatedDate,
@@ -278,9 +282,9 @@
         try
         {
             Model.idProyecto = value;
-        stories = (List<Stories>)await repository.GetAllAsync();
+            stories = (List<Stories>)await repository.GetByProjectIdAsync(value);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Logger.LogError(ex.Message);
         }

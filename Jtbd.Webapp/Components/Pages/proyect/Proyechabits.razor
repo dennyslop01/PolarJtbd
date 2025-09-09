@@ -1,12 +1,12 @@
 ﻿@page "/proyect/proyechabits"
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyechabits> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Proyectos Hábitos</PageTitle>
 <div class="row align-content-center">
@@ -157,8 +157,10 @@
     {
         try
         {
-            var session = HttpContextAccessor.HttpContext.Session;
-            username = session.GetString("WindowsUser");
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+
         }
         catch (Exception ex)
         {
@@ -168,7 +170,7 @@
 
         try
         {
-            proyectos = (List<Projects>)await repository.GetAllAsync();
+            proyectos = (List<Projects>)await repoproyec.GetAllAsync();
         }
         catch (Exception ex)
         {

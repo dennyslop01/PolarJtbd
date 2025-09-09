@@ -37,7 +37,7 @@ namespace Jtbd.Infrastructure.Repositories
             var interview = _context.Interviews.Where(x => x.IdInter == stories.IdInter).AsQueryable().AsNoTracking().FirstOrDefault();
             if (interview != null)
             {
-                auxStorie.Interviews = interview;
+                auxStorie.IdInter = interview;
             }
             else
             {
@@ -46,7 +46,7 @@ namespace Jtbd.Infrastructure.Repositories
 
             await _context.Stories.AddAsync(auxStorie);
             _context.Entry(auxStorie.Project).State = EntityState.Unchanged;
-            _context.Entry(auxStorie.Interviews).State = EntityState.Unchanged;
+            _context.Entry(auxStorie.IdInter).State = EntityState.Unchanged;
 
             await _context.SaveChangesAsync();
             _context.Entry(auxStorie).State = EntityState.Detached;
@@ -73,6 +73,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             return await _context.Stories
                .Include(x => x.Project)
+               .Include(x => x.IdInter)
                .AsQueryable().AsNoTracking().ToListAsync();
         }
 
@@ -80,6 +81,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var storie = await _context.Stories
                  .Include(x => x.Project)
+                 .Include(x => x.IdInter)
                  .FirstOrDefaultAsync(x => x.IdStorie == id);
             return storie!;
         }
@@ -88,6 +90,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var stories = await _context.Stories
                  .Include(x => x.Project)
+                 .Include(x => x.IdInter)
                  .Where(x => x.Project.IdProject == id).AsQueryable().AsNoTracking().ToListAsync();
             return stories!;
         }
@@ -116,7 +119,7 @@ namespace Jtbd.Infrastructure.Repositories
             var interview = _context.Interviews.Where(x => x.IdInter == stories.IdInter).AsQueryable().AsNoTracking().FirstOrDefault();
             if (interview != null)
             {
-                auxStorie.Interviews = interview;
+                auxStorie.IdInter = interview;
             }
             else
             {
@@ -125,7 +128,7 @@ namespace Jtbd.Infrastructure.Repositories
 
             _context.Stories.Update(auxStorie);
             _context.Entry(auxStorie.Project).State = EntityState.Unchanged;
-            _context.Entry(auxStorie.Interviews).State = EntityState.Unchanged;
+            _context.Entry(auxStorie.IdInter).State = EntityState.Unchanged;
 
             await _context.SaveChangesAsync();
             _context.Entry(auxStorie).State = EntityState.Detached;

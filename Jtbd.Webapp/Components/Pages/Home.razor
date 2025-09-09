@@ -1,11 +1,14 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Authorization
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@rendermode InteractiveServer
+
 @inject ILogger<Home> Logger
 @inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Home</PageTitle>
+<p>@username</p>
 
 <h4>JTBD WEB APP – Empresas Polar</h4>
 <br />
@@ -27,30 +30,21 @@
 </p>
 
 @code{
+    private string username = "Auxiliar";
+
     protected override async Task OnInitializedAsync()
     {
-        var session = HttpContextAccessor.HttpContext.Session;
         try
         {
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
 
-            if (user.Identity.IsAuthenticated)
-            {
-                session.SetString("WindowsUser", user.Identity.Name);
-            }
-            else
-            {
-                session.SetString("WindowsUser", "Auxiliar");
-                session.SetString("RolUser", "1");
-            }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             //Logger.LogError(ex.Message);
             await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-            session.SetString("WindowsUser", "Auxiliar");
-            session.SetString("RolUser", "1");
         }
     }
 }

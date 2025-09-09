@@ -21,7 +21,7 @@ namespace Jtbd.Domain.Entities
         [MaxLength(4000)]
         public string ContextStorie { get;set; } = string.Empty;
 
-        public Interviews? Interviews { get; set; }
+        public Interviews? IdInter { get; set; }
         public string CreatedUser { get; set; } = string.Empty;
         public string UpdatedUser { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; } = DateTime.Now;

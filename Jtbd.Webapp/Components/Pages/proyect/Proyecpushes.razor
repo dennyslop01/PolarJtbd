@@ -1,5 +1,6 @@
 ﻿@page "/proyect/proyecpushes"
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@using Microsoft.AspNetCore.Components.Authorization
 
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
@@ -7,6 +8,7 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecpushes> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Proyectos Pushes</PageTitle>
 <div class="row align-content-center">
@@ -166,8 +168,9 @@
     {
         try
         {
-            var session = HttpContextAccessor.HttpContext.Session;
-            username = session.GetString("WindowsUser");
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
         }
         catch (Exception ex)
         {
@@ -177,7 +180,7 @@
 
         try
         {
-            proyectos = (List<Projects>)await repository.GetAllAsync();
+            proyectos = (List<Projects>)await repoproyec.GetAllAsync();
         }
         catch (Exception ex)
         {
