@@ -15,7 +15,7 @@
         <h3 class="text-center mt-4">Gestión de proyectos Ansiedades</h3>
         <div class="d-flex justify-content-end mb-3">
             <button class="btn btn-primary" @onclick="MostrarFormulario">
-                <i class="fas fa-plus"></i> Agregar Ansiedades
+                <i class="bi bi-plus"></i> Agregar Ansiedades
             </button>
         </div>
         <EditForm Model="@Model">
@@ -79,10 +79,10 @@
                             }
                             <td>
                                 <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
-                                    <i class="fas fa-edit"></i> Editar
+                                    <i class="bi bi-pencil"></i> Editar
                                 </button>
                                 <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.IdAnxie)">
-                                    <i class="fas fa-trash"></i> Eliminar
+                                    <i class="bi bi-trash"></i> Eliminar
                                 </button>
                             </td>
                         </tr>
@@ -122,10 +122,10 @@
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success me-2">
-                                <i class="fas fa-save"></i> Guardar
+                                <i class="bi bi-save"></i> Guardar
                             </button>
                             <button type="button" class="btn btn-secondary" @onclick="Cancelar">
-                                <i class="fas fa-times"></i> Cancelar
+                                <i class="bi bi-times"></i> Cancelar
                             </button>
                         </div>
                     </EditForm>
