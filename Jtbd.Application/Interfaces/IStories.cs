@@ -15,5 +15,9 @@ namespace Jtbd.Application.Interfaces
         Task<bool> CreateAsync(CreateStorie stories);
         Task<bool> UpdateAsync(CreateStorie stories);
         Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<StoriesPush>> GetPushesByStorieIdAsync(int id);
+        Task<IEnumerable<StoriesPull>> GetPullsByStorieIdAsync(int id);
+        Task<IEnumerable<StoriesHabbit>> GetHabitsByStorieIdAsync(int id);
+        Task<IEnumerable<StoriesAnxiety>> GetAxieByStorieIdAsync(int id);
     }
 }

@@ -10,8 +10,8 @@ namespace Jtbd.Domain.Entities
     [Keyless]
     public partial class StoriesPull
     {
-        public List<Stories>? Stories { get; set; }
+        public Stories? Stories { get; set; }
 
-        public List<PullGroups>? PullGroups { get; set; }
+        public PullGroups? PullGroups { get; set; }
     }
 }

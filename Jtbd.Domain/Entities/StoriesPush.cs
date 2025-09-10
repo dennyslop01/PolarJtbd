@@ -11,8 +11,8 @@ namespace Jtbd.Domain.Entities
     public partial class StoriesPush
     {
        
-        public List<Stories>? Stories { get; set; }
+        public Stories? Stories { get; set; }
 
-        public List<PushesGroups>? PushesGroups { get; set; }
+        public PushesGroups? PushesGroups{ get; set; }
     }
 }

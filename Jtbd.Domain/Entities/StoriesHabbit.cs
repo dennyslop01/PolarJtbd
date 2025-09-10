@@ -10,8 +10,8 @@ namespace Jtbd.Domain.Entities
     [Keyless]
     public partial class StoriesHabbit
     {
-        public List<Stories>? Stories { get; set; }
+        public Stories? Stories { get; set; }
 
-        public List<Habits>? Habits { get; set; }
+        public Habits? Habits { get; set; }
     }
 }
