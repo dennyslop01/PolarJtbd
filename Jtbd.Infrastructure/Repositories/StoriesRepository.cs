@@ -1,8 +1,10 @@
 ﻿using Jtbd.Application.Interfaces;
 using Jtbd.Domain.Entities;
 using Jtbd.Infrastructure.DataContext;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client.Extensions.Msal;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -176,6 +178,113 @@ namespace Jtbd.Infrastructure.Repositories
                 .Where(x => x.Stories.IdStorie == id).AsNoTracking().ToListAsync();
 
             return anxiestorie!;
+        }
+
+        public async Task<bool> CreateStoriePushAsync(CreateStoriesPush nuevo)
+        {
+            var storie = _context.Stories.Where(x => x.IdStorie == nuevo.IdStories).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (storie == null)
+            {
+                throw new InvalidOperationException("La historia no existe.");
+            }
+
+            var push = _context.PushesGroups.Where(x => x.IdPush == nuevo.IdPush).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (push == null)
+            {
+                throw new InvalidOperationException("El push no existe.");
+            }
+
+            var result = await _context.Database.ExecuteSqlAsync(
+                $"Insert into StoriesPushes (StoriesIdStorie, PushesGroupsIdPush) Values( {nuevo.IdStories}, {nuevo.IdPush})");
+
+            //await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> CreateStoriePullAsync(CreateStoriesPull nuevo)
+        {
+            var storie = _context.Stories.Where(x => x.IdStorie == nuevo.IdStories).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (storie == null)
+            {
+                throw new InvalidOperationException("La historia no existe.");
+            }
+
+            var pull = _context.PullGroups.Where(x => x.IdPull == nuevo.IdPull).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (pull == null)
+            {
+                throw new InvalidOperationException("El pull no existe.");
+            }
+
+            var result = await _context.Database.ExecuteSqlAsync(
+                $"Insert into StoriesPulls (StoriesIdStorie, PullGroupsIdPull) Values( {nuevo.IdStories}, {nuevo.IdPull})");
+
+            //await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> CreateStorieHabitAsync(CreateStoriesHabbit nuevo)
+        {
+            var storie = _context.Stories.Where(x => x.IdStorie == nuevo.IdStories).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (storie == null)
+            {
+                throw new InvalidOperationException("La historia no existe.");
+            }
+
+            var habit = _context.Habits.Where(x => x.IdHabit == nuevo.IdHabit).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (habit == null)
+            {
+                throw new InvalidOperationException("El hábito no existe.");
+            }
+
+            var result = await _context.Database.ExecuteSqlAsync(
+                $"Insert into StoriesHabbits (StoriesIdStorie, HabitsIdHabit) Values( {nuevo.IdStories}, {nuevo.IdHabit})");
+
+            //await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> CreateStorieAnxieAsync(CreateStoriesAnxiety nuevo)
+        {
+            var storie = _context.Stories.Where(x => x.IdStorie == nuevo.IdStories).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (storie == null)
+            {
+                throw new InvalidOperationException("La historia no existe.");
+            }
+
+            var anxie = _context.Anxieties.Where(x => x.IdAnxie == nuevo.IdAnxie).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (anxie == null)
+            {
+                throw new InvalidOperationException("El ansiedad no existe.");
+            }
+
+            var result = await _context.Database.ExecuteSqlAsync(
+                $"Insert into StoriesAnxieties (StoriesIdStorie, AnxietiesIdAnxie) Values( {nuevo.IdStories}, {nuevo.IdAnxie})");
+
+            //await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteStorieEntityAsync(int opcion, int idStorie, int idEntidad)
+        {
+            switch (opcion)
+            {
+                case 1:
+                    var result = await _context.Database.ExecuteSqlAsync($"DELETE StoriesPushes WHERE StoriesIdStorie={idStorie} AND PushesGroupsIdPush={idEntidad}");
+                    break;
+                case 2:
+                    var result2 = await _context.Database.ExecuteSqlAsync($"DELETE StoriesPulls WHERE StoriesIdStorie={idStorie} AND PullGroupsIdPull={idEntidad}");
+                    break;
+                case 3:
+                    var result3 = await _context.Database.ExecuteSqlAsync($"DELETE StoriesHabbits WHERE StoriesIdStorie={idStorie} AND HabitsIdHabit={idEntidad}");
+                    break;
+                case 4:
+                    var result4 = await _context.Database.ExecuteSqlAsync($"DELETE StoriesAnxieties WHERE StoriesIdStorie={idStorie} AND AnxietiesIdAnxie={idEntidad}");
+                    break;
+            }
+
+            //await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
