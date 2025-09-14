@@ -13,7 +13,7 @@ namespace Jtbd.Infrastructure.Repositories
     public class PullGroupsRepository(JtbdDbContext context) : IPullGroups
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(CreatePull pull)
+        public async Task<PullGroups> CreateAsync(CreatePull pull)
         {
             PullGroups auxPull = new PullGroups();
             auxPull.PullName = pull.PullName;
@@ -40,7 +40,7 @@ namespace Jtbd.Infrastructure.Repositories
             _context.Entry(auxPull).State = EntityState.Detached;
             _context.Entry(project).State = EntityState.Detached;
 
-            return true;
+            return auxPull;
         }
 
         public async Task<bool> DeleteAsync(int id)

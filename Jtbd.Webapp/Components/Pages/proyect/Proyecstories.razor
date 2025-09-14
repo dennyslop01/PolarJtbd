@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyecstories"
+﻿@page "/proyect/proyecstories/{IdInter}"
 
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -12,25 +12,35 @@
 
 <PageTitle>Historias</PageTitle>
 <div class="row align-content-center">
-    <div class="col-lg-4">
+    <div class="col-lg-11">
         <h3 class="text-center mt-4">Gestión de Historias</h3>
-        <EditForm Model="@Model">
-            <div class="mb-3">
-                <label class="form-label">Proyectos:</label>
-                <InputSelect class="form-select" Value="Model.idProyecto" ValueChanged="@((int value) => OnProyectChanged(value))" ValueExpression="@(() => Model.idProyecto)">
-                    <option value="-1">-- Seleccione uno --</option>
-                    @foreach (var item in proyectos)
-                    {
-                        <option value="@item.IdProject">@item.ProjectName</option>
-                    }
-                </InputSelect>
-            </div>
-        </EditForm>
+        <div class="col-lg-11">
+            <table class="table table-striped table-hover">
+                <thead class="table bg-opacity-25">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Proyecto : @(entrevistado == null ? "-" : entrevistado.Project?.ProjectName) </td>
+                        <td>@(entrevistado == null ? "-" : entrevistado.InterName) </td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                                <i class="bi bi-arrow-return-left"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-lg-10">
         <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-primary" @onclick="MostrarFormulario">
-                <i class="bi bi-plus"></i> Agregar Historia
+            <button class="btn btn-primary" title="Agregar Historia" @onclick="MostrarFormulario">
+                <i class="bi bi-plus-lg"></i> 
             </button>
         </div>
 
@@ -61,8 +71,8 @@
                     <tr>
                         <th>#</th>
                         <th>Titulo</th>
-                        <th>Entrevistado</th>
-                        <th>Acciones</th>
+                        <th>Contexto</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,16 +81,16 @@
                         <tr>
                             <td>@p.IdStorie</td>
                             <td>@p.TitleStorie</td>
-                            <td>@p.IdInter.InterName</td>
+                            <td>@p.ContextStorie</td>
                             <td>
-                                <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
-                                    <i class="bi bi-pencil"></i> Editar
+                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <i class="bi bi-pencil"></i> 
                                 </button>
-                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.IdStorie)">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.IdStorie)">
+                                    <i class="bi bi-trash"></i> 
                                 </button>
-                                <button class="btn btn-secondary btn-sm" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
-                                    <i class="bi bi-grid m-1"></i> Características
+                                <button class="btn btn-secondary btn-sm" title="Catálogar" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
+                                    <i class="bi bi-grid m-1"></i> 
                                 </button>
                             </td>
                         </tr>
@@ -104,23 +114,13 @@
                     <EditForm Model="@entidadActual" OnValidSubmit="GuardarEntidad">
                         <DataAnnotationsValidator />
 
-                        <div class="mb-3">
-                            <label class="form-label">Entrevistado:</label>
-                            <InputSelect class="form-select" @bind-Value="entidadActual.IdInter">
-                                <option value="-1">-- Seleccione uno --</option>
-                                @foreach (var item in entrevistados)
-                                {
-                                    <option value="@item.IdInter">@item.InterName</option>
-                                }
-                            </InputSelect>
-                        </div>
-                        <div class="mb-3">
+                         <div class="mb-3">
                             <label class="form-label">Título:</label>
                             <InputText class="form-control" @bind-Value="entidadActual.TitleStorie" />
                             <ValidationMessage For="@(() => entidadActual.TitleStorie)" />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Descripcion:</label>
+                            <label class="form-label">Contexto:</label>
                             <InputTextArea class="form-control" @bind-Value="entidadActual.ContextStorie" />
                             <ValidationMessage For="@(() => entidadActual.ContextStorie)" />
                         </div>
@@ -140,14 +140,10 @@
 }
 
 @code {
-    public class Proyecto
-    {
-        public int idProyecto { get; set; }
-    }
+    [Parameter]
+    public string IdInter { get; set; }
 
-    public Proyecto Model { get; set; } = new Proyecto();
-    private List<Projects> proyectos = new();
-    private List<Interviews> entrevistados = new();
+    private Interviews entrevistado = new();
     private List<Stories> stories = new();
     private CreateStorie entidadActual = new();
     private bool mostrarFormulario = false;
@@ -157,7 +153,6 @@
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IStories repository { get; set; } = null!;
-    [Inject] private IProjects repoproyec { get; set; } = null!;
     [Inject] private IInterviews repointer { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
@@ -177,8 +172,9 @@
 
         try
         {
-            proyectos = (List<Projects>)await repoproyec.GetAllAsync();
-            entrevistados = (List<Interviews>)await repointer.GetAllAsync();
+            entrevistado = (Interviews)await repointer.GetByIdAsync(int.Parse(IdInter));
+
+            stories = (List<Stories>)await repository.GetByInterIdAsync(int.Parse(IdInter));
         }
         catch (Exception ex)
         {
@@ -191,20 +187,17 @@
     {
         try
         {
-            if (Model.idProyecto > 0)
-            {
-                entidadActual = new CreateStorie();
-                entidadActual.IdProject = Model.idProyecto;
-                entidadActual.IdInter = -1;
-                entidadActual.CreatedDate = DateTime.Now;
-                entidadActual.CreatedUser = username;
-                entidadActual.UpdatedDate = DateTime.Now;
-                entidadActual.UpdatedUser = username;
+            entidadActual = new CreateStorie();
+            entidadActual.IdProject = entrevistado.Project.IdProject;
+            entidadActual.IdInter = entrevistado.IdInter;
+            entidadActual.CreatedDate = DateTime.Now;
+            entidadActual.CreatedUser = username;
+            entidadActual.UpdatedDate = DateTime.Now;
+            entidadActual.UpdatedUser = username;
 
-                mostrarFormulario = true;
-            }
+            mostrarFormulario = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Logger.LogError(ex.Message);
         }
@@ -214,23 +207,22 @@
     {
         try
         {
-            if (Model.idProyecto > 0)
-            {
-                entidadActual = new CreateStorie
-                    {
-                        IdProject = entidad.Project.IdProject,
-                        IdInter = entidad.IdInter.IdInter,
-                        TitleStorie = entidad.TitleStorie,
-                        ContextStorie = entidad.ContextStorie,
-                        CreatedDate = entidad.CreatedDate,
-                        CreatedUser = entidad.CreatedUser,
-                        UpdatedDate = DateTime.Now,
-                        UpdatedUser = username
-                    };
-                mostrarFormulario = true;
-            }
+            entidadActual = new CreateStorie
+                {
+                    IdStorie = entidad.IdStorie,
+                    IdProject = entidad.Project.IdProject,
+                    IdInter = entidad.IdInter.IdInter,
+                    TitleStorie = entidad.TitleStorie,
+                    ContextStorie = entidad.ContextStorie,
+                    CreatedDate = entidad.CreatedDate,
+                    CreatedUser = entidad.CreatedUser,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedUser = username
+                };
+
+            mostrarFormulario = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Logger.LogError(ex.Message);
         }
@@ -282,12 +274,11 @@
         mostrarFormulario = false;
     }
 
-    private async Task OnProyectChanged(int value)
+    private async Task AgrgarCaracteristicas(string IdStorie)
     {
         try
         {
-            Model.idProyecto = value;
-            stories = (List<Stories>)await repository.GetByProjectIdAsync(value);
+            NavigationManager.NavigateTo($"proyect/detalle/{IdStorie}");
         }
         catch (Exception ex)
         {
@@ -295,11 +286,11 @@
         }
     }
 
-    private async Task AgrgarCaracteristicas(string IdStorie)
+    private void Regresar()
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/detalle/{IdStorie}");
+            NavigationManager.NavigateTo($"/proyect/interview/{entrevistado.Project.IdProject}");
         }
         catch (Exception ex)
         {

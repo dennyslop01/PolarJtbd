@@ -11,6 +11,8 @@ namespace Jtbd.Domain.Entities
     {
         public int IdInter { get; set; }
 
+        public int IdProject { get; set; }
+
         [Required]
         [MaxLength(100)]
         public string InterName { get; set; } = string.Empty;

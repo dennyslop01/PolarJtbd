@@ -98,6 +98,15 @@ namespace Jtbd.Infrastructure.Repositories
             return stories!;
         }
 
+        public async Task<IEnumerable<Stories>> GetByInterIdAsync(int id)
+        {
+            var stories = await _context.Stories
+                 .Include(x => x.Project)
+                 .Include(x => x.IdInter)
+                 .Where(x => x.IdInter.IdInter == id).AsQueryable().AsNoTracking().ToListAsync();
+            return stories!;
+        }
+
         public async Task<bool> UpdateAsync(CreateStorie stories)
         {
             Stories auxStorie = new Stories();

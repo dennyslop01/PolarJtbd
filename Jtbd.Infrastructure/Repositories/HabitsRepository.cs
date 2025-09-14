@@ -13,7 +13,7 @@ namespace Jtbd.Infrastructure.Repositories
     public class HabitsRepository(JtbdDbContext context) : IHabits
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(CreateHabits habits)
+        public async Task<Habits> CreateAsync(CreateHabits habits)
         {
             Habits auxHabbit = new Habits();
             auxHabbit.HabitName = habits.HabitName;
@@ -40,7 +40,7 @@ namespace Jtbd.Infrastructure.Repositories
             _context.Entry(auxHabbit).State = EntityState.Detached;
             _context.Entry(project).State = EntityState.Detached;
 
-            return true;
+            return auxHabbit;
         }
 
         public async Task<bool> DeleteAsync(int id)

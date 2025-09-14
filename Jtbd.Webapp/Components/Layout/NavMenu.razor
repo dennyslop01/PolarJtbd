@@ -26,17 +26,17 @@
             @if (isExpandSubNavP)
             {
                 <ul class="nav flex-column submenu">
-                    <li class="nav-item px-3">
+                    @* <li class="nav-item px-3">
                         <NavLink class="nav-link" href="proyect/interview" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
                             <p><i class="bi bi-person-check m-1"></i> Entrevistados</p>
                         </NavLink>
-                    </li>
+                    </li> *@
                     <li class="nav-item px-3">
                         <NavLink class="nav-link" href="proyect/proyectos" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
                             <p><i class="bi bi-clipboard-data m-1"></i> Proyectos</p>
                         </NavLink>
                     </li>
-                    <li class="nav-item px-3">
+                    @* <li class="nav-item px-3">
                         <NavLink class="nav-link" href="proyect/proyecpushes" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
                             <p><i class="bi bi-grid m-1"></i> Pushes</p>
                         </NavLink>
@@ -60,7 +60,7 @@
                         <NavLink class="nav-link" href="proyect/proyecstories" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
                             <p><i class="bi bi-list-columns-reverse m-1"></i> Historias</p>
                         </NavLink>
-                    </li>
+                    </li> *@
                 </ul>
             }
         </div>

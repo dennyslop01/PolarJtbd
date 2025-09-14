@@ -26,9 +26,22 @@ namespace Jtbd.Infrastructure.Repositories
                 InterNSE = interviews.InterNSE,
                 DateInter = interviews.DateInter
             };
+            var project = _context.Projects.Where(x => x.IdProject == interviews.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (project != null)
+            {
+                auxInter.Project = project;
+            }
+            else
+            {
+                throw new InvalidOperationException("El proyecto no existe.");
+            }
+
             await _context.Interviews.AddAsync(auxInter);
+            _context.Entry(auxInter.Project).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
             _context.Entry(auxInter).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
             return true;
         }
 
@@ -47,14 +60,25 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<IEnumerable<Interviews>> GetAllAsync()
         {
-            return await _context.Interviews.AsQueryable().AsNoTracking().ToListAsync();
+            return await _context.Interviews
+                .Include(x => x.Project)
+                .AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<Interviews> GetByIdAsync(int id)
         {
-            var categoria = await _context.Interviews
+            var inter = await _context.Interviews
+                .Include(x => x.Project)
                  .FirstOrDefaultAsync(x => x.IdInter == id);
-            return categoria!;
+            return inter!;
+        }
+
+        public async Task<IEnumerable<Interviews>> GetByProjectIdAsync(int id)
+        {
+            var inter = await _context.Interviews
+                 .Include(x => x.Project)
+                 .Where(x => x.Project.IdProject == id).AsQueryable().AsNoTracking().ToListAsync();
+            return inter!;
         }
 
         public async Task<bool> UpdateAsync(CreateInterview interviews)
@@ -69,10 +93,25 @@ namespace Jtbd.Infrastructure.Repositories
                 InterNickname = interviews.InterNickname,
                 InterNSE = interviews.InterNSE,
                 DateInter = interviews.DateInter
-            }; 
+            };
+
+            var project = _context.Projects.Where(x => x.IdProject == interviews.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (project != null)
+            {
+                auxInter.Project = project;
+            }
+            else
+            {
+                throw new InvalidOperationException("El proyecto no existe.");
+            }
+
             _context.Interviews.Update(auxInter);
+            _context.Entry(auxInter.Project).State = EntityState.Unchanged;
+
             await _context.SaveChangesAsync();
             _context.Entry(auxInter).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+
             return true;
         }
     }

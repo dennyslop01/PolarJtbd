@@ -12,7 +12,7 @@
         <h3 class="text-center mt-4">Gestión de Usuarios</h3>
         <div class="d-flex justify-content-end mb-3">
             <button class="btn btn-primary" @onclick="MostrarFormulario">
-                <i class="bi bi-plus"></i> Agregar Usuario
+                <i class="bi bi-plus-lg"></i> Agregar Usuario
             </button>
         </div>
 
@@ -46,7 +46,7 @@
                         <th>Departamento</th>
                         <th>Rol</th>
                         <th>Estatus</th>
-                        <th>Acciones</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,7 +79,7 @@
                                     break;
                             }
                             <td>
-                                <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
+                                <button class="btn btn-success btn-sm me-2" @onclick="() => EditarEntidad(p)">
                                     <i class="bi bi-pencil"></i> Editar
                                 </button>
                                 <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.Id)">

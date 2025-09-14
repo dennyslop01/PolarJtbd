@@ -13,7 +13,7 @@ namespace Jtbd.Infrastructure.Repositories
     public class PushesGroupsRepository(JtbdDbContext context) : IPushesGroups
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(CreatePushes push)
+        public async Task<PushesGroups> CreateAsync(CreatePushes push)
         {
             PushesGroups auxPushes = new PushesGroups();
             auxPushes.PushName = push.PushName;
@@ -40,7 +40,7 @@ namespace Jtbd.Infrastructure.Repositories
             _context.Entry(auxPushes).State = EntityState.Detached;
             _context.Entry(project).State = EntityState.Detached;
 
-            return true;
+            return auxPushes;
         }
 
         public async Task<bool> DeleteAsync(int id)

@@ -13,7 +13,7 @@ namespace Jtbd.Infrastructure.Repositories
     public class AnxietiesRepository(JtbdDbContext context) : IAnxieties
     {
         private readonly JtbdDbContext _context = context;
-        public async Task<bool> CreateAsync(CreateAnxietie anxieties)
+        public async Task<Anxieties> CreateAsync(CreateAnxietie anxieties)
         {
             Anxieties auxAnxie = new Anxieties();
             auxAnxie.AnxieName = anxieties.AnxieName;
@@ -40,7 +40,7 @@ namespace Jtbd.Infrastructure.Repositories
             _context.Entry(auxAnxie).State = EntityState.Detached;
             _context.Entry(project).State = EntityState.Detached;
 
-            return true;
+            return auxAnxie;
         }
 
         public async Task<bool> DeleteAsync(int id)

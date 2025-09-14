@@ -11,6 +11,7 @@ namespace Jtbd.Domain.Entities
     {
         [Key] 
         public int IdInter { get; set; }
+        public Projects? Project { get; set; }
 
         [Required]
         [MaxLength(100)]

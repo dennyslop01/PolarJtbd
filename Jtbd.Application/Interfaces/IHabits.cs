@@ -12,7 +12,7 @@ namespace Jtbd.Application.Interfaces
         Task<IEnumerable<Habits>> GetAllAsync();
         Task<Habits> GetByIdAsync(int id);
         Task<IEnumerable<Habits>> GetByProjectIdAsync(int id);
-        Task<bool> CreateAsync(CreateHabits habits);
+        Task<Habits> CreateAsync(CreateHabits habits);
         Task<bool> UpdateAsync(CreateHabits habits);
         Task<bool> DeleteAsync(int id);
     }

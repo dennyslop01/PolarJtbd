@@ -12,7 +12,7 @@ namespace Jtbd.Application.Interfaces
         Task<IEnumerable<PushesGroups>> GetAllAsync();
         Task<PushesGroups> GetByIdAsync(int id);
         Task<IEnumerable<PushesGroups>> GetByProjectIdAsync(int id);
-        Task<bool> CreateAsync(CreatePushes push);
+        Task<PushesGroups> CreateAsync(CreatePushes push);
         Task<bool> UpdateAsync(CreatePushes push);
         Task<bool> DeleteAsync(int id);
     }

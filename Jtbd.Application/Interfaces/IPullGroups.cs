@@ -12,7 +12,7 @@ namespace Jtbd.Application.Interfaces
         Task<IEnumerable<PullGroups>> GetAllAsync();
         Task<PullGroups> GetByIdAsync(int id);
         Task<IEnumerable<PullGroups>> GetByProjectIdAsync(int id);
-        Task<bool> CreateAsync(CreatePull pull);
+        Task<PullGroups> CreateAsync(CreatePull pull);
         Task<bool> UpdateAsync(CreatePull pull);
         Task<bool> DeleteAsync(int id);
     }

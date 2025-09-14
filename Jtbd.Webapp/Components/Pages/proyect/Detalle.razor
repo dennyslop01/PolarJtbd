@@ -18,25 +18,31 @@
 </div>
 
 <div class="row align-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-11">
         <table class="table table-striped table-hover">
-            <thead class="table-secondary bg-opacity-25">
+            <thead class="table bg-opacity-25">
                 <tr>
-                    <th>Proyecto</th>
-                    <th>#</th>
-                    <th>Titulo</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                <tr>
-                    <td>@(entidadStorie.Project == null? "-": entidadStorie.Project.ProjectName) </td>
-                    <td>@entidadStorie.IdStorie</td>
+                    <td>@(entidadStorie.Project == null ? "-" : entidadStorie.Project.ProjectName) </td>
+                    <td>@(entidadStorie.IdInter == null ? "-" : entidadStorie.IdInter.InterName) </td>
                     <td>@entidadStorie.TitleStorie</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                            <i class="bi bi-arrow-return-left"></i>
+                        </button>
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <div class="col-lg-10">
+    <div class="col-lg-11">
         <table class="table table-striped table-hover">
             <thead class="table-secondary bg-opacity-25">
                 <tr>
@@ -53,7 +59,7 @@
 </div>
 
 <div class="row align-content-center" style="font-size: 11px;">
-    <div class="col-lg-4">
+    <div class="col-lg-5">
         <label><strong>Pushes</strong></label>
         <br />
         @if (pushstorie is null)
@@ -65,7 +71,7 @@
         }
         else if (!pushstorie.Any())
         {
-            <div class="alert alert-info text-center">No hay pushes disponibles.</div>
+            <div class="alert alert-light text-center bg-opacity-25">No hay pushes disponibles.</div>
         }
         else
         {
@@ -74,7 +80,7 @@
                     <tr>
                         <th>#</th>
                         <th>Nombre</th>
-                        <th>Acciones</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,8 +90,11 @@
                             <td>@p.PushesGroups.IdPush</td>
                             <td>@p.PushesGroups.PushName</td>
                             <td>
-                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" style="font-size: 11px;">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
+                                    <i class="bi bi-pencil"></i> 
+                                </button>
+                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" style="font-size: 11px;">
+                                    <i class="bi bi-trash"></i> 
                                 </button>
                             </td>
                         </tr>
@@ -94,11 +103,11 @@
             </table>
         }
         <br />
-        <button class="btn btn-primary btn-sm" @onclick="MostrarPushes" style="font-size: 11px;">
-           <i class="bi bi-plus"></i> Pushes
+        <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes" style="font-size: 11px;">
+           <i class="bi bi-plus-lg"></i> 
         </button>
     </div>
-    <div class="col-lg-4">
+    <div class="col-lg-5">
         <label><strong>Pulls</strong></label>
         <br />
         @if (pullstorie is null)
@@ -110,7 +119,7 @@
         }
         else if (!pullstorie.Any())
         {
-            <div class="alert alert-info text-center">No hay pulls disponibles.</div>
+            <div class="alert alert-light text-center bg-opacity-25">No hay pulls disponibles.</div>
         }
         else
         {
@@ -119,7 +128,7 @@
                     <tr>
                         <th>#</th>
                         <th>Nombre</th>
-                        <th>Acciones</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -129,8 +138,11 @@
                             <td>@p.PullGroups.IdPull</td>
                             <td>@p.PullGroups.PullName</td>
                             <td>
-                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" style="font-size: 11px;">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" style="font-size: 11px;">
+                                    <i class="bi bi-trash"></i> 
                                 </button>
                             </td>
                         </tr>
@@ -139,8 +151,8 @@
             </table>
         }
         <br />
-        <button class="btn btn-primary btn-sm" @onclick="MostrarPulls" style="font-size: 11px;">
-           <i class="bi bi-plus"></i> Pulls
+        <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls" style="font-size: 11px;">
+           <i class="bi bi-plus-lg"></i> 
         </button>
     </div>
 </div>
@@ -148,7 +160,7 @@
 <br />
 
 <div class="row align-content-center" style="font-size: 11px;">
-    <div class="col-lg-4">
+    <div class="col-lg-5">
         <label><strong>Hábitos</strong></label>
         <br />
         @if (habitstorie is null)
@@ -160,7 +172,7 @@
         }
         else if (!habitstorie.Any())
         {
-            <div class="alert alert-info text-center">No hay hábitos disponibles.</div>
+            <div class="alert alert-light text-center bg-opacity-25">No hay hábitos disponibles.</div>
         }
         else
         {
@@ -169,7 +181,7 @@
                     <tr>
                         <th>#</th>
                         <th>Nombre</th>
-                        <th>Acciones</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -179,8 +191,11 @@
                             <td>@p.Habits.IdHabit</td>
                             <td>@p.Habits.HabitName</td>
                             <td>
-                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" style="font-size: 11px;">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" style="font-size: 11px;">
+                                    <i class="bi bi-trash"></i> 
                                 </button>
                             </td>
                         </tr>
@@ -189,11 +204,11 @@
             </table>
         }
         <br />
-        <button class="btn btn-primary btn-sm" @onclick="MostrarHabits" style="font-size: 11px;">
-            <i class="bi bi-plus"></i> Hábitos
+        <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits" style="font-size: 11px;">
+            <i class="bi bi-plus-lg"></i> 
         </button>
     </div>
-    <div class="col-lg-4">
+    <div class="col-lg-5">
         <label><strong>Ansiedades</strong></label>
         <br />
         @if (anxiestorie is null)
@@ -205,7 +220,7 @@
         }
         else if (!anxiestorie.Any())
         {
-            <div class="alert alert-info text-center">No hay ansiedades disponibles.</div>
+            <div class="alert alert-light text-center bg-opacity-25">No hay ansiedades disponibles.</div>
         }
         else
         {
@@ -214,7 +229,7 @@
                     <tr>
                         <th>#</th>
                         <th>Nombre</th>
-                        <th>Acciones</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -224,8 +239,11 @@
                             <td>@p.Anxieties.IdAnxie</td>
                             <td>@p.Anxieties.AnxieName</td>
                             <td>
-                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" style="font-size: 11px;">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" style="font-size: 11px;">
+                                    <i class="bi bi-trash"></i> 
                                 </button>
                             </td>
                         </tr>
@@ -234,8 +252,8 @@
             </table>
         }
         <br />
-        <button class="btn btn-primary btn-sm" @onclick="MostrarAnxies" style="font-size: 11px;">
-            <i class="bi bi-plus"></i> Ansiedades
+        <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies" style="font-size: 11px;">
+            <i class="bi bi-plus-lg"></i> 
         </button>
     </div>
 </div>
@@ -251,19 +269,13 @@
                     <button type="button" class="btn-close" @onclick="Cancelar"></button>
                 </div>
                 <div class="modal-body">
-                    <EditForm Model="pushActual" OnValidSubmit="GuardarPush">
+                    <EditForm Model="@pushActual" OnValidSubmit="GuardarPush">
                         <DataAnnotationsValidator />
 
                         <div class="mb-3">
                             <label class="form-label">Push:</label>
-                            <InputSelect class="form-select" @bind-Value="pushActual.IdPush">
-                                <option value="-1">-- Seleccione uno --</option>
-                                @foreach (var item in auxpushes)
-                                {
-                                    <option value="@item.IdPush">@item.PushName</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => pushActual.IdPush)" />
+                            <InputText class="form-control" @bind-Value="pushActual.PushName" />
+                            <ValidationMessage For="@(() => pushActual.PushName)" />
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success me-2">
@@ -290,19 +302,13 @@
                     <button type="button" class="btn-close" @onclick="Cancelar"></button>
                 </div>
                 <div class="modal-body">
-                    <EditForm Model="pullActual" OnValidSubmit="GuardarPull">
+                    <EditForm Model="@pullActual" OnValidSubmit="GuardarPull">
                         <DataAnnotationsValidator />
 
                         <div class="mb-3">
                             <label class="form-label">Pull:</label>
-                            <InputSelect class="form-select" @bind-Value="pullActual.IdPull">
-                                <option value="-1">-- Seleccione uno --</option>
-                                @foreach (var item in auxpulls)
-                                {
-                                    <option value="@item.IdPull">@item.PullName</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => pullActual.IdPull)" />
+                            <InputText class="form-control" @bind-Value="pullActual.PullName" />
+                            <ValidationMessage For="@(() => pullActual.PullName)" />
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success me-2">
@@ -329,19 +335,13 @@
                     <button type="button" class="btn-close" @onclick="Cancelar"></button>
                 </div>
                 <div class="modal-body">
-                    <EditForm Model="habitActual" OnValidSubmit="GuardarHabit">
+                    <EditForm Model="@habitActual" OnValidSubmit="GuardarHabit">
                         <DataAnnotationsValidator />
 
                         <div class="mb-3">
                             <label class="form-label">Hábito:</label>
-                            <InputSelect class="form-select" @bind-Value="habitActual.IdHabit">
-                                <option value="-1">-- Seleccione uno --</option>
-                                @foreach (var item in auxhabits)
-                                {
-                                    <option value="@item.IdHabit">@item.HabitName</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => habitActual.IdHabit)" />
+                            <InputText class="form-control" @bind-Value="habitActual.HabitName" />
+                            <ValidationMessage For="@(() => habitActual.HabitName)" />
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success me-2">
@@ -368,19 +368,13 @@
                     <button type="button" class="btn-close" @onclick="Cancelar"></button>
                 </div>
                 <div class="modal-body">
-                    <EditForm Model="anxieActual" OnValidSubmit="GuardarAnxie">
+                    <EditForm Model="@anxieActual" OnValidSubmit="GuardarAnxie">
                         <DataAnnotationsValidator />
 
                         <div class="mb-3">
                             <label class="form-label">Ansiedad:</label>
-                            <InputSelect class="form-select" @bind-Value="anxieActual.IdAnxie">
-                                <option value="-1">-- Seleccione uno --</option>
-                                @foreach (var item in auxanxies)
-                                {
-                                    <option value="@item.IdAnxie">@item.AnxieName</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => anxieActual.IdAnxie)" />
+                            <InputText class="form-control" @bind-Value="anxieActual.AnxieName" />
+                            <ValidationMessage For="@(() => anxieActual.AnxieName)" />
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success me-2">
@@ -413,31 +407,32 @@
     [Inject] private IPullGroups repopull { get; set; } = null!;
     [Inject] private IHabits repohabi { get; set; } = null!;
     [Inject] private IAnxieties repoanxie { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     private Stories entidadStorie = new ();
     private string username = "Auxiliar";
     private int idProyec = 0;
 
-    private List<PushesGroups> pushes = new();
-    private List<PushesGroups> auxpushes = new();
+    // private List<PushesGroups> pushes = new();
+    // private List<PushesGroups> auxpushes = new();
     private List<StoriesPush> pushstorie = new();
 
-    private List<PullGroups> pulls = new();
-    private List<PullGroups> auxpulls = new();
+    // private List<PullGroups> pulls = new();
+    // private List<PullGroups> auxpulls = new();
     private List<StoriesPull> pullstorie = new();
 
-    private List<Habits> habits = new();
-    private List<Habits> auxhabits = new();
+    // private List<Habits> habits = new();
+    // private List<Habits> auxhabits = new();
     private List<StoriesHabbit> habitstorie = new();
 
-    private List<Anxieties> anxies = new();
-    private List<Anxieties> auxanxies = new();
+    // private List<Anxieties> anxies = new();
+    // private List<Anxieties> auxanxies = new();
     private List<StoriesAnxiety> anxiestorie = new();
 
-    private CreateStoriesPush pushActual = new();
-    private CreateStoriesPull pullActual = new();
-    private CreateStoriesAnxiety anxieActual = new();
-    private CreateStoriesHabbit habitActual = new();
+    private CreatePushes pushActual = new();
+    private CreatePull pullActual = new();
+    private CreateAnxietie anxieActual = new();
+    private CreateHabits habitActual = new();
 
 
     protected override async Task OnInitializedAsync()
@@ -462,20 +457,20 @@
                 idProyec = entidadStorie.Project.IdProject;
 
                 pushstorie = (List<StoriesPush>)await repostorie.GetPushesByStorieIdAsync(int.Parse(idStorie));
-                pushes = (List<PushesGroups>)await repopush.GetByProjectIdAsync(idProyec);
-                auxpushes = pushes;
+                // pushes = (List<PushesGroups>)await repopush.GetByProjectIdAsync(idProyec);
+                // auxpushes = pushes;
 
                 pullstorie = (List<StoriesPull>)await repostorie.GetPullsByStorieIdAsync(int.Parse(idStorie));
-                pulls = (List<PullGroups>)await repopull.GetByProjectIdAsync(idProyec);
-                auxpulls = pulls;
+                // pulls = (List<PullGroups>)await repopull.GetByProjectIdAsync(idProyec);
+                // auxpulls = pulls;
 
                 habitstorie = (List<StoriesHabbit>)await repostorie.GetHabitsByStorieIdAsync(int.Parse(idStorie));
-                habits = (List<Habits>)await repohabi.GetByProjectIdAsync(idProyec);
-                auxhabits = habits;
+                // habits = (List<Habits>)await repohabi.GetByProjectIdAsync(idProyec);
+                // auxhabits = habits;
 
                 anxiestorie = (List<StoriesAnxiety>)await repostorie.GetAxieByStorieIdAsync(int.Parse(idStorie));
-                anxies = (List<Anxieties>)await repoanxie.GetByProjectIdAsync(idProyec);
-                auxanxies = anxies;
+                // anxies = (List<Anxieties>)await repoanxie.GetByProjectIdAsync(idProyec);
+                // auxanxies = anxies;
             }
 
         }
@@ -490,17 +485,45 @@
     {
         try
         {
-            if (pushstorie.Count() > 0)
-            {
-                var excludedIDs = new HashSet<int>(pushstorie.Select(p => p.PushesGroups.IdPush));
-                var auxiliar = pushes.Where(p => !excludedIDs.Contains(p.IdPush)).ToList();
+            // if (pushstorie.Count() > 0)
+            // {
+            //     var excludedIDs = new HashSet<int>(pushstorie.Select(p => p.PushesGroups.IdPush));
+            //     var auxiliar = pushes.Where(p => !excludedIDs.Contains(p.IdPush)).ToList();
 
-                auxpushes = (List<PushesGroups>) auxiliar;
-            }
+            //     auxpushes = (List<PushesGroups>) auxiliar;
+            // }
 
-            pushActual = new CreateStoriesPush();
-            pushActual.IdPush = -1;
-            pushActual.IdStories = int.Parse(idStorie);
+            pushActual = new CreatePushes();
+            pushActual.IdPush = 0;
+            pushActual.IdProject = entidadStorie.Project.IdProject;
+            pushActual.CreatedDate = DateTime.Now;
+            pushActual.CreatedUser = username;
+            pushActual.UpdatedDate = DateTime.Now;
+            pushActual.UpdatedUser = username;
+            pushActual.StatusPush = 1;
+            mostrarPush = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void EditarPush(PushesGroups entidad)
+    {
+        try
+        {
+            pushActual = new CreatePushes
+                {
+                    IdProject = entidadStorie.Project.IdProject,
+                    IdPush = entidad.IdPush,
+                    PushName = entidad.PushName,
+                    CreatedDate = entidad.CreatedDate,
+                    CreatedUser = entidad.CreatedUser,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedUser = username,
+                    StatusPush = entidad.StatusPush
+                };
             mostrarPush = true;
         }
         catch (Exception ex)
@@ -513,20 +536,48 @@
     {
         try
         {
-            if (pullstorie.Count() > 0)
-            {
-                var excludedIDs = new HashSet<int>(pullstorie.Select(p => p.PullGroups.IdPull));
-                var auxiliar = pulls.Where(p => !excludedIDs.Contains(p.IdPull)).ToList();
+            // if (pullstorie.Count() > 0)
+            // {
+            //     var excludedIDs = new HashSet<int>(pullstorie.Select(p => p.PullGroups.IdPull));
+            //     var auxiliar = pulls.Where(p => !excludedIDs.Contains(p.IdPull)).ToList();
 
-                auxpulls = (List<PullGroups>)auxiliar;
-            }
+            //     auxpulls = (List<PullGroups>)auxiliar;
+            // }
 
-            pullActual = new CreateStoriesPull();
-            pullActual.IdPull = -1;
-            pullActual.IdStories = int.Parse(idStorie);
+            pullActual = new CreatePull();
+            pullActual.IdPull = 0;
+            pullActual.IdProject = entidadStorie.Project.IdProject;
+            pullActual.CreatedDate = DateTime.Now;
+            pullActual.CreatedUser = username;
+            pullActual.UpdatedDate = DateTime.Now;
+            pullActual.UpdatedUser = username;
+            pullActual.StatusPull = 1;
             mostrarPull = true;
         }
         catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void EditarPull(PullGroups entidad)
+    {
+        try
+        {
+            pullActual = new CreatePull
+            {
+                IdProject = entidadStorie.Project.IdProject,
+                IdPull = entidad.IdPull,
+                PullName = entidad.PullName,
+                CreatedDate = entidad.CreatedDate,
+                CreatedUser = entidad.CreatedUser,
+                UpdatedDate = DateTime.Now,
+                UpdatedUser = username,
+                StatusPull = entidad.StatusPull
+            };
+            mostrarPull = true;
+        }
+        catch (Exception ex)
         {
             Logger.LogError(ex.Message);
         }
@@ -536,20 +587,48 @@
     {
         try
         {
-            if (habitstorie.Count() > 0)
-            {
-                var excludedIDs = new HashSet<int>(habitstorie.Select(p => p.Habits.IdHabit));
-                var auxiliar = habits.Where(p => !excludedIDs.Contains(p.IdHabit)).ToList();
+            // if (habitstorie.Count() > 0)
+            // {
+            //     var excludedIDs = new HashSet<int>(habitstorie.Select(p => p.Habits.IdHabit));
+            //     var auxiliar = habits.Where(p => !excludedIDs.Contains(p.IdHabit)).ToList();
 
-                auxhabits = (List<Habits>)auxiliar;
-            }
+            //     auxhabits = (List<Habits>)auxiliar;
+            // }
 
-            habitActual = new CreateStoriesHabbit();
-            habitActual.IdHabit = -1;
-            habitActual.IdStories = int.Parse(idStorie);
+            habitActual = new CreateHabits();
+            habitActual.IdHabit = 0;
+            habitActual.IdProject = entidadStorie.Project.IdProject;
+            habitActual.CreatedDate = DateTime.Now;
+            habitActual.CreatedUser = username;
+            habitActual.UpdatedDate = DateTime.Now;
+            habitActual.UpdatedUser = username;
+            habitActual.StatusHabit = 1;
             mostrarHabit = true;
         }
         catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void EditarHabit(Habits entidad)
+    {
+        try
+        {
+            habitActual = new CreateHabits
+            {
+                IdProject = entidadStorie.Project.IdProject,
+                IdHabit = entidad.IdHabit,
+                HabitName = entidad.HabitName,
+                CreatedDate = entidad.CreatedDate,
+                CreatedUser = entidad.CreatedUser,
+                UpdatedDate = DateTime.Now,
+                UpdatedUser = username,
+                StatusHabit = entidad.StatusHabit
+            };
+            mostrarHabit = true;
+        }
+        catch (Exception ex)
         {
             Logger.LogError(ex.Message);
         }
@@ -559,20 +638,48 @@
     {
         try
         {
-            if (anxiestorie.Count() > 0)
-            {
-                var excludedIDs = new HashSet<int>(anxiestorie.Select(p => p.Anxieties.IdAnxie));
-                var auxiliar = anxies.Where(p => !excludedIDs.Contains(p.IdAnxie)).ToList();
+            // if (anxiestorie.Count() > 0)
+            // {
+            //     var excludedIDs = new HashSet<int>(anxiestorie.Select(p => p.Anxieties.IdAnxie));
+            //     var auxiliar = anxies.Where(p => !excludedIDs.Contains(p.IdAnxie)).ToList();
 
-                auxanxies = (List<Anxieties>)auxiliar;
-            }
+            //     auxanxies = (List<Anxieties>)auxiliar;
+            // }
 
-            anxieActual = new CreateStoriesAnxiety();
-            anxieActual.IdAnxie = -1;
-            anxieActual.IdStories = int.Parse(idStorie);
+            anxieActual = new CreateAnxietie();
+            anxieActual.IdAnxie = 0;
+            anxieActual.IdProject = entidadStorie.Project.IdProject;
+            anxieActual.CreatedDate = DateTime.Now;
+            anxieActual.CreatedUser = username;
+            anxieActual.UpdatedDate = DateTime.Now;
+            anxieActual.UpdatedUser = username;
+            anxieActual.StatusAnxie = 1;
             mostrarAnxie = true;
         }
         catch(Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void EditarAnxie(Anxieties entidad)
+    {
+        try
+        {
+            anxieActual = new CreateAnxietie
+            {
+                IdProject = entidadStorie.Project.IdProject,
+                IdAnxie = entidad.IdAnxie,
+                AnxieName = entidad.AnxieName,
+                CreatedDate = entidad.CreatedDate,
+                CreatedUser = entidad.CreatedUser,
+                UpdatedDate = DateTime.Now,
+                UpdatedUser = username,
+                StatusAnxie = entidad.StatusAnxie
+            };
+            mostrarAnxie = true;
+        }
+        catch (Exception ex)
         {
             Logger.LogError(ex.Message);
         }
@@ -582,7 +689,18 @@
     {
         try
         {
-            await repostorie.CreateStoriePushAsync(pushActual);
+            if (pushActual.IdPush == 0)
+            {
+                PushesGroups auxenti = await repopush.CreateAsync(pushActual);
+                CreateStoriesPush auxnuevo = new CreateStoriesPush()
+                    {
+                        IdPush = auxenti.IdPush,
+                        IdStories = int.Parse(idStorie)
+                    };
+                await repostorie.CreateStoriePushAsync(auxnuevo);
+            }
+            else
+                await repopush.UpdateAsync(pushActual);
 
             pushstorie = (List<StoriesPush>)await repostorie.GetPushesByStorieIdAsync(int.Parse(idStorie));
 
@@ -600,7 +718,19 @@
     {
         try
         {
-            await repostorie.CreateStoriePullAsync(pullActual);
+            if (pullActual.IdPull == 0)
+            {
+                PullGroups auxenti = await repopull.CreateAsync(pullActual);
+                CreateStoriesPull auxnuevo = new CreateStoriesPull()
+                    {
+                        IdPull = auxenti.IdPull,
+                        IdStories = int.Parse(idStorie)
+                    };
+                await repostorie.CreateStoriePullAsync(auxnuevo);
+            }
+            else
+                await repopull.UpdateAsync(pullActual);
+
             pullstorie = (List<StoriesPull>)await repostorie.GetPullsByStorieIdAsync(int.Parse(idStorie));
 
             mostrarPull = false;
@@ -617,7 +747,19 @@
     {
         try
         {
-            await repostorie.CreateStorieHabitAsync(habitActual);
+            if (habitActual.IdHabit == 0)
+            {
+                Habits auxenti = await repohabi.CreateAsync(habitActual);
+                CreateStoriesHabbit auxnuevo = new CreateStoriesHabbit()
+                    {
+                        IdHabit = auxenti.IdHabit,
+                        IdStories = int.Parse(idStorie)
+                    };
+                await repostorie.CreateStorieHabitAsync(auxnuevo);
+            }
+            else
+                await repohabi.UpdateAsync(habitActual);
+
             habitstorie = (List<StoriesHabbit>)await repostorie.GetHabitsByStorieIdAsync(int.Parse(idStorie));
 
             mostrarHabit = false;
@@ -634,7 +776,19 @@
     {
         try
         {
-            await repostorie.CreateStorieAnxieAsync(anxieActual);
+            if (anxieActual.IdAnxie == 0)
+            {
+                Anxieties auxenti = await repoanxie.CreateAsync(anxieActual);
+                CreateStoriesAnxiety auxnuevo = new CreateStoriesAnxiety()
+                    {
+                        IdAnxie = auxenti.IdAnxie,
+                        IdStories = int.Parse(idStorie)
+                    };
+                await repostorie.CreateStorieAnxieAsync(auxnuevo);
+            }
+            else
+                await repoanxie.UpdateAsync(anxieActual);
+
             anxiestorie = (List<StoriesAnxiety>)await repostorie.GetAxieByStorieIdAsync(int.Parse(idStorie));
 
             mostrarAnxie = false;
@@ -662,15 +816,19 @@
                 switch(opcion)
                 {
                     case 1:
+                        await repopush.DeleteAsync(id);
                         pushstorie = (List<StoriesPush>)await repostorie.GetPushesByStorieIdAsync(int.Parse(idStorie));
                         break;
                     case 2:
+                        await repopull.DeleteAsync(id);
                         pullstorie = (List<StoriesPull>)await repostorie.GetPullsByStorieIdAsync(int.Parse(idStorie));
                         break;
                     case 3:
+                        await repohabi.DeleteAsync(id);
                         habitstorie = (List<StoriesHabbit>)await repostorie.GetHabitsByStorieIdAsync(int.Parse(idStorie));
                         break;
                     case 4:
+                        await repoanxie.DeleteAsync(id);
                         anxiestorie = (List<StoriesAnxiety>)await repostorie.GetAxieByStorieIdAsync(int.Parse(idStorie));
                         break;
                 }
@@ -689,5 +847,17 @@
         mostrarPull = false;
         mostrarHabit = false;
         mostrarAnxie = false;
+    }
+
+    private void Regresar()
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"/proyect/proyecstories/{entidadStorie.IdInter.IdInter}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 }

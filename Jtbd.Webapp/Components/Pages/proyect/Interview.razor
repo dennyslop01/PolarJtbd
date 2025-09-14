@@ -1,4 +1,4 @@
-﻿@page "/proyect/interview"
+﻿@page "/proyect/interview/{IdProyecto}"
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
@@ -10,9 +10,29 @@
 <div class="row align-content-center">
     <div class="col-lg-12">
         <h3 class="text-center mt-4">Gestión de Entrevistados</h3>
+        <div class="col-lg-11">
+            <table class="table table-striped table-hover">
+                <thead class="table bg-opacity-25">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Proyecto : @(proyecto == null ? "-" : proyecto.ProjectName) </td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                                <i class="bi bi-arrow-return-left"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-primary" @onclick="MostrarFormulario">
-                <i class="bi bi-plus"></i> Agregar Entrevistado
+            <button class="btn btn-primary" title="Agregar Entrevistado" @onclick="MostrarFormulario">
+                <i class="bi bi-plus-lg"></i> 
             </button>
         </div>
 
@@ -39,7 +59,7 @@
         else
         {
             <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+                <thead class="table table-secondary bg-opacity-25">
                     <tr>
                         <th>#</th>
                         <th>Nombre</th>
@@ -49,7 +69,7 @@
                         <th>Nickname</th>
                         <th>NSE</th>
                         <th>Fecha Entrevista</th>
-                        <th>Acciones</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -73,11 +93,14 @@
                             <td>@p.InterNSE</td>
                             <td>@p.DateInter</td>
                             <td>
-                                <button class="btn btn-warning btn-sm me-2" @onclick="() => EditarEntidad(p)">
-                                    <i class="bi bi-pencil"></i> Editar
+                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <i class="bi bi-pencil"></i> 
                                 </button>
-                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.IdInter)">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                <button class="btn btn-danger btn-sm me-2" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
+                                    <i class="bi bi-trash"></i> 
+                                </button>
+                                <button class="btn btn-secondary btn-sm me-2" title="Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
+                                    <i class="bi bi-list-columns-reverse"></i>
                                 </button>
                             </td>
                         </tr>
@@ -156,6 +179,9 @@
 }
 
 @code {
+    [Parameter]
+    public string IdProyecto { get; set; }
+
     private List<Interviews> entrevistados = new();
     private CreateInterview entrevistadoActual = new();
     private bool mostrarFormulario = false;
@@ -164,12 +190,16 @@
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IInterviews repository { get; set; } = null!;
+    [Inject] private IProjects repoproyect { get; set; } = null!;
+    private Projects proyecto = new();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            entrevistados = (List<Interviews>)await repository.GetAllAsync();
+            proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
+
+            entrevistados = (List<Interviews>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
         }
         catch (Exception ex)
         {
@@ -182,6 +212,7 @@
         try
         {
             entrevistadoActual = new CreateInterview();
+            entrevistadoActual.IdProject = int.Parse(IdProyecto);
             entrevistadoActual.InterGender = -1;
             entrevistadoActual.DateInter = DateTime.Now;
             mostrarFormulario = true;
@@ -198,6 +229,7 @@
         {
             entrevistadoActual = new CreateInterview
                 {
+                    IdProject = int.Parse(IdProyecto),
                     IdInter = entrevistado.IdInter,
                     InterName = entrevistado.InterName,
                     InterAge = entrevistado.InterAge,
@@ -224,9 +256,9 @@
             else
                 await repository.UpdateAsync(entrevistadoActual);
 
-            entrevistados = (List<Interviews>)await repository.GetAllAsync();
+            entrevistados = (List<Interviews>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
             mostrarFormulario = false;
-            mensajeAlerta = "Usuario guardado exitosamente.";
+            mensajeAlerta = "Entrevistado guardado exitosamente.";
             mostrarAlerta = true;
         }
         catch(Exception ex)
@@ -243,8 +275,8 @@
             if (confirmed)
             {
                 await repository.DeleteAsync(id);
-                entrevistados = (List<Interviews>)await repository.GetAllAsync();
-                mensajeAlerta = "Usuario eliminado exitosamente.";
+                entrevistados = (List<Interviews>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+                mensajeAlerta = "Entrevistado eliminado exitosamente.";
                 mostrarAlerta = true;
             }
         }
@@ -257,5 +289,29 @@
     private void Cancelar()
     {
         mostrarFormulario = false;
+    }
+
+    private void Regresar()
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyectos");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void AgrgarHistorias(string id)
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecstories/{id}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace Jtbd.Application.Interfaces
         Task<IEnumerable<Stories>> GetAllAsync();
         Task<Stories> GetByIdAsync(int id);
         Task<IEnumerable<Stories>> GetByProjectIdAsync(int id);
+        Task<IEnumerable<Stories>> GetByInterIdAsync(int id);
         Task<bool> CreateAsync(CreateStorie stories);
         Task<bool> UpdateAsync(CreateStorie stories);
         Task<bool> DeleteAsync(int id);
