@@ -1,0 +1,240 @@
+﻿@page "/proyect/proyecsgroups/{IdProyecto}"
+@rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
+@using Jtbd.Domain.Entities
+@inject IJSRuntime JSRuntime
+@inject IConfiguration configuration
+@inject ILogger<Interview> Logger
+
+<PageTitle>Grupos</PageTitle>
+<div class="row align-content-center">
+    <div class="col-lg-6">
+        <h3 class="text-center mt-4">Gestión de Grupos</h3>
+        <div class="col-lg-11">
+            <table class="table table-striped table-hover">
+                <thead class="table bg-opacity-25">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Proyecto : @(proyecto == null ? "-" : proyecto.ProjectName) </td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                                <i class="bi bi-arrow-return-left"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-primary" title="Agregar Grupo" @onclick="MostrarFormulario">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+
+        @if (mostrarAlerta)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @mensajeAlerta
+                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+            </div>
+        }
+
+
+        @if (grupos is null)
+        {
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Cargando datos...</p>
+            </div>
+        }
+        else if (!grupos.Any())
+        {
+            <div class="alert alert-info text-center">No hay grupos disponibles.</div>
+        }
+        else
+        {
+            <table class="table table-striped table-hover">
+                <thead class="table table-secondary bg-opacity-25">
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (p, index) in grupos.Select((p, i) => (p, i + 1)))
+                    {
+                        <tr>
+                            <td>@p.IdGroup</td>
+                            <td>@p.GroupName</td>
+                            <td>
+                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm me-2" title="Eliminar" @onclick="() => EliminarEntidad(p.IdGroup)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@if (mostrarFormulario)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(entidadActual.IdGroup == 0 ? "Agregar" : "Editar")</h5>
+                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="entidadActual" OnValidSubmit="GuardarEntidad">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre:</label>
+                            <InputText class="form-control" @bind-Value="entidadActual.GroupName" />
+                            <ValidationMessage For="@(() => entidadActual.GroupName)" />
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="bi bi-save"></i> Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                <i class="bi bi-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string IdProyecto { get; set; }
+
+    private List<Groups> grupos = new();
+    private CreateGroup entidadActual = new();
+    private bool mostrarFormulario = false;
+    private string? mensajeAlerta;
+    private bool mostrarAlerta = false;
+
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IGroups repository { get; set; } = null!;
+    [Inject] private IProjects repoproyect { get; set; } = null!;
+    private Projects proyecto = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
+
+            grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void MostrarFormulario()
+    {
+        try
+        {
+            entidadActual = new CreateGroup();
+            entidadActual.IdProject = int.Parse(IdProyecto);
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void EditarEntidad(Groups entrevistado)
+    {
+        try
+        {
+            entidadActual = new CreateGroup
+            {
+                IdProject = int.Parse(IdProyecto),
+                IdGroup = entrevistado.IdGroup,
+                GroupName = entrevistado.GroupName
+            };
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private async Task GuardarEntidad()
+    {
+        try
+        {
+            if (entidadActual.IdGroup == 0)
+                await repository.CreateAsync(entidadActual);
+            else
+                await repository.UpdateAsync(entidadActual);
+
+            grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+            mostrarFormulario = false;
+            mensajeAlerta = "Grupo guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private async Task EliminarEntidad(int id)
+    {
+        try
+        {
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Esta seguro que desea eliminar este registro?");
+            if (confirmed)
+            {
+                await repository.DeleteAsync(id);
+                grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+                mensajeAlerta = "Grupo eliminado exitosamente.";
+                mostrarAlerta = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private void Regresar()
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyectos");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+}

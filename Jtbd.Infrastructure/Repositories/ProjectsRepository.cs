@@ -39,14 +39,14 @@ namespace Jtbd.Infrastructure.Repositories
             auxpro.ProjectName = project.ProjectName;
             auxpro.ProjectDate = project.ProjectDate;
             auxpro.ProjectDescription = project.ProjectDescription;
-            auxpro.MaxPushes = project.MaxPushes;
-            auxpro.MaxPulls = project.MaxPulls;
-            auxpro.RutaImage = project.RutaImage;
+            auxpro.MaxPushes   = 0;// project.MaxPushes;
+            auxpro.MaxPulls    = 0;// project.MaxPulls;
+            auxpro.RutaImage   = project.RutaImage;
             auxpro.CreatedDate = project.CreatedDate;
             auxpro.CreatedUser = project.CreatedUser;
             auxpro.UpdatedDate = project.UpdatedDate;
             auxpro.UpdatedUser = project.UpdatedUser;
-            auxpro.StatusProject = project.StatusProject;
+            auxpro.StatusProject = 1;// project.StatusProject;
 
             await _context.Projects.AddAsync(auxpro);
             _context.Entry(auxpro.Categories).State = EntityState.Unchanged;

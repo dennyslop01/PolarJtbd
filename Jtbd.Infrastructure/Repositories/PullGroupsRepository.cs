@@ -15,10 +15,6 @@ namespace Jtbd.Infrastructure.Repositories
         private readonly JtbdDbContext _context = context; 
         public async Task<PullGroups> CreateAsync(CreatePull pull)
         {
-            PullGroups existdatos = _context.PullGroups.Where(c => c.PullName.Contains(pull.PullName)).AsQueryable().AsNoTracking().FirstOrDefault();
-            if (existdatos != null)
-                return (existdatos);
-
             PullGroups auxPull = new PullGroups();
             auxPull.PullName = pull.PullName;
             auxPull.PullDescription = pull.PullDescription;
@@ -48,11 +44,7 @@ namespace Jtbd.Infrastructure.Repositories
         }
 
         public async Task<bool> DeleteAsync(int id)
-        {
-            var existdatos = _context.StoriesPulls.Where(c => c.PullGroups.IdPull == id).AsQueryable().AsNoTracking().ToList();
-            if (existdatos != null)
-                return true;
-            
+        {            
             var pull = await _context.PullGroups.FindAsync(id);
             if (pull != null)
             {

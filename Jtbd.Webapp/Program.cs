@@ -39,6 +39,7 @@ builder.Services.AddScoped<IProjects, ProjectsRepository>();
 builder.Services.AddScoped<IPullGroups, PullGroupsRepository>();
 builder.Services.AddScoped<IPushesGroups, PushesGroupsRepository>();
 builder.Services.AddScoped<IStories, StoriesRepository>();
+builder.Services.AddScoped<IGroups, GroupsRepository>();
 
 builder.WebHost.UseStaticWebAssets();
 

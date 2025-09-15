@@ -15,10 +15,6 @@ namespace Jtbd.Infrastructure.Repositories
         private readonly JtbdDbContext _context = context;
         public async Task<Anxieties> CreateAsync(CreateAnxietie anxieties)
         {
-            Anxieties existdatos = _context.Anxieties.Where(c => c.AnxieName.Contains(anxieties.AnxieName)).AsQueryable().AsNoTracking().FirstOrDefault();
-            if (existdatos != null)
-                return (existdatos);
-
             Anxieties auxAnxie = new Anxieties();
             auxAnxie.AnxieName = anxieties.AnxieName;
             //auxHabbit.ha = habits.PullDescription;
@@ -49,10 +45,6 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var existdatos = _context.StoriesAnxieties.Where(c => c.Anxieties.IdAnxie == id).AsQueryable().AsNoTracking().ToList();
-            if (existdatos != null)
-                return true;
-
             var anxiet = await _context.Anxieties.FindAsync(id);
             if (anxiet != null)
             {
