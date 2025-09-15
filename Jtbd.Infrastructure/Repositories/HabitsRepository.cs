@@ -15,6 +15,11 @@ namespace Jtbd.Infrastructure.Repositories
         private readonly JtbdDbContext _context = context; 
         public async Task<Habits> CreateAsync(CreateHabits habits)
         {
+            Habits existdatos = _context.Habits.Where(c => c.HabitName.Contains(habits.HabitName)).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (existdatos != null)
+                return (existdatos);
+
+
             Habits auxHabbit = new Habits();
             auxHabbit.HabitName = habits.HabitName;
             //auxHabbit.ha = habits.PullDescription;
@@ -45,6 +50,10 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<bool> DeleteAsync(int id)
         {
+            var existdatos = _context.StoriesHabbits.Where(c => c.Habits.IdHabit == id).AsQueryable().AsNoTracking().ToList();
+            if (existdatos != null)
+                return true;
+
             var habbit = await _context.Habits.FindAsync(id);
             if (habbit != null)
             {

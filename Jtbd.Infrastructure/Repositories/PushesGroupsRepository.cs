@@ -15,6 +15,10 @@ namespace Jtbd.Infrastructure.Repositories
         private readonly JtbdDbContext _context = context; 
         public async Task<PushesGroups> CreateAsync(CreatePushes push)
         {
+            PushesGroups existdatos = _context.PushesGroups.Where(c => c.PushName.Contains(push.PushName)).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (existdatos != null)
+                return (existdatos);
+            
             PushesGroups auxPushes = new PushesGroups();
             auxPushes.PushName = push.PushName;
             auxPushes.PushDescription = push.PushDescription;
@@ -45,6 +49,10 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<bool> DeleteAsync(int id)
         {
+            var existdatos = _context.StoriesPushes.Where(c => c.PushesGroups.IdPush == id).AsQueryable().AsNoTracking().ToList();
+            if (existdatos != null)
+                return true;
+            
             var push = await _context.PushesGroups.FindAsync(id);
             if (push != null)
             {
