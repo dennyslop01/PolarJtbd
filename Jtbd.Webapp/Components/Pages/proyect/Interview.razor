@@ -9,9 +9,11 @@
 <PageTitle>Entrevistados</PageTitle>
 <div class="row align-content-center">
     <div class="col-lg-12">
-        <h3 class="text-center mt-4">Gestión de Entrevistados</h3>
         <div class="col-lg-11">
-            <table class="table table-striped table-hover">
+            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                @(proyecto == null ? "-" : proyecto.ProjectName)  <i class="bi bi-arrow-return-left"></i>
+            </button>
+            @* <table class="table table-striped table-hover">
                 <thead class="table bg-opacity-25">
                     <tr>
                         <th></th>
@@ -22,14 +24,12 @@
                     <tr>
                         <td>Proyecto : @(proyecto == null ? "-" : proyecto.ProjectName) </td>
                         <td>
-                            <button class="btn btn-secondary btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                                <i class="bi bi-arrow-return-left"></i>
-                            </button>
                         </td>
                     </tr>
                 </tbody>
-            </table>
+            </table> *@
         </div>
+        <h3 class="text-center mt-4">Gestión de Entrevistados</h3>
         <div class="d-flex justify-content-end mb-3">
             <button class="btn btn-primary" title="Agregar Entrevistado" @onclick="MostrarFormulario">
                 <i class="bi bi-plus-lg"></i> 

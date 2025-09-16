@@ -13,9 +13,15 @@
 <PageTitle>Historias</PageTitle>
 <div class="row align-content-center">
     <div class="col-lg-11">
-        <h3 class="text-center mt-4">Gestión de Historias</h3>
         <div class="col-lg-11">
-            <table class="table table-striped table-hover">
+            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
+                @(entrevistado.Project == null ? "-" : entrevistado.Project.ProjectName)  <i class="bi bi-arrow-return-left"></i>
+            </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                @(entrevistado == null ? "-" : entrevistado.InterName)  <i class="bi bi-arrow-return-left"></i>
+            </button>
+            <h3 class="text-center mt-4">Gestión de Historias</h3>
+            @* <table class="table table-striped table-hover">
                 <thead class="table bg-opacity-25">
                     <tr>
                         <th></th>
@@ -34,7 +40,7 @@
                         </td>
                     </tr>
                 </tbody>
-            </table>
+            </table> *@
         </div>
     </div>
     <div class="col-lg-10">
@@ -291,6 +297,18 @@
         try
         {
             NavigationManager.NavigateTo($"/proyect/interview/{entrevistado.Project.IdProject}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void Regresar2()
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyectos");
         }
         catch (Exception ex)
         {

@@ -51,7 +51,7 @@
                         <th>Fecha</th>
                         <th>Departamento</th>
                         <th>Categoria</th>
-                        <th>Estatus</th>
+                        @* <th>Estatus</th> *@
                         <th> </th>
                     </tr>
                 </thead>
@@ -64,7 +64,7 @@
                             <td>@p.ProjectDate</td>
                             <td>@p.Deparment.Name</td>
                             <td>@p.Categories.Name</td>
-                            @switch (p.StatusProject)
+                            @* @switch (p.StatusProject)
                             {
                                 case 0:
                                     <td>Inactivo</td>
@@ -72,7 +72,7 @@
                                 case 1:
                                     <td>Activo</td>
                                     break;
-                            }
+                            } *@
                             <td>
                                 <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                     <i class="bi bi-pencil"></i> 
@@ -85,6 +85,9 @@
                                 </button>
                                 <button class="btn btn-secondary btn-sm me-2" title="Agregar Grupos" @onclick="() => AgrgarGrupos(p.IdProject.ToString())">
                                     <i class="bi bi-grid-3x2 m-1"></i>
+                                </button>
+                                <button class="btn btn-secondary btn-sm me-2" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
+                                    <i class="bi bi-ui-checks"></i>
                                 </button>
                             </td>
                         </tr>
@@ -333,6 +336,18 @@
         try
         {
             NavigationManager.NavigateTo($"proyect/proyecsgroups/{id}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void AgruparHistorias(string id)
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecsagrupar/{id}");
         }
         catch (Exception ex)
         {
