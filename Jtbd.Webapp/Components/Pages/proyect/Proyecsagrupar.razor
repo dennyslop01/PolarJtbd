@@ -46,11 +46,86 @@
 </div>
 
 <div class="row align-content-center">
-    <div class="col-lg-6">       
-        <div class="col-lg-11">
-            
+    @* <div class="col-lg-11">  *@      
+        @* <div style="display: flex;"> *@
+            <div class="col-lg-5">
+                <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1">
+                    <h5>Historias - Pushes</h5>
+                    @foreach (var item in List1)
+                    {
+                        <div class="draggable-item" draggable="true"
+                                @ondragstart="() => HandleDragStart(item, null)"
+                                @ondragend="HandleDragEnd">
+                            @item.Name
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-5">
+                @foreach (var group in grupos)
+                {
+                    <div class="col-lg-11">
+                <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
+                            <h5>@group.GroupName</h5>
+                            @foreach (var item in List2)
+                            {
+                                if(group.IdGroup == item.IdGroup)
+                                {
+                                    <div class="draggable-item" draggable="true"
+                                            @ondragstart="() => HandleDragStart(item, group.IdGroup)"
+                                            @ondragend="HandleDragEnd">
+                                        @item.Name
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        @* </div> *@
+    @* </div> *@
+</div>
+<br />
+<br />
+<div class="row align-content-center">
+    @* <div class="col-lg-11">  *@      
+        @* <div style="display: flex;"> *@
+    <div class="col-lg-5">
+        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3">
+            <h5>Historias - Pulls</h5>
+            @foreach (var item in List3)
+            {
+                <div class="draggable-item" draggable="true"
+                     @ondragstart="() => HandleDragStart2(item, null)"
+                     @ondragend="HandleDragEnd2">
+                    @item.Name
+                </div>
+            }
         </div>
     </div>
+    <div class="col-lg-5">
+        @foreach (var group in grupos)
+        {
+            <div class="col-lg-11">
+                <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
+                    <h5>@group.GroupName</h5>
+                    @foreach (var item in List4)
+                    {
+                        if (group.IdGroup == item.IdGroup)
+                        {
+                            <div class="draggable-item" draggable="true"
+                                 @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
+                                 @ondragend="HandleDragEnd2">
+                                @item.Name
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    @* </div> *@
+    @* </div> *@
 </div>
 
 @code {
@@ -58,6 +133,8 @@
     public string IdProyecto { get; set; }
 
     private List<Groups> grupos = new();
+    private List<StoriesPush> storiespush = new();
+    private List<StoriesPull> storiespull = new();
     private CreateGroup entidadActual = new();
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
@@ -66,7 +143,18 @@
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IGroups repository { get; set; } = null!;
     [Inject] private IProjects repoproyect { get; set; } = null!;
+    [Inject] private IStories repostorie { get; set; } = null!;
     private Projects proyecto = new();
+
+    private List<Item> List1 = new();
+    private List<Item> List2 = new();
+    private List<Item> List3 = new();
+    private List<Item> List4 = new();
+
+    private Item _draggedItem;
+    private List<Item> _sourceList;
+    private Item _draggedItem1;
+    private List<Item> _sourceList1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,6 +163,50 @@
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
 
             grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+
+            storiespush = (List<StoriesPush>)await repostorie.GetPushesByProjectIdAsync(int.Parse(IdProyecto));
+            foreach(var push in storiespush)
+            {
+                if (push.Groups == null)
+                {
+                    List1.Add(new Item
+                        {
+                            Id = push.PushesGroups.IdPush,
+                            Name = push.Stories.TitleStorie + "-" + push.PushesGroups.PushName
+                        });
+                }
+                else
+                {
+                    List2.Add(new Item
+                    {
+                        Id = push.PushesGroups.IdPush,
+                        IdGroup = push.Groups.IdGroup,
+                        Name = push.Stories.TitleStorie + "-" + push.PushesGroups.PushName
+                    });
+                }
+            }
+
+            storiespull = (List<StoriesPull>)await repostorie.GetPullsByProjectIdAsync(int.Parse(IdProyecto));
+            foreach (var pull in storiespull)
+            {
+                if (pull.Groups == null)
+                {
+                    List3.Add(new Item
+                    {
+                        Id = pull.PullGroups.IdPull,
+                        Name = pull.Stories.TitleStorie + "-" + pull.PullGroups.PullName
+                    });
+                }
+                else
+                {
+                    List4.Add(new Item
+                    {
+                        Id = pull.PullGroups.IdPull,
+                        IdGroup = pull.Groups.IdGroup,
+                        Name = pull.Stories.TitleStorie + "-" + pull.PullGroups.PullName
+                    });
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -94,4 +226,112 @@
         }
     }
 
+    private void HandleDragStart(Item item, int? idGroup)
+    {
+        if(idGroup!=null)
+            item.IdGroup = idGroup;
+
+        _draggedItem = item;
+        _sourceList = List1.Contains(item) ? List1 : List2;
+    }
+
+    private void HandleDragEnd()
+    {
+        _draggedItem = null;
+        _sourceList = null;
+    }
+
+    private void HandleDragOver(DragEventArgs e)
+    {
+        e.DataTransfer.DropEffect = "move";
+    }
+
+    private async Task HandleDropList1(DragEventArgs e)
+    {
+        if (_draggedItem != null && _sourceList != List1)
+        {
+            _draggedItem.IdGroup = null;
+            _sourceList.Remove(_draggedItem);
+            List1.Add(_draggedItem);
+            await repostorie.UpdatePushesGroupEntityAsync(_draggedItem.Id, null);
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleDropList2(int? idGroup, DragEventArgs e)
+    {
+        if (_draggedItem != null && _sourceList != List2)
+        {
+            if (idGroup != null)
+                _draggedItem.IdGroup = idGroup;
+
+            _sourceList.Remove(_draggedItem);
+            List2.Add(_draggedItem);
+            await repostorie.UpdatePushesGroupEntityAsync(_draggedItem.Id, _draggedItem.IdGroup);
+            StateHasChanged();
+        }
+    }
+
+    private void HandleDragStart2(Item item, int? idGroup)
+    {
+        if (idGroup != null)
+            item.IdGroup = idGroup;
+
+        _draggedItem1 = item;
+        _sourceList1 = List3.Contains(item) ? List3 : List4;
+    }
+
+    private void HandleDragEnd2()
+    {
+        _draggedItem1 = null;
+        _sourceList1 = null;
+    }
+
+    private void HandleDragOver2(DragEventArgs e)
+    {
+        e.DataTransfer.DropEffect = "move";
+    }
+
+    private async Task HandleDropList3(DragEventArgs e)
+    {
+        if (_draggedItem1 != null && _sourceList1 != List3)
+        {
+            _draggedItem1.IdGroup = null;
+            _sourceList1.Remove(_draggedItem1);
+            List3.Add(_draggedItem1);
+            await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, null);
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleDropList4(int? idGroup, DragEventArgs e)
+    {
+        if (_draggedItem1 != null && _sourceList1 != List4)
+        {
+            if (idGroup != null)
+                _draggedItem1.IdGroup = idGroup;
+
+            _sourceList1.Remove(_draggedItem1);
+            List4.Add(_draggedItem1);
+            await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, _draggedItem1.IdGroup);
+            StateHasChanged();
+        }
+    }
 }
+<style>
+    .list-container {
+        border: 2px dashed #ccc;
+        padding: 10px;
+        margin: 10px;
+        min-height: 150px;
+        flex: 1;
+    }
+
+    .draggable-item {
+        background-color: lightblue;
+        border: 1px solid blue;
+        padding: 5px;
+        margin-bottom: 5px;
+        cursor: grab;
+    }
+</style>

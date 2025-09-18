@@ -13,5 +13,7 @@ namespace Jtbd.Domain.Entities
         public Stories? Stories { get; set; }
 
         public PullGroups? PullGroups { get; set; }
+
+        public Groups? Groups { get; set; }
     }
 }

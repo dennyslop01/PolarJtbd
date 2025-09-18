@@ -200,6 +200,7 @@
             entidadActual.CreatedUser = username;
             entidadActual.UpdatedDate = DateTime.Now;
             entidadActual.UpdatedUser = username;
+            entidadActual.IdGroup = null;
 
             mostrarFormulario = true;
         }
@@ -223,8 +224,9 @@
                     CreatedDate = entidad.CreatedDate,
                     CreatedUser = entidad.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = username
-                };
+                    UpdatedUser = username,
+                    IdGroup = null
+            };
 
             mostrarFormulario = true;
         }

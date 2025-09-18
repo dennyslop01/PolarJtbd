@@ -117,6 +117,7 @@ namespace Jtbd.Infrastructure.Repositories
             auxStorie.CreatedDate = stories.CreatedDate;
             auxStorie.UpdatedDate = stories.UpdatedDate;
             auxStorie.UpdatedUser = stories.UpdatedUser;
+            auxStorie.Groups = null;
 
             var project = _context.Projects.Where(x => x.IdProject == stories.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
@@ -293,6 +294,40 @@ namespace Jtbd.Infrastructure.Repositories
 
             //await _context.SaveChangesAsync();
 
+            return true;
+        }
+
+        public async Task<IEnumerable<StoriesPush>> GetPushesByProjectIdAsync(int id)
+        {
+            var pushstorie = await _context.StoriesPushes
+                .Include(x => x.Groups)
+                .Include(x => x.Stories)
+                .Include(x => x.PushesGroups)
+                .Where(x => x.PushesGroups.Project.IdProject == id).AsNoTracking().ToListAsync();
+
+            return pushstorie!;
+        }
+
+        public async Task<bool> UpdatePushesGroupEntityAsync(int idPush, int? idGroup)
+        {
+            var result = await _context.Database.ExecuteSqlAsync($"UPDATE [StoriesPushes] SET [GroupsIdGroup] = {idGroup} WHERE [PushesGroupsIdPush] = {idPush}");
+            return true;
+        }
+
+        public async Task<IEnumerable<StoriesPull>> GetPullsByProjectIdAsync(int id)
+        {
+            var pushstorie = await _context.StoriesPulls
+                .Include(x => x.Groups)
+                .Include(x => x.Stories)
+                .Include(x => x.PullGroups)
+                .Where(x => x.PullGroups.Project.IdProject == id).AsNoTracking().ToListAsync();
+
+            return pushstorie!;
+        }
+        
+        public async Task<bool> UpdatePullsGroupEntityAsync(int idPull, int? idGroup)
+        {
+            var result = await _context.Database.ExecuteSqlAsync($"UPDATE [StoriesPulls] SET [GroupsIdGroup] = {idGroup} WHERE [PullGroupsIdPull] = {idPull}");
             return true;
         }
     }

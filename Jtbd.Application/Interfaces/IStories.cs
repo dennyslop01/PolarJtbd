@@ -26,6 +26,9 @@ namespace Jtbd.Application.Interfaces
         Task<bool> CreateStorieHabitAsync(CreateStoriesHabbit nuevo);
         Task<bool> CreateStorieAnxieAsync(CreateStoriesAnxiety nuevo);
         Task<bool> DeleteStorieEntityAsync(int opcion, int idStorie, int idEntidad);
-
+        Task<IEnumerable<StoriesPush>> GetPushesByProjectIdAsync(int id);
+        Task<bool> UpdatePushesGroupEntityAsync(int idPush, int? idGroup);
+        Task<IEnumerable<StoriesPull>> GetPullsByProjectIdAsync(int id);
+        Task<bool> UpdatePullsGroupEntityAsync(int idPull, int? idGroup);
     }
 }
