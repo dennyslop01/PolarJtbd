@@ -1,0 +1,110 @@
+﻿@page "/twolistdragdrop"
+@using Jtbd.Webapp.Data
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
+
+<h3>Drag and Drop between Two Lists</h3>
+
+<div style="display: flex;">
+    <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1">
+        <h4>List 1</h4>
+        @foreach (var item in List1)
+        {
+            <div class="draggable-item" draggable="true"
+                 @ondragstart="() => HandleDragStart(item)"
+                 @ondragend="HandleDragEnd">
+                @item.Name
+            </div>
+        }
+    </div>
+
+    <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList2">
+        <h4>List 2</h4>
+        @foreach (var item in List2)
+        {
+            <div class="draggable-item" draggable="true"
+                 @ondragstart="() => HandleDragStart(item)"
+                 @ondragend="HandleDragEnd">
+                @item.Name
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Item> List1 = new List<Item>
+    {
+        new Item { Id = 1, Name = "Item A" },
+        new Item { Id = 2, Name = "Item B" },
+        new Item { Id = 3, Name = "Item C" }
+    };
+
+    private List<Item> List2 = new List<Item>
+    {
+        new Item { Id = 4, Name = "Item D" },
+        new Item { Id = 5, Name = "Item E" }
+    };
+
+    private Item _draggedItem;
+    private List<Item> _sourceList;
+
+    private void HandleDragStart(Item item)
+    {
+        _draggedItem = item;
+        _sourceList = List1.Contains(item) ? List1 : List2;
+    }
+
+    private void HandleDragEnd()
+    {
+        _draggedItem = null;
+        _sourceList = null;
+    }
+
+    private void HandleDragOver(DragEventArgs e)
+    {
+        e.DataTransfer.DropEffect = "move";
+    }
+
+    private void HandleDropList1(DragEventArgs e)
+    {
+        if (_draggedItem != null && _sourceList != List1)
+        {
+            _sourceList.Remove(_draggedItem);
+            List1.Add(_draggedItem);
+            StateHasChanged();
+        }
+    }
+
+    private void HandleDropList2(DragEventArgs e)
+    {
+        if (_draggedItem != null && _sourceList != List2)
+        {
+            this.JSRuntime.InvokeVoidAsync("console.log", _draggedItem);
+            _sourceList.Remove(_draggedItem);
+            
+            List2.Add(_draggedItem);
+            this.JSRuntime.InvokeVoidAsync("console.log", _draggedItem);
+            
+            StateHasChanged();
+        }
+    }
+}
+
+<style>
+    .list-container {
+        border: 2px dashed #ccc;
+        padding: 10px;
+        margin: 10px;
+        min-height: 150px;
+        flex: 1;
+    }
+
+    .draggable-item {
+        background-color: lightblue;
+        border: 1px solid blue;
+        padding: 5px;
+        margin-bottom: 5px;
+        cursor: grab;
+    }
+</style>
