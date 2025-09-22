@@ -1,6 +1,6 @@
 ﻿@page "/proyect/proyectos"
 
-@using Microsoft.AspNetCore.Components.Authorization
+@inject IHttpContextAccessor HttpContextAccessor
 
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
@@ -8,18 +8,20 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyectos> Logger
-@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Proyectos</PageTitle>
 
 <div class="row align-content-center">
     <div class="col-lg-12">
         <h3 class="text-center mt-4">Gestión de proyectos</h3>
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-primary" @onclick="MostrarFormulario" title="Agregar Proyecto">
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        {
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" @onclick="MostrarFormulario" title="Agregar Proyecto">
                 <i class="bi bi-plus-lg"></i> 
-            </button>
-        </div>
+                </button>
+            </div>
+        }
 
         @if (mostrarAlerta)
         {
@@ -74,12 +76,15 @@
                                     break;
                             } *@
                             <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
-                                    <i class="bi bi-pencil"></i> 
-                                </button>
-                                <button class="btn btn-danger btn-sm me-2" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
+                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <i class="bi bi-pencil"></i> 
+                                    </button>
+                                    <button class="btn btn-danger btn-sm me-2" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
+                                        <i class="bi bi-trash"></i> 
+                                    </button>
+                                }
                                 <button class="btn btn-secondary btn-sm me-2" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
                                     <i class="bi bi-person-add"></i> 
                                 </button>
@@ -121,17 +126,20 @@
                             <InputDate class="form-control" @bind-Value="proyectoActual.ProjectDate" />
                             <ValidationMessage For="@(() => proyectoActual.ProjectDate)" />
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Departamentos:</label>
-                            <InputSelect class="form-select" @bind-Value="proyectoActual.IdDeparmento">
-                                <option value="-1">-- Seleccione uno --</option>
-                                @foreach (var item in departamento)
-                                {
-                                    <option value="@item.Id">@item.Name</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => proyectoActual.IdDeparmento)" />
-                        </div>
+                        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") == 1)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Departamentos:</label>
+                                <InputSelect class="form-select" @bind-Value="proyectoActual.IdDeparmento">
+                                    <option value="-1">-- Seleccione uno --</option>
+                                    @foreach (var item in departamento)
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => proyectoActual.IdDeparmento)" />
+                            </div>
+                        }
                         <div class="mb-3">
                             <label class="form-label">Categorías:</label>
                             <InputSelect class="form-select" @bind-Value="proyectoActual.idCategoria">
@@ -201,21 +209,18 @@
     {
         try
         {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.Name != null)
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-        }
-        catch(Exception ex)
-        {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-        }
-
-        try
-        {
-            departamento = (List<Deparments>)await repodepart.GetAllAsync();
             categorias = (List<Categories>)await repocategoria.GetAllAsync();
-            proyectos = (List<Projects>)await repository.GetAllAsync();
+
+            if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") == 1)
+            {
+                departamento = (List<Deparments>)await repodepart.GetAllAsync();
+                proyectos = (List<Projects>)await repository.GetAllAsync();
+            }
+            else
+            {
+                int aux = (HttpContextAccessor.HttpContext.Session.GetInt32("UserDepart") == null ? -1 : int.Parse(HttpContextAccessor.HttpContext.Session.GetInt32("UserDepart").ToString()));
+                proyectos = (List<Projects>)await repository.GetByDeparmentIdAsync(aux);
+            }
         }
         catch(Exception ex)
         {
@@ -229,7 +234,14 @@
         try
         {
             proyectoActual = new CreateProject();
-            proyectoActual.IdDeparmento = -1;
+            if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") == 1)
+                proyectoActual.IdDeparmento = -1;
+            else
+            {
+                int aux = (HttpContextAccessor.HttpContext.Session.GetInt32("UserDepart") == null ? -1 : int.Parse(HttpContextAccessor.HttpContext.Session.GetInt32("UserDepart").ToString()));
+                proyectoActual.IdDeparmento = aux;
+            }
+           
             proyectoActual.idCategoria = -1;
             proyectoActual.StatusProject = 1;
             proyectoActual.ProjectDate = DateTime.Now;

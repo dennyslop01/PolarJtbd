@@ -1,18 +1,14 @@
 ﻿@page "/"
-@using Microsoft.AspNetCore.Components.Authorization
+
 
 @rendermode InteractiveServer
+@inject IHttpContextAccessor HttpContextAccessor
 
 @inject ILogger<Home> Logger
 @inject IJSRuntime JSRuntime
-@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Home</PageTitle>
-<p>@username</p>
 
-@* <h4>JTBD WEB APP – Empresas Polar</h4>
-<br />
- *@
 <p>
 <strong>Qué es el método de Ward</strong>
     <br />
@@ -28,23 +24,3 @@
     Este proceso se basa en las agrupaciones previas de Pushes y Pulls, lo que permite organizar los datos de manera jerárquica y minimizar 
     la varianza dentro de cada grupo, asegurando que los elementos dentro de cada clúster sean lo más similares posible entre sí.
 </p>
-
-@code{
-    private string username = "Auxiliar";
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-
-        }
-        catch (Exception ex)
-        {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-        }
-    }
-}

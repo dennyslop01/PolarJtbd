@@ -1,13 +1,13 @@
 ﻿@page "/proyect/proyecpulls"
 
-@using Microsoft.AspNetCore.Components.Authorization
+@inject IHttpContextAccessor HttpContextAccessor
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecpulls> Logger
-@inject AuthenticationStateProvider authenticationStateProvider
+
 
 <PageTitle>Proyectos Pulls</PageTitle>
 <div class="row align-content-center">
@@ -80,12 +80,15 @@
                                     break;
                             }
                             <td>
+                            @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                            {
                                 <button class="btn btn-success btn-sm me-2" @onclick="() => EditarEntidad(p)">
                                     <i class="bi bi-pencil"></i> Editar
                                 </button>
                                 <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.IdPull)">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </button>
+                            }
                             </td>
                         </tr>
                     }
@@ -163,19 +166,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-
-        }
-        catch (Exception ex)
-        {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-        }
-
         try
         {
             proyectos = (List<Projects>)await repoproyec.GetAllAsync();

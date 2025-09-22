@@ -11,6 +11,7 @@ namespace Jtbd.Application.Interfaces
     {
         Task<IEnumerable<Employee>> GetAllAsync();
         Task<Employee> GetByIdAsync(int id);
+        Task<Employee> GetByUsernameAsync(string user);
         Task<bool> CreateAsync(CreateEmployee employee);
         Task<bool> UpdateAsync(CreateEmployee employee);
         Task<bool> DeleteAsync(int id);

@@ -2,6 +2,7 @@ using Jtbd.Application.Interfaces;
 using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Repositories;
 using Jtbd.Webapp.Components;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -11,10 +12,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = "Identity.Application"; // Or your chosen scheme
+    options.DefaultSignInScheme = "Identity.External"; // If using external logins
+})
+.AddIdentityCookies(); // Or other authentication methods like AddOpenIdConnect, AddJwtBearer
+
 builder.Services.AddDistributedMemoryCache(); // Or another distributed cache provider
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(300); // Customize session timeout
+    options.IdleTimeout = TimeSpan.FromSeconds(30); // Set your desired timeout
+    options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
@@ -54,7 +63,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseSession();
-//app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseSession();
 
 app.UseAntiforgery();
 

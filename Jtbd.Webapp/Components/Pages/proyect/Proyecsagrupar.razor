@@ -7,6 +7,7 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Interview> Logger
+@inject IHttpContextAccessor HttpContextAccessor
 
 <PageTitle>Agrupar Historias</PageTitle>
 <div class="row align-content-center">
@@ -228,11 +229,14 @@
 
     private void HandleDragStart(Item item, int? idGroup)
     {
-        if(idGroup!=null)
-            item.IdGroup = idGroup;
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        {
+            if (idGroup != null)
+                item.IdGroup = idGroup;
 
-        _draggedItem = item;
-        _sourceList = List1.Contains(item) ? List1 : List2;
+            _draggedItem = item;
+            _sourceList = List1.Contains(item) ? List1 : List2;
+        }
     }
 
     private void HandleDragEnd()
@@ -248,37 +252,45 @@
 
     private async Task HandleDropList1(DragEventArgs e)
     {
-        if (_draggedItem != null && _sourceList != List1)
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
         {
-            _draggedItem.IdGroup = null;
-            _sourceList.Remove(_draggedItem);
-            List1.Add(_draggedItem);
-            await repostorie.UpdatePushesGroupEntityAsync(_draggedItem.Id, null);
-            StateHasChanged();
+            if (_draggedItem != null && _sourceList != List1)
+            {
+                _draggedItem.IdGroup = null;
+                _sourceList.Remove(_draggedItem);
+                List1.Add(_draggedItem);
+                await repostorie.UpdatePushesGroupEntityAsync(_draggedItem.Id, null);
+                StateHasChanged();
+            }
         }
     }
 
     private async Task HandleDropList2(int? idGroup, DragEventArgs e)
     {
-        if (_draggedItem != null && _sourceList != List2)
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
         {
-            if (idGroup != null)
-                _draggedItem.IdGroup = idGroup;
+            {
+                if (idGroup != null)
+                    _draggedItem.IdGroup = idGroup;
 
-            _sourceList.Remove(_draggedItem);
-            List2.Add(_draggedItem);
-            await repostorie.UpdatePushesGroupEntityAsync(_draggedItem.Id, _draggedItem.IdGroup);
-            StateHasChanged();
+                _sourceList.Remove(_draggedItem);
+                List2.Add(_draggedItem);
+                await repostorie.UpdatePushesGroupEntityAsync(_draggedItem.Id, _draggedItem.IdGroup);
+                StateHasChanged();
+            }
         }
     }
 
     private void HandleDragStart2(Item item, int? idGroup)
     {
-        if (idGroup != null)
-            item.IdGroup = idGroup;
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        {
+            if (idGroup != null)
+                item.IdGroup = idGroup;
 
-        _draggedItem1 = item;
-        _sourceList1 = List3.Contains(item) ? List3 : List4;
+            _draggedItem1 = item;
+            _sourceList1 = List3.Contains(item) ? List3 : List4;
+        }
     }
 
     private void HandleDragEnd2()
@@ -294,27 +306,33 @@
 
     private async Task HandleDropList3(DragEventArgs e)
     {
-        if (_draggedItem1 != null && _sourceList1 != List3)
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
         {
-            _draggedItem1.IdGroup = null;
-            _sourceList1.Remove(_draggedItem1);
-            List3.Add(_draggedItem1);
-            await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, null);
-            StateHasChanged();
+            if (_draggedItem1 != null && _sourceList1 != List3)
+            {
+                _draggedItem1.IdGroup = null;
+                _sourceList1.Remove(_draggedItem1);
+                List3.Add(_draggedItem1);
+                await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, null);
+                StateHasChanged();
+            }
         }
     }
 
     private async Task HandleDropList4(int? idGroup, DragEventArgs e)
     {
-        if (_draggedItem1 != null && _sourceList1 != List4)
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
         {
-            if (idGroup != null)
-                _draggedItem1.IdGroup = idGroup;
+            if (_draggedItem1 != null && _sourceList1 != List4)
+            {
+                if (idGroup != null)
+                    _draggedItem1.IdGroup = idGroup;
 
-            _sourceList1.Remove(_draggedItem1);
-            List4.Add(_draggedItem1);
-            await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, _draggedItem1.IdGroup);
-            StateHasChanged();
+                _sourceList1.Remove(_draggedItem1);
+                List4.Add(_draggedItem1);
+                await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, _draggedItem1.IdGroup);
+                StateHasChanged();
+            }
         }
     }
 }

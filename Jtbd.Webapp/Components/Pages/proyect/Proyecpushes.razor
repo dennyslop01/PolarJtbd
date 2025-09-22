@@ -1,14 +1,13 @@
 ﻿@page "/proyect/proyecpushes"
 
-@using Microsoft.AspNetCore.Components.Authorization
-
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecpushes> Logger
-@inject AuthenticationStateProvider authenticationStateProvider
+
+@inject IHttpContextAccessor HttpContextAccessor
 
 <PageTitle>Proyectos Pushes</PageTitle>
 <div class="row align-content-center">
@@ -166,18 +165,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-        }
-        catch (Exception ex)
-        {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-        }
-
         try
         {
             proyectos = (List<Projects>)await repoproyec.GetAllAsync();

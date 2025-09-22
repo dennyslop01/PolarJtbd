@@ -1,14 +1,12 @@
 ﻿@page "/proyect/proyecstories/{IdInter}"
 
-@using Microsoft.AspNetCore.Components.Authorization
-
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
-@inject AuthenticationStateProvider authenticationStateProvider
+@inject IHttpContextAccessor HttpContextAccessor
 
 <PageTitle>Historias</PageTitle>
 <div class="row align-content-center">
@@ -44,11 +42,14 @@
         </div>
     </div>
     <div class="col-lg-10">
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-primary" title="Agregar Historia" @onclick="MostrarFormulario">
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        {
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" title="Agregar Historia" @onclick="MostrarFormulario">
                 <i class="bi bi-plus-lg"></i> 
-            </button>
-        </div>
+                </button>
+            </div>
+        }
 
         @if (mostrarAlerta)
         {
@@ -89,13 +90,16 @@
                             <td>@p.TitleStorie</td>
                             <td>@p.ContextStorie</td>
                             <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
-                                    <i class="bi bi-pencil"></i> 
-                                </button>
-                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.IdStorie)">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
-                                <button class="btn btn-secondary btn-sm" title="Catálogar" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
+                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <i class="bi bi-pencil"></i> 
+                                    </button>
+                                    <button class="btn btn-danger btn-sm me-2" title="Eliminar" @onclick="() => EliminarEntidad(p.IdStorie)">
+                                        <i class="bi bi-trash"></i> 
+                                    </button>
+                                }
+                                <button class="btn btn-secondary btn-sm me-2" title="Catálogar" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
                                     <i class="bi bi-grid m-1"></i> 
                                 </button>
                             </td>
@@ -163,19 +167,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-
-        }
-        catch (Exception ex)
-        {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-        }
-
         try
         {
             entrevistado = (Interviews)await repointer.GetByIdAsync(int.Parse(IdInter));

@@ -1,28 +1,94 @@
-﻿@inherits LayoutComponentBase
+﻿@using Jtbd.Application.Interfaces
+@using Jtbd.Domain.Entities
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider authenticationStateProvider
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
+@using Microsoft.Extensions.Logging
+
+@inject IHttpContextAccessor HttpContextAccessor
+@inherits LayoutComponentBase
+
+@if (!string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Session.GetString("UserName")))
+{
+    <div class="page">
+        <div class="sidebar">
+            @if (!string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Session.GetString("UserName")))
+            {
+                <NavMenu />
+            }
+        </div>
+
+        <main>        
+            <div class="top-row px-10">
+                <div class="col-lg-6 align-content-start">
+                    <p>
+                        <h5><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;JTBD WEB APP – Empresas Polar</strong></h5>
+                    </p>
+                </div>
+                <div class="col-lg-5 d-flex justify-content-end mb-3">
+                    <strong>@HttpContextAccessor.HttpContext.Session.GetString("UserName")</strong>
+                     @* <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a> *@
+                </div>
+            </div>
+
+            <article class="content px-4">
+               @Body
+            </article>
+        </main>
     </div>
 
-    <main>        
-        <div class="align-content-start">
-            <p>
-                <h5><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;JTBD WEB APP – Empresas Polar</strong></h5>
-            </p>
+    <div id="blazor-error-ui" data-nosnippet>
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">🗙</span>
+    </div>
+}
+else
+{
+    <PageTitle>No Autorizado</PageTitle>
+
+    <div class="row align-content-center">
+        <div class="col-lg-11">
+            <div class="col-lg-11">
+                <h3 class="text-center mt-4">No Autorizado</h3>
+            </div>
         </div>
-        @* <div class="top-row px-4">
-             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div> *@
+    </div>
+}
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+@code{
+    private string username = "dusa-user";
+    [Inject] private IEmployee repouser { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Session.GetString("UserName")))
+            {
+                var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+                if (authState.User.Identity.IsAuthenticated)
+                {
+                    username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                    Employee user = await repouser.GetByUsernameAsync(username);
+
+                    if (user != null)
+                    {
+                        HttpContextAccessor.HttpContext.Session.SetInt32("UserRol", user.EmployeeRol);
+                        HttpContextAccessor.HttpContext.Session.SetString("UserName", username);
+                        HttpContextAccessor.HttpContext.Session.SetInt32("UserDepart", user.Deparments.Id);
+                    }
+                //     else
+                //         NavigationManager.NavigateTo("noautorizado");
+                }
+                // else
+                //     await this.JSRuntime.InvokeVoidAsync("windows.redirect", "Noautorizado.razor");
+            }
+        }
+        catch (Exception ex)
+        {
+           Console.WriteLine(ex.Message);
+        }
+    }
+}

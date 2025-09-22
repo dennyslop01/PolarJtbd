@@ -42,7 +42,7 @@ namespace Jtbd.Infrastructure.Repositories
         public async Task<Deparments> GetByIdAsync(int id)
         {
             var categoria = await _context.Deparments
-                  .FirstOrDefaultAsync(x => x.Id == id);
+                  .AsQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             return categoria!;
         }
 

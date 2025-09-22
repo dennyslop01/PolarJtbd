@@ -61,7 +61,15 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var employee = await _context.Employees
                  .Include(x => x.Deparments)
-                 .FirstOrDefaultAsync(x => x.Id == id);
+                 .AsQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            return employee!;
+        }
+
+        public async Task<Employee> GetByUsernameAsync(string user)
+        {
+            var employee = await _context.Employees
+                 .Include(x => x.Deparments)
+                 .AsQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.EmployeeName == user);
             return employee!;
         }
 

@@ -2,12 +2,13 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IHttpContextAccessor HttpContextAccessor
 
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
-@inject AuthenticationStateProvider authenticationStateProvider
+
 
 <PageTitle>Historia Detalle</PageTitle>
 
@@ -101,12 +102,15 @@
                             <td>@p.PushesGroups.IdPush</td>
                             <td>@p.PushesGroups.PushName</td>
                             <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
-                                    <i class="bi bi-pencil"></i> 
-                                </button>
-                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" style="font-size: 11px;">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
+                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
+                                        <i class="bi bi-pencil"></i> 
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" style="font-size: 11px;">
+                                        <i class="bi bi-trash"></i> 
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -114,9 +118,12 @@
             </table>
         }
         <br />
-        <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes" style="font-size: 11px;">
-           <i class="bi bi-plus-lg"></i> 
-        </button>
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        {
+            <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes" style="font-size: 11px;">
+                <i class="bi bi-plus-lg"></i> 
+            </button>
+        }
     </div>
     <div class="col-lg-5">
         <label><strong>Pulls</strong></label>
@@ -149,12 +156,15 @@
                             <td>@p.PullGroups.IdPull</td>
                             <td>@p.PullGroups.PullName</td>
                             <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" style="font-size: 11px;">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
+                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" style="font-size: 11px;">
+                                        <i class="bi bi-trash"></i> 
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -162,9 +172,12 @@
             </table>
         }
         <br />
-        <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls" style="font-size: 11px;">
-           <i class="bi bi-plus-lg"></i> 
-        </button>
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        {
+            <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls" style="font-size: 11px;">
+                <i class="bi bi-plus-lg"></i> 
+            </button>
+        }
     </div>
 </div>
 <br />
@@ -202,12 +215,15 @@
                             <td>@p.Habits.IdHabit</td>
                             <td>@p.Habits.HabitName</td>
                             <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" style="font-size: 11px;">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
+                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" style="font-size: 11px;">
+                                        <i class="bi bi-trash"></i> 
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -215,9 +231,12 @@
             </table>
         }
         <br />
-        <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits" style="font-size: 11px;">
-            <i class="bi bi-plus-lg"></i> 
-        </button>
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        {
+            <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits" style="font-size: 11px;">
+                <i class="bi bi-plus-lg"></i> 
+            </button>
+        }
     </div>
     <div class="col-lg-5">
         <label><strong>Ansiedades</strong></label>
@@ -250,12 +269,15 @@
                             <td>@p.Anxieties.IdAnxie</td>
                             <td>@p.Anxieties.AnxieName</td>
                             <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" style="font-size: 11px;">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
+                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" style="font-size: 11px;">
+                                        <i class="bi bi-trash"></i> 
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -263,9 +285,12 @@
             </table>
         }
         <br />
-        <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies" style="font-size: 11px;">
-            <i class="bi bi-plus-lg"></i> 
-        </button>
+        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        {
+            <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies" style="font-size: 11px;">
+                <i class="bi bi-plus-lg"></i> 
+            </button>
+        }
     </div>
 </div>
 
@@ -448,18 +473,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-        }
-        catch (Exception ex)
-        {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-        }
-
         try
         {
             entidadStorie = (Stories)await repostorie.GetByIdAsync(int.Parse(idStorie));

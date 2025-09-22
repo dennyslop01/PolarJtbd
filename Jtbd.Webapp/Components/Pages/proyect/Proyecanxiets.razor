@@ -1,13 +1,14 @@
 ﻿@page "/proyect/proyecanxiets"
 
 @rendermode InteractiveServer
-@using Microsoft.AspNetCore.Components.Authorization
+@inject IHttpContextAccessor HttpContextAccessor
+
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecanxiets> Logger
-@inject AuthenticationStateProvider authenticationStateProvider
+
 
 <PageTitle>Proyectos Ansiedades</PageTitle>
 <div class="row align-content-center">
@@ -156,19 +157,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-
-        }
-        catch (Exception ex)
-        {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
-        }
-
         try
         {
             proyectos = (List<Projects>)await repoproyec.GetAllAsync();

@@ -89,13 +89,12 @@ namespace Jtbd.Infrastructure.Repositories
             return producto!;
         }
 
-        public async Task<Projects> GetByDeparmentIdAsync(int id)
+        public async Task<IEnumerable<Projects>> GetByDeparmentIdAsync(int id)
         {
-            var producto = await _context.Projects
-                 .Include(x => x.Categories)
-                 .Include(x => x.Deparment)
-                 .FirstOrDefaultAsync(x => x.Deparment.Id == id);
-            return producto!;
+            return await _context.Projects
+                .Include(x => x.Categories)
+                .Include(x => x.Deparment)
+                .AsQueryable().AsNoTracking().ToListAsync();
         }
 
         public async Task<bool> UpdateAsync(CreateProject project)
