@@ -4,10 +4,11 @@
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @using Jtbd.Webapp.Data
+@using Jtbd.Webapp.Service
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Interview> Logger
-@inject IHttpContextAccessor HttpContextAccessor
+@inject SessionService sessionService
 
 <PageTitle>Agrupar Historias</PageTitle>
 <div class="row align-content-center">
@@ -229,7 +230,7 @@
 
     private void HandleDragStart(Item item, int? idGroup)
     {
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             if (idGroup != null)
                 item.IdGroup = idGroup;
@@ -252,7 +253,7 @@
 
     private async Task HandleDropList1(DragEventArgs e)
     {
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             if (_draggedItem != null && _sourceList != List1)
             {
@@ -267,7 +268,7 @@
 
     private async Task HandleDropList2(int? idGroup, DragEventArgs e)
     {
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             {
                 if (idGroup != null)
@@ -283,7 +284,7 @@
 
     private void HandleDragStart2(Item item, int? idGroup)
     {
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             if (idGroup != null)
                 item.IdGroup = idGroup;
@@ -306,7 +307,7 @@
 
     private async Task HandleDropList3(DragEventArgs e)
     {
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             if (_draggedItem1 != null && _sourceList1 != List3)
             {
@@ -321,7 +322,7 @@
 
     private async Task HandleDropList4(int? idGroup, DragEventArgs e)
     {
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             if (_draggedItem1 != null && _sourceList1 != List4)
             {

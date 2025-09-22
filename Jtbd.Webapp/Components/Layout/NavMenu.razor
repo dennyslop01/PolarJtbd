@@ -1,5 +1,5 @@
-﻿@rendermode InteractiveServer
-@inject IHttpContextAccessor HttpContextAccessor
+﻿@using Jtbd.Webapp.Service
+@rendermode InteractiveServer
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid align-content-center">
@@ -23,55 +23,9 @@
             <NavLink class="nav-link" href="proyect/proyectos">
                 <p><i class="bi bi-clipboard-data m-1"></i> Proyectos</p>
             </NavLink>
-
-            @* @if (isExpandSubNavP)
-            {
-                <ul class="nav flex-column submenu">
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="proyect/interview" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
-                            <p><i class="bi bi-person-check m-1"></i> Entrevistados</p>
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="proyect/proyectos" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
-                            <p><i class="bi bi-clipboard-data m-1"></i> Proyectos</p>
-                        </NavLink>
-                    </li>
-                     <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="twolistdragdrop" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
-                            <p><i class="bi bi-clipboard-data m-1"></i> drag and drop</p>
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="proyect/proyecpushes" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
-                            <p><i class="bi bi-grid m-1"></i> Pushes</p>
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="proyect/proyecpulls" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
-                            <p><i class="bi bi-grid-1x2 m-1"></i> Pulls</p>
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="proyect/proyechabits" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
-                            <p><i class="bi bi-grid-3x2 m-1"></i> Hábitos</p>
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="proyect/proyecanxiets" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
-                            <p><i class="bi bi-grid-3x2-gap m-1"></i> Ansiedades</p>
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="proyect/proyecstories" @onclick="() => isExpandSubNavP = !isExpandSubNavP">
-                            <p><i class="bi bi-list-columns-reverse m-1"></i> Historias</p>
-                        </NavLink>
-                    </li>
-                </ul>
-            } *@
         </div>
 
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 2)
+        @if (sessionService.UserRol == 1)
         {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="#" @onclick="() => isExpandSubNav = !isExpandSubNav">
@@ -104,6 +58,8 @@
 </div>
 
 @code {
+
     private bool isExpandSubNavP = false;
     private bool isExpandSubNav = false;
+    @inject SessionService sessionService
 }

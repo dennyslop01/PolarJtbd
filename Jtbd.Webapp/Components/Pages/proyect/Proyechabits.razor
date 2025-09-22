@@ -2,12 +2,13 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-@inject IHttpContextAccessor HttpContextAccessor
+@using Jtbd.Webapp.Service
+
 
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyechabits> Logger
-
+@inject SessionService sessionService
 
 <PageTitle>Proyectos Hábitos</PageTitle>
 <div class="row align-content-center">
@@ -177,9 +178,9 @@
                 entidadActual.IdProject = Model.idProyecto;
                 entidadActual.StatusHabit = -1;
                 entidadActual.CreatedDate = DateTime.Now;
-                entidadActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+                entidadActual.CreatedUser = sessionService.UserName;
                 entidadActual.UpdatedDate = DateTime.Now;
-                entidadActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+                entidadActual.UpdatedUser = sessionService.UserName;
 
                 mostrarFormulario = true;
             }
@@ -204,7 +205,7 @@
                         CreatedDate = entidad.CreatedDate,
                         CreatedUser = entidad.CreatedUser,
                         UpdatedDate = DateTime.Now,
-                        UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                        UpdatedUser = sessionService.UserName,
                         StatusHabit = entidad.StatusHabit
                     };
                 mostrarFormulario = true;

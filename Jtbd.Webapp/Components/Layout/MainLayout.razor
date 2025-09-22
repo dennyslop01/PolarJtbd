@@ -1,18 +1,17 @@
-﻿@using Jtbd.Application.Interfaces
+﻿
+@using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Service
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider authenticationStateProvider
 
-@using Microsoft.Extensions.Logging
-
-@inject IHttpContextAccessor HttpContextAccessor
 @inherits LayoutComponentBase
 
-@if (!string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Session.GetString("UserName")))
+@if (!string.IsNullOrEmpty(username))
 {
     <div class="page">
         <div class="sidebar">
-            @if (!string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Session.GetString("UserName")))
+            @if (!string.IsNullOrEmpty(username))
             {
                 <NavMenu />
             }
@@ -26,7 +25,7 @@
                     </p>
                 </div>
                 <div class="col-lg-5 d-flex justify-content-end mb-3">
-                    <strong>@HttpContextAccessor.HttpContext.Session.GetString("UserName")</strong>
+                    <strong>@username</strong>
                      @* <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a> *@
                 </div>
             </div>
@@ -58,14 +57,16 @@ else
 
 @code{
     private string username = "dusa-user";
+
     [Inject] private IEmployee repouser { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    @inject SessionService sessionService
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            if (string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Session.GetString("UserName")))
+            if (string.IsNullOrEmpty(sessionService.UserName))
             {
                 var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
                 if (authState.User.Identity.IsAuthenticated)
@@ -75,15 +76,11 @@ else
 
                     if (user != null)
                     {
-                        HttpContextAccessor.HttpContext.Session.SetInt32("UserRol", user.EmployeeRol);
-                        HttpContextAccessor.HttpContext.Session.SetString("UserName", username);
-                        HttpContextAccessor.HttpContext.Session.SetInt32("UserDepart", user.Deparments.Id);
+                        sessionService.UserRol = user.EmployeeRol;
+                        sessionService.UserName = username;
+                        sessionService.UserDepart = user.Deparments.Id;
                     }
-                //     else
-                //         NavigationManager.NavigateTo("noautorizado");
                 }
-                // else
-                //     await this.JSRuntime.InvokeVoidAsync("windows.redirect", "Noautorizado.razor");
             }
         }
         catch (Exception ex)

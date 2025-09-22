@@ -1,13 +1,14 @@
 ﻿@page "/proyect/proyecpulls"
 
-@inject IHttpContextAccessor HttpContextAccessor
+
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Service
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecpulls> Logger
-
+@inject SessionService sessionService
 
 <PageTitle>Proyectos Pulls</PageTitle>
 <div class="row align-content-center">
@@ -80,7 +81,7 @@
                                     break;
                             }
                             <td>
-                            @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                            @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
                             {
                                 <button class="btn btn-success btn-sm me-2" @onclick="() => EditarEntidad(p)">
                                     <i class="bi bi-pencil"></i> Editar
@@ -187,9 +188,9 @@
                 entidadActual.IdProject = Model.idProyecto;
                 entidadActual.StatusPull = -1;
                 entidadActual.CreatedDate = DateTime.Now;
-                entidadActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+                entidadActual.CreatedUser = sessionService.UserName;
                 entidadActual.UpdatedDate = DateTime.Now;
-                entidadActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+                entidadActual.UpdatedUser = sessionService.UserName;
 
                 mostrarFormulario = true;
             }
@@ -215,7 +216,7 @@
                         CreatedDate = entidad.CreatedDate,
                         CreatedUser = entidad.CreatedUser,
                         UpdatedDate = DateTime.Now,
-                        UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                        UpdatedUser = sessionService.UserName,
                         StatusPull = entidad.StatusPull
                     };
                 mostrarFormulario = true;

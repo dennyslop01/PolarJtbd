@@ -1,20 +1,20 @@
 ﻿@page "/proyect/proyectos"
 
-@inject IHttpContextAccessor HttpContextAccessor
-
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Service
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyectos> Logger
+@inject SessionService sessionService
 
 <PageTitle>Proyectos</PageTitle>
 
 <div class="row align-content-center">
     <div class="col-lg-12">
         <h3 class="text-center mt-4">Gestión de proyectos</h3>
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-primary" @onclick="MostrarFormulario" title="Agregar Proyecto">
@@ -76,7 +76,7 @@
                                     break;
                             } *@
                             <td>
-                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i> 
@@ -93,6 +93,9 @@
                                 </button>
                                 <button class="btn btn-secondary btn-sm me-2" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
                                     <i class="bi bi-ui-checks"></i>
+                                </button>
+                                <button class="btn btn-secondary btn-sm me-2" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
+                                    <i class="bi bi-kanban"></i>
                                 </button>
                             </td>
                         </tr>
@@ -126,7 +129,7 @@
                             <InputDate class="form-control" @bind-Value="proyectoActual.ProjectDate" />
                             <ValidationMessage For="@(() => proyectoActual.ProjectDate)" />
                         </div>
-                        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") == 1)
+                        @if (sessionService.UserRol == 1)
                         {
                             <div class="mb-3">
                                 <label class="form-label">Departamentos:</label>
@@ -211,14 +214,14 @@
         {
             categorias = (List<Categories>)await repocategoria.GetAllAsync();
 
-            if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") == 1)
+            if (sessionService.UserRol == 1)
             {
                 departamento = (List<Deparments>)await repodepart.GetAllAsync();
                 proyectos = (List<Projects>)await repository.GetAllAsync();
             }
             else
             {
-                int aux = (HttpContextAccessor.HttpContext.Session.GetInt32("UserDepart") == null ? -1 : int.Parse(HttpContextAccessor.HttpContext.Session.GetInt32("UserDepart").ToString()));
+                int aux = (sessionService.UserDepart == null ? -1 : int.Parse(sessionService.UserDepart.ToString()));
                 proyectos = (List<Projects>)await repository.GetByDeparmentIdAsync(aux);
             }
         }
@@ -234,11 +237,11 @@
         try
         {
             proyectoActual = new CreateProject();
-            if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") == 1)
+            if (sessionService.UserRol == 1)
                 proyectoActual.IdDeparmento = -1;
             else
             {
-                int aux = (HttpContextAccessor.HttpContext.Session.GetInt32("UserDepart") == null ? -1 : int.Parse(HttpContextAccessor.HttpContext.Session.GetInt32("UserDepart").ToString()));
+                int aux = (sessionService.UserDepart == null ? -1 : int.Parse(sessionService.UserDepart.ToString()));
                 proyectoActual.IdDeparmento = aux;
             }
            
@@ -246,9 +249,9 @@
             proyectoActual.StatusProject = 1;
             proyectoActual.ProjectDate = DateTime.Now;
             proyectoActual.CreatedDate = DateTime.Now;
-            proyectoActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            proyectoActual.CreatedUser = sessionService.UserName;
             proyectoActual.UpdatedDate = DateTime.Now;
-            proyectoActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            proyectoActual.UpdatedUser = sessionService.UserName;
 
             mostrarFormulario = true;
         }
@@ -276,7 +279,7 @@
                     CreatedDate = proyecto.CreatedDate,
                     CreatedUser = proyecto.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                    UpdatedUser = sessionService.UserName,
                     StatusProject = proyecto.StatusProject
                 };
             mostrarFormulario = true;
@@ -362,6 +365,18 @@
         try
         {
             NavigationManager.NavigateTo($"proyect/proyecsagrupar/{id}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void MostrarMatriz(string id)
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecsmatriz/{id}");
         }
         catch (Exception ex)
         {

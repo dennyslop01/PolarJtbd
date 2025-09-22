@@ -2,12 +2,12 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
-
-@inject IHttpContextAccessor HttpContextAccessor
+@using Jtbd.Webapp.Service
 
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
+@inject SessionService sessionService
 
 
 <PageTitle>Historia Detalle</PageTitle>
@@ -102,7 +102,7 @@
                             <td>@p.PushesGroups.IdPush</td>
                             <td>@p.PushesGroups.PushName</td>
                             <td>
-                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
                                         <i class="bi bi-pencil"></i> 
@@ -118,7 +118,7 @@
             </table>
         }
         <br />
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes" style="font-size: 11px;">
                 <i class="bi bi-plus-lg"></i> 
@@ -156,7 +156,7 @@
                             <td>@p.PullGroups.IdPull</td>
                             <td>@p.PullGroups.PullName</td>
                             <td>
-                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
                                         <i class="bi bi-pencil"></i>
@@ -172,7 +172,7 @@
             </table>
         }
         <br />
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls" style="font-size: 11px;">
                 <i class="bi bi-plus-lg"></i> 
@@ -215,7 +215,7 @@
                             <td>@p.Habits.IdHabit</td>
                             <td>@p.Habits.HabitName</td>
                             <td>
-                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
                                         <i class="bi bi-pencil"></i>
@@ -231,7 +231,7 @@
             </table>
         }
         <br />
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits" style="font-size: 11px;">
                 <i class="bi bi-plus-lg"></i> 
@@ -269,7 +269,7 @@
                             <td>@p.Anxieties.IdAnxie</td>
                             <td>@p.Anxieties.AnxieName</td>
                             <td>
-                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
                                         <i class="bi bi-pencil"></i>
@@ -285,7 +285,7 @@
             </table>
         }
         <br />
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies" style="font-size: 11px;">
                 <i class="bi bi-plus-lg"></i> 
@@ -521,9 +521,9 @@
             pushActual.IdPush = 0;
             pushActual.IdProject = entidadStorie.Project.IdProject;
             pushActual.CreatedDate = DateTime.Now;
-            pushActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            pushActual.CreatedUser = sessionService.UserName;
             pushActual.UpdatedDate = DateTime.Now;
-            pushActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            pushActual.UpdatedUser = sessionService.UserName;
             pushActual.StatusPush = 1;
             mostrarPush = true;
         }
@@ -545,7 +545,7 @@
                     CreatedDate = entidad.CreatedDate,
                     CreatedUser = entidad.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                    UpdatedUser = sessionService.UserName,
                     StatusPush = entidad.StatusPush
                 };
             mostrarPush = true;
@@ -572,9 +572,9 @@
             pullActual.IdPull = 0;
             pullActual.IdProject = entidadStorie.Project.IdProject;
             pullActual.CreatedDate = DateTime.Now;
-            pullActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            pullActual.CreatedUser = sessionService.UserName;
             pullActual.UpdatedDate = DateTime.Now;
-            pullActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            pullActual.UpdatedUser = sessionService.UserName;
             pullActual.StatusPull = 1;
             mostrarPull = true;
         }
@@ -596,7 +596,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                UpdatedUser = sessionService.UserName,
                 StatusPull = entidad.StatusPull
             };
             mostrarPull = true;
@@ -623,9 +623,9 @@
             habitActual.IdHabit = 0;
             habitActual.IdProject = entidadStorie.Project.IdProject;
             habitActual.CreatedDate = DateTime.Now;
-            habitActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            habitActual.CreatedUser = sessionService.UserName;
             habitActual.UpdatedDate = DateTime.Now;
-            habitActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            habitActual.UpdatedUser = sessionService.UserName;
             habitActual.StatusHabit = 1;
             mostrarHabit = true;
         }
@@ -647,7 +647,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                UpdatedUser = sessionService.UserName,
                 StatusHabit = entidad.StatusHabit
             };
             mostrarHabit = true;
@@ -674,9 +674,9 @@
             anxieActual.IdAnxie = 0;
             anxieActual.IdProject = entidadStorie.Project.IdProject;
             anxieActual.CreatedDate = DateTime.Now;
-            anxieActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            anxieActual.CreatedUser = sessionService.UserName;
             anxieActual.UpdatedDate = DateTime.Now;
-            anxieActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            anxieActual.UpdatedUser = sessionService.UserName;
             anxieActual.StatusAnxie = 1;
             mostrarAnxie = true;
         }
@@ -698,7 +698,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                UpdatedUser = sessionService.UserName,
                 StatusAnxie = entidad.StatusAnxie
             };
             mostrarAnxie = true;

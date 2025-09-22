@@ -2,6 +2,7 @@ using Jtbd.Application.Interfaces;
 using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Repositories;
 using Jtbd.Webapp.Components;
+using Jtbd.Webapp.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,14 +19,6 @@ builder.Services.AddAuthentication(options =>
     options.DefaultSignInScheme = "Identity.External"; // If using external logins
 })
 .AddIdentityCookies(); // Or other authentication methods like AddOpenIdConnect, AddJwtBearer
-
-builder.Services.AddDistributedMemoryCache(); // Or another distributed cache provider
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromSeconds(30); // Set your desired timeout
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
 
 builder.Services.AddDbContext<JtbdDbContext>(options =>
 {
@@ -49,6 +42,7 @@ builder.Services.AddScoped<IPullGroups, PullGroupsRepository>();
 builder.Services.AddScoped<IPushesGroups, PushesGroupsRepository>();
 builder.Services.AddScoped<IStories, StoriesRepository>();
 builder.Services.AddScoped<IGroups, GroupsRepository>();
+builder.Services.AddSingleton<SessionService>();
 
 builder.WebHost.UseStaticWebAssets();
 
@@ -62,11 +56,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseSession();
-
 app.UseAuthentication();
-
-app.UseSession();
 
 app.UseAntiforgery();
 

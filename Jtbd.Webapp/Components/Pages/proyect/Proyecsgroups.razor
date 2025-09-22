@@ -2,10 +2,11 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Service
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Interview> Logger
-@inject IHttpContextAccessor HttpContextAccessor
+@inject SessionService sessionService
 
 <PageTitle>Grupos</PageTitle>
 <div class="row align-content-center">
@@ -36,7 +37,7 @@
             </table> *@
             <h3 class="text-center mt-4">Gestión de Grupos</h3>
         </div>
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-primary" title="Agregar Grupo" @onclick="MostrarFormulario">
@@ -82,7 +83,7 @@
                             <td>@p.IdGroup</td>
                             <td>@p.GroupName</td>
                             <td>
-                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>

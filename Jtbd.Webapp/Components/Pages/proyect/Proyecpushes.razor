@@ -3,11 +3,12 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Service
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecpushes> Logger
+@inject SessionService sessionService
 
-@inject IHttpContextAccessor HttpContextAccessor
 
 <PageTitle>Proyectos Pushes</PageTitle>
 <div class="row align-content-center">
@@ -186,9 +187,9 @@
                 entidadActual.IdProject = Model.idProyecto;
                 entidadActual.StatusPush = -1;
                 entidadActual.CreatedDate = DateTime.Now;
-                entidadActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+                entidadActual.CreatedUser = sessionService.UserName;
                 entidadActual.UpdatedDate = DateTime.Now;
-                entidadActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+                entidadActual.UpdatedUser = sessionService.UserName;
 
                 mostrarFormulario = true;
             }
@@ -214,7 +215,7 @@
                         CreatedDate = entidad.CreatedDate,
                         CreatedUser = entidad.CreatedUser,
                         UpdatedDate = DateTime.Now,
-                        UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                        UpdatedUser = sessionService.UserName,
                         StatusPush = entidad.StatusPush
                     };
                 mostrarFormulario = true;

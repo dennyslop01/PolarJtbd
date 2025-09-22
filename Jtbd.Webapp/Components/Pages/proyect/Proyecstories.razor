@@ -3,10 +3,11 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Jtbd.Webapp.Service
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
-@inject IHttpContextAccessor HttpContextAccessor
+@inject SessionService sessionService
 
 <PageTitle>Historias</PageTitle>
 <div class="row align-content-center">
@@ -42,7 +43,7 @@
         </div>
     </div>
     <div class="col-lg-10">
-        @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
         {
             <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-primary" title="Agregar Historia" @onclick="MostrarFormulario">
@@ -90,7 +91,7 @@
                             <td>@p.TitleStorie</td>
                             <td>@p.ContextStorie</td>
                             <td>
-                                @if (HttpContextAccessor.HttpContext.Session.GetInt32("UserRol") < 3)
+                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i> 
@@ -188,9 +189,9 @@
             entidadActual.IdProject = entrevistado.Project.IdProject;
             entidadActual.IdInter = entrevistado.IdInter;
             entidadActual.CreatedDate = DateTime.Now;
-            entidadActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            entidadActual.CreatedUser = sessionService.UserName;
             entidadActual.UpdatedDate = DateTime.Now;
-            entidadActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+            entidadActual.UpdatedUser = sessionService.UserName;
             entidadActual.IdGroup = null;
 
             mostrarFormulario = true;
@@ -215,7 +216,7 @@
                     CreatedDate = entidad.CreatedDate,
                     CreatedUser = entidad.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
+                    UpdatedUser = sessionService.UserName,
                     IdGroup = null
             };
 
