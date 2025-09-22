@@ -159,7 +159,7 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string username = "Auxiliar";
+    
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IStories repository { get; set; } = null!;
@@ -188,9 +188,9 @@
             entidadActual.IdProject = entrevistado.Project.IdProject;
             entidadActual.IdInter = entrevistado.IdInter;
             entidadActual.CreatedDate = DateTime.Now;
-            entidadActual.CreatedUser = username;
+            entidadActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             entidadActual.UpdatedDate = DateTime.Now;
-            entidadActual.UpdatedUser = username;
+            entidadActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             entidadActual.IdGroup = null;
 
             mostrarFormulario = true;
@@ -215,7 +215,7 @@
                     CreatedDate = entidad.CreatedDate,
                     CreatedUser = entidad.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = username,
+                    UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
                     IdGroup = null
             };
 

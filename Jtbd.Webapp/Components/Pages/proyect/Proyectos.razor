@@ -198,7 +198,7 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string username = "Auxiliar";
+    
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IProjects repository { get; set; } = null!;
@@ -246,9 +246,9 @@
             proyectoActual.StatusProject = 1;
             proyectoActual.ProjectDate = DateTime.Now;
             proyectoActual.CreatedDate = DateTime.Now;
-            proyectoActual.CreatedUser = username;
+            proyectoActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             proyectoActual.UpdatedDate = DateTime.Now;
-            proyectoActual.UpdatedUser = username;
+            proyectoActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
 
             mostrarFormulario = true;
         }
@@ -276,7 +276,7 @@
                     CreatedDate = proyecto.CreatedDate,
                     CreatedUser = proyecto.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = username,
+                    UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
                     StatusProject = proyecto.StatusProject
                 };
             mostrarFormulario = true;

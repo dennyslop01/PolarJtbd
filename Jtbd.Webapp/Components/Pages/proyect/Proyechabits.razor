@@ -148,7 +148,7 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string username = "Auxiliar";
+    
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IHabits repository { get; set; } = null!;
@@ -177,9 +177,9 @@
                 entidadActual.IdProject = Model.idProyecto;
                 entidadActual.StatusHabit = -1;
                 entidadActual.CreatedDate = DateTime.Now;
-                entidadActual.CreatedUser = username;
+                entidadActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
                 entidadActual.UpdatedDate = DateTime.Now;
-                entidadActual.UpdatedUser = username;
+                entidadActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
 
                 mostrarFormulario = true;
             }
@@ -204,7 +204,7 @@
                         CreatedDate = entidad.CreatedDate,
                         CreatedUser = entidad.CreatedUser,
                         UpdatedDate = DateTime.Now,
-                        UpdatedUser = username,
+                        UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
                         StatusHabit = entidad.StatusHabit
                     };
                 mostrarFormulario = true;

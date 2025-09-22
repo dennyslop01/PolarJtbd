@@ -155,7 +155,7 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private string username = "Auxiliar";
+    
     private int cantPerm = 0;
     private int cantActi = 0;
 
@@ -186,9 +186,9 @@
                 entidadActual.IdProject = Model.idProyecto;
                 entidadActual.StatusPush = -1;
                 entidadActual.CreatedDate = DateTime.Now;
-                entidadActual.CreatedUser = username;
+                entidadActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
                 entidadActual.UpdatedDate = DateTime.Now;
-                entidadActual.UpdatedUser = username;
+                entidadActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
 
                 mostrarFormulario = true;
             }
@@ -214,7 +214,7 @@
                         CreatedDate = entidad.CreatedDate,
                         CreatedUser = entidad.CreatedUser,
                         UpdatedDate = DateTime.Now,
-                        UpdatedUser = username,
+                        UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
                         StatusPush = entidad.StatusPush
                     };
                 mostrarFormulario = true;

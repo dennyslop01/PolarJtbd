@@ -446,7 +446,7 @@
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     private Stories entidadStorie = new ();
-    private string username = "Auxiliar";
+    
     private int idProyec = 0;
 
     // private List<PushesGroups> pushes = new();
@@ -521,9 +521,9 @@
             pushActual.IdPush = 0;
             pushActual.IdProject = entidadStorie.Project.IdProject;
             pushActual.CreatedDate = DateTime.Now;
-            pushActual.CreatedUser = username;
+            pushActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             pushActual.UpdatedDate = DateTime.Now;
-            pushActual.UpdatedUser = username;
+            pushActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             pushActual.StatusPush = 1;
             mostrarPush = true;
         }
@@ -545,7 +545,7 @@
                     CreatedDate = entidad.CreatedDate,
                     CreatedUser = entidad.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = username,
+                    UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
                     StatusPush = entidad.StatusPush
                 };
             mostrarPush = true;
@@ -572,9 +572,9 @@
             pullActual.IdPull = 0;
             pullActual.IdProject = entidadStorie.Project.IdProject;
             pullActual.CreatedDate = DateTime.Now;
-            pullActual.CreatedUser = username;
+            pullActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             pullActual.UpdatedDate = DateTime.Now;
-            pullActual.UpdatedUser = username;
+            pullActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             pullActual.StatusPull = 1;
             mostrarPull = true;
         }
@@ -596,7 +596,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = username,
+                UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
                 StatusPull = entidad.StatusPull
             };
             mostrarPull = true;
@@ -623,9 +623,9 @@
             habitActual.IdHabit = 0;
             habitActual.IdProject = entidadStorie.Project.IdProject;
             habitActual.CreatedDate = DateTime.Now;
-            habitActual.CreatedUser = username;
+            habitActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             habitActual.UpdatedDate = DateTime.Now;
-            habitActual.UpdatedUser = username;
+            habitActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             habitActual.StatusHabit = 1;
             mostrarHabit = true;
         }
@@ -647,7 +647,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = username,
+                UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
                 StatusHabit = entidad.StatusHabit
             };
             mostrarHabit = true;
@@ -674,9 +674,9 @@
             anxieActual.IdAnxie = 0;
             anxieActual.IdProject = entidadStorie.Project.IdProject;
             anxieActual.CreatedDate = DateTime.Now;
-            anxieActual.CreatedUser = username;
+            anxieActual.CreatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             anxieActual.UpdatedDate = DateTime.Now;
-            anxieActual.UpdatedUser = username;
+            anxieActual.UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName");
             anxieActual.StatusAnxie = 1;
             mostrarAnxie = true;
         }
@@ -698,7 +698,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = username,
+                UpdatedUser = HttpContextAccessor.HttpContext.Session.GetString("UserName"),
                 StatusAnxie = entidad.StatusAnxie
             };
             mostrarAnxie = true;
