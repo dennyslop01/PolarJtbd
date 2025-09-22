@@ -310,6 +310,8 @@
         }
         catch (Exception ex)
         {
+            mensajeAlerta = "No se puede eliminar el registros ya que existen relaciones con otras tablas que no han sido eliminadas.";
+            mostrarAlerta = true;
             Logger.LogError(ex.Message);
         }
     }
