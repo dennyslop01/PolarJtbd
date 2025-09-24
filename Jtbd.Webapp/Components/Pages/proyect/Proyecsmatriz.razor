@@ -50,10 +50,13 @@
                             {
                                 <th>Push</th>
                             }
+                            @* <th>Sin</th> *@
+
                             @foreach (var (p, index) in grupos.Select((p, i) => (p, i + 1)))
                             {
                                 <th>Pull</th>
                             }
+                            @* <th>Sin</th> *@
                         </tr>
                         <tr>
                             <th>&nbsp;&nbsp;</th>
@@ -61,10 +64,13 @@
                             {
                                 <th>@p.GroupName</th>
                             }
+                            @* <th>Asignar</th> *@
+
                             @foreach (var (p, index) in grupos.Select((p, i) => (p, i + 1)))
                             {
                                 <th>@p.GroupName</th>
                             }
+                            @* <th>Asignar</th> *@
                         </tr>
                     </thead>
                     <tbody>
@@ -74,33 +80,71 @@
                                 <td>@p.IdInter.InterName - @p.TitleStorie</td>
                                 @foreach (var (p1, index1) in grupos.Select((p, i) => (p, i + 1)))
                                 {
-                                    int contador = storiespush.Where(c => c.Stories.IdStorie == p.IdStorie && c.Groups.IdGroup == p1.IdGroup).Count();
-                                    if (contador > 0)
+                                    try
                                     {
-                                        <td>
-                                            <button type="button" class="btn btn-success">1</button>
-                                        </td>
+                                        int contador = storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).Count();
+                                        if (contador > 0)
+                                        {
+                                            <td>
+                                                <button type="button" class="btn btn-success">1</button>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            @if (storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups == null).Count() > 0)
+                                            {
+                                                <td>-</td>
+                                            }
+                                            else
+                                            {
+                                                <td>0</td>
+                                            }
+                                        }
                                     }
-                                    else
-                                    {
-                                        <td>0</td>
-                                    }
+                                    catch { }
+                                }                                
+                                @* @if (storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups == null).Count() > 0)
+                                {
+                                    <td>-</td>
                                 }
+                                else
+                                {
+                                    <td>-</td>
+                                } *@
 
                                 @foreach (var (p1, index1) in grupos.Select((p, i) => (p, i + 1)))
                                 {
-                                    int contador = storiespull.Where(c => c.Stories.IdStorie == p.IdStorie && c.Groups.IdGroup == p1.IdGroup).Count();
-                                    if (contador > 0)
+                                    try
                                     {
-                                        <td>
-                                            <button type="button" class="btn btn-success">1</button>
-                                        </td>
+                                        int contador = storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).Count();
+                                        if (contador > 0)
+                                        {
+                                            <td>
+                                                <button type="button" class="btn btn-success">1</button>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            @if (storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups == null).Count() > 0)
+                                            {
+                                                <td>-</td>
+                                            }
+                                            else
+                                            {
+                                                <td>0</td>
+                                            }
+                                        }
                                     }
-                                    else
-                                    {
-                                        <td>0</td>
-                                    }
+                                    catch { }
                                 }
+                                @* @if (storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups == null).Count() > 0)
+                                {
+                                    <td>-</td>
+                                }
+                                else
+                                {
+                                    <td>-</td>
+                                } *@
                             </tr>
                         }
                     </tbody>

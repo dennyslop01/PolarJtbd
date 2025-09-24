@@ -237,7 +237,7 @@
             else
                 await repository.UpdateAsync(entidadActual);
 
-            stories = (List<Stories>)await repository.GetAllAsync();
+            stories = (List<Stories>)await repository.GetByInterIdAsync(int.Parse(IdInter));
 
             mostrarFormulario = false;
             mensajeAlerta = "Historia guardada exitosamente.";
@@ -257,7 +257,7 @@
             if (confirmed)
             {
                 await repository.DeleteAsync(id);
-                stories = (List<Stories>)await repository.GetAllAsync();
+                stories = (List<Stories>)await repository.GetByInterIdAsync(int.Parse(IdInter));
 
                 mensajeAlerta = "Historia eliminada exitosamente.";
                 mostrarAlerta = true;
