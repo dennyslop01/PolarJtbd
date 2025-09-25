@@ -3,10 +3,13 @@
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @using Jtbd.Webapp.Service
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Interview> Logger
-@inject SessionService sessionService
+@inject AuthenticationStateProvider authenticationStateProvider
+
+@* @inject SessionService sessionService *@
 
 <PageTitle>Grupos</PageTitle>
 <div class="row align-content-center">
@@ -37,7 +40,7 @@
             </table> *@
             <h3 class="text-center mt-4">Gestión de Grupos</h3>
         </div>
-        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+        @if (UserRol > 0 && UserRol < 3)
         {
             <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-primary" title="Agregar Grupo" @onclick="MostrarFormulario">
@@ -83,7 +86,7 @@
                             <td>@p.IdGroup</td>
                             <td>@p.GroupName</td>
                             <td>
-                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+                                @if (UserRol > 0 && UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
@@ -143,14 +146,38 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private int UserRol = 5;
+    private string username = string.Empty;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IGroups repository { get; set; } = null!;
     [Inject] private IProjects repoproyect { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
     private Projects proyecto = new();
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+                if (authState.User.Identity.IsAuthenticated)
+                {
+                    username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                    Employee user = await repouser.GetByUsernameAsync(username);
+
+                    if (user != null)
+                    {
+                        UserRol = user.EmployeeRol;
+                    }
+                }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+        
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));

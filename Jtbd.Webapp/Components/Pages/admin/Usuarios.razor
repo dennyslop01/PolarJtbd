@@ -2,161 +2,176 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Usuarios> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Usuarios</PageTitle>
-<div class="row align-content-center">
-    <div class="col-lg-8">
-        <h3 class="text-center mt-4">Gestión de Usuarios</h3>
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-primary" @onclick="MostrarFormulario">
-                <i class="bi bi-plus-lg"></i> Agregar Usuario
-            </button>
-        </div>
 
-        @if (mostrarAlerta)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @mensajeAlerta
-                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+ @if (UserRol == 1)
+ {
+    <div class="row align-content-center">
+        <div class="col-lg-8">
+            <h3 class="text-center mt-4">Gestión de Usuarios</h3>
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" @onclick="MostrarFormulario">
+                    <i class="bi bi-plus-lg"></i> Agregar Usuario
+                </button>
             </div>
-        }
+
+            @if (mostrarAlerta)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @mensajeAlerta
+                    <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+                </div>
+            }
 
 
-        @if (usuarios is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!usuarios.Any())
-        {
-            <div class="alert alert-info text-center">No hay usuarios disponibles.</div>
-        }
-        else
-        {
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Departamento</th>
-                        <th>Rol</th>
-                        <th>Estatus</th>
-                        <th> </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var (p, index) in usuarios.Select((p, i) => (p, i + 1)))
-                    {
+            @if (usuarios is null)
+            {
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p>Cargando datos...</p>
+                </div>
+            }
+            else if (!usuarios.Any())
+            {
+                <div class="alert alert-info text-center">No hay usuarios disponibles.</div>
+            }
+            else
+            {
+                <table class="table table-striped table-hover">
+                    <thead class="table-secondary bg-opacity-25">
                         <tr>
-                            <td>@index</td>
-                            <td>@p.EmployeeName</td>
-                            <td>@p.Deparments.Name</td>
-                            @switch (p.EmployeeRol)
-                            {
-                                case 1:
-                                    <td>Administrador</td>
-                                    break;
-                                case 2:
-                                    <td>Analista</td>
-                                    break;
-                                case 3:
-                                    <td>Consulta</td>
-                                    break;
-                            }
-
-                            @switch(p.StatusEmployee)
-                            {
-                                case 0:
-                                    <td>Inactivo</td>
-                                    break;
-                                case 1:
-                                    <td>Activo</td>
-                                    break;
-                            }
-                            <td>
-                                <button class="btn btn-success btn-sm me-2" @onclick="() => EditarEntidad(p)">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </button>
-                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.Id)">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </button>
-                            </td>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Departamento</th>
+                            <th>Rol</th>
+                            <th>Estatus</th>
+                            <th> </th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
-</div>
-
-@if (mostrarFormulario)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@(usuarioActual.Id == 0 ? "Agregar" : "Editar")</h5>
-                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
-                </div>
-                <div class="modal-body">
-                    <EditForm Model="@usuarioActual" OnValidSubmit="GuardarEntidad">
-                        <DataAnnotationsValidator />
-
-                        <div class="mb-3">
-                            <label class="form-label">Nombre:</label>
-                            <InputText class="form-control" @bind-Value="usuarioActual.EmployeeName" />
-                            <ValidationMessage For="@(() => usuarioActual.EmployeeName)" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Roles:</label>
-                            <InputSelect class="form-select" @bind-Value="usuarioActual.EmployeeRol">
-                                <option value="-1">-- Seleccione uno --</option>
-                                <option value="1">Administrador</option>
-                                <option value="2">Analista</option>
-                                <option value="3">Consulta</option>
-                            </InputSelect>
-                            <ValidationMessage For="@(() => usuarioActual.EmployeeRol)" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Departamentos:</label>
-                            <InputSelect class="form-select" @bind-Value="usuarioActual.IdDeparment">
-                                <option value="-1">-- Seleccione uno --</option>
-                                @foreach (var item in departamento)
+                    </thead>
+                    <tbody>
+                        @foreach (var (p, index) in usuarios.Select((p, i) => (p, i + 1)))
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@p.EmployeeName</td>
+                                <td>@p.Deparments.Name</td>
+                                @switch (p.EmployeeRol)
                                 {
-                                    <option value="@item.Id">@item.Name</option>
+                                    case 1:
+                                        <td>Administrador</td>
+                                        break;
+                                    case 2:
+                                        <td>Analista</td>
+                                        break;
+                                    case 3:
+                                        <td>Consulta</td>
+                                        break;
                                 }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => usuarioActual.IdDeparment)" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Estatus:</label>
-                            <InputSelect class="form-select" @bind-Value="usuarioActual.StatusEmployee">
-                                <option value="-1">-- Seleccione uno --</option>
-                                <option value="1">Activo</option>
-                                <option value="0">Inactivo</option>
-                            </InputSelect>
-                            <ValidationMessage For="@(() => usuarioActual.StatusEmployee)" />
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success me-2">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
-                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
-                                <i class="bi bi-times"></i> Cancelar
-                            </button>
-                        </div>
-                    </EditForm>
+
+                                @switch(p.StatusEmployee)
+                                {
+                                    case 0:
+                                        <td>Inactivo</td>
+                                        break;
+                                    case 1:
+                                        <td>Activo</td>
+                                        break;
+                                }
+                                <td>
+                                    <button class="btn btn-success btn-sm me-2" @onclick="() => EditarEntidad(p)">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" @onclick="() => EliminarEntidad(p.Id)">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    @if (mostrarFormulario)
+    {
+        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@(usuarioActual.Id == 0 ? "Agregar" : "Editar")</h5>
+                        <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="@usuarioActual" OnValidSubmit="GuardarEntidad">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label class="form-label">Nombre:</label>
+                                <InputText class="form-control" @bind-Value="usuarioActual.EmployeeName" />
+                                <ValidationMessage For="@(() => usuarioActual.EmployeeName)" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Roles:</label>
+                                <InputSelect class="form-select" @bind-Value="usuarioActual.EmployeeRol">
+                                    <option value="-1">-- Seleccione uno --</option>
+                                    <option value="1">Administrador</option>
+                                    <option value="2">Analista</option>
+                                    <option value="3">Consulta</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => usuarioActual.EmployeeRol)" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Departamentos:</label>
+                                <InputSelect class="form-select" @bind-Value="usuarioActual.IdDeparment">
+                                    <option value="-1">-- Seleccione uno --</option>
+                                    @foreach (var item in departamento)
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => usuarioActual.IdDeparment)" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Estatus:</label>
+                                <InputSelect class="form-select" @bind-Value="usuarioActual.StatusEmployee">
+                                    <option value="-1">-- Seleccione uno --</option>
+                                    <option value="1">Activo</option>
+                                    <option value="0">Inactivo</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => usuarioActual.StatusEmployee)" />
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-success me-2">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                                <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                    <i class="bi bi-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </EditForm>
+                    </div>
                 </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="row align-content-center">
+        <div class="col-lg-11">
+            <div class="col-lg-11">
+                <h3 class="text-center mt-4">No Autorizado</h3>
             </div>
         </div>
     </div>
 }
-
 @code {
     private List<Deparments> departamento = new();
     private List<Employee> usuarios = new();
@@ -164,13 +179,37 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private int UserRol = 5;
+    private string username = string.Empty;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IEmployee repository { get; set; } = null!;
     [Inject] private IDeparments repodepart { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
+
+                if (user != null)
+                {
+                    UserRol = user.EmployeeRol;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+
         try
         {
             usuarios = (List<Employee>)await repository.GetAllAsync();

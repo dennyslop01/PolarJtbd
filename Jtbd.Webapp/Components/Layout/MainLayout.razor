@@ -57,6 +57,7 @@ else
 
 @code{
     private string username = "dusa-user";
+    private string userrol = "5";
 
     [Inject] private IEmployee repouser { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -77,15 +78,17 @@ else
                     if (user != null)
                     {
                         sessionService.UserRol = user.EmployeeRol;
+                        userrol = user.EmployeeRol.ToString();
                         sessionService.UserName = username;
                         sessionService.UserDepart = user.Deparments.Id;
                     }
                 }
             }
         }
-        catch (Exception ex)
-        {
-           Console.WriteLine(ex.Message);
-        }
+        catch{}
+        // catch (Exception ex)
+        // {
+        //    Console.WriteLine(ex.Message);
+        // }
     }
 }

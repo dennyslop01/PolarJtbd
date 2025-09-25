@@ -3,6 +3,8 @@ using Jtbd.Domain.Entities;
 using Jtbd.Infrastructure.DataContext;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Identity.Client.Extensions.Msal;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -324,11 +326,102 @@ namespace Jtbd.Infrastructure.Repositories
 
             return pushstorie!;
         }
-        
+
         public async Task<bool> UpdatePullsGroupEntityAsync(int idPull, int? idGroup)
         {
             var result = await _context.Database.ExecuteSqlAsync($"UPDATE [StoriesPulls] SET [GroupsIdGroup] = {idGroup} WHERE [PullGroupsIdPull] = {idPull}");
             return true;
+        }
+
+        public async Task<byte[]> GenerarExcelMatrizAsync(string IdProyecto)
+        {
+            ProjectsRepository repoproyect = new ProjectsRepository(_context);
+            GroupsRepository repogroups = new GroupsRepository(_context);
+
+            var package = await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
+
+            Projects proyecto = await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
+            List<Groups> grupos = (List<Groups>)await repogroups.GetByProjectIdAsync(int.Parse(IdProyecto));
+            List<Stories> stories = (List<Stories>)await GetByProjectIdAsync(int.Parse(IdProyecto));
+            List<StoriesPull> storiespull = (List<StoriesPull>)await GetPullsByProjectIdAsync(int.Parse(IdProyecto));
+            List<StoriesPush> storiespush = (List<StoriesPush>)await GetPushesByProjectIdAsync(int.Parse(IdProyecto));
+
+            Console.Write(proyecto.ProjectName);
+
+            Console.WriteLine(string.Empty);
+            foreach (var p in grupos)
+            {
+                Console.WriteLine("Push");
+            }
+            foreach (var p in grupos)
+            {
+                Console.WriteLine("Pull");
+            }
+
+            Console.WriteLine(string.Empty);
+            foreach (var p in grupos)
+            {
+                Console.WriteLine(p.GroupName);
+            }
+            foreach (var p in grupos)
+            {
+                Console.WriteLine(p.GroupName);
+            }
+
+            foreach (var p in stories)
+            {
+
+                Console.WriteLine(p.IdInter.InterName + "-" + p.TitleStorie);
+                foreach (var p1 in grupos)
+                {
+                    try
+                    {
+                        int contador = storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).Count();
+                        if (contador > 0)
+                        {
+                            Console.WriteLine("1");
+                        }
+                        else
+                        {
+                            if (storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups == null).Count() > 0)
+                            {
+                                Console.WriteLine("-");
+                            }
+                            else
+                            {
+                                Console.WriteLine("0");
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+                foreach (var p1 in grupos)
+                {
+                    try
+                    {
+                        int contador = storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).Count();
+                        if (contador > 0)
+                        {
+                            Console.WriteLine("1");
+                        }
+                        else
+                        {
+                            if (storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups == null).Count() > 0)
+                            {
+                                Console.WriteLine("-");
+                            }
+                            else
+                            {
+                                Console.WriteLine("0");
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            return null;// package.GetAsByteArray();
         }
     }
 }

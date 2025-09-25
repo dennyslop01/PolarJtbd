@@ -2,98 +2,113 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Departamentos> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Departamentos</PageTitle>
-<div class="row align-content-center">
-    <div class="col-lg-6">
-        <h3 class="text-center mt-4">Gestión de Departamentos</h3>
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-primary" title="Agregar Departamento" @onclick="MostrarFormulario">
-                <i class="bi bi-plus-lg"></i> 
-            </button>
-        </div>
-
-        @if (mostrarAlerta)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @mensajeAlerta
-                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+@if (UserRol == 1)
+ {
+     <div class="row align-content-center">
+        <div class="col-lg-6">
+            <h3 class="text-center mt-4">Gestión de Departamentos</h3>
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" title="Agregar Departamento" @onclick="MostrarFormulario">
+                    <i class="bi bi-plus-lg"></i> 
+                </button>
             </div>
-        }
+
+            @if (mostrarAlerta)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @mensajeAlerta
+                    <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+                </div>
+            }
 
 
-        @if (departamento is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!departamento.Any())
-        {
-            <div class="alert alert-info text-center">No hay departamentos disponibles.</div>
-        }
-        else
-        {
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th> </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var (p, index) in departamento.Select((p, i) => (p, i + 1)))
-                    {
+            @if (departamento is null)
+            {
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p>Cargando datos...</p>
+                </div>
+            }
+            else if (!departamento.Any())
+            {
+                <div class="alert alert-info text-center">No hay departamentos disponibles.</div>
+            }
+            else
+            {
+                <table class="table table-striped table-hover">
+                    <thead class="table-secondary bg-opacity-25">
                         <tr>
-                            <td>@p.Id</td>
-                            <td>@p.Name</td>
-                            <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
-                                    <i class="bi bi-pencil"></i> 
-                                </button>
-                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
-                            </td>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th> </th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        }
+                    </thead>
+                    <tbody>
+                        @foreach (var (p, index) in departamento.Select((p, i) => (p, i + 1)))
+                        {
+                            <tr>
+                                <td>@p.Id</td>
+                                <td>@p.Name</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <i class="bi bi-pencil"></i> 
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                        <i class="bi bi-trash"></i> 
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
     </div>
-</div>
 
-@if (mostrarFormulario)
+    @if (mostrarFormulario)
+    {
+        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@(departamentoActual.Id == 0 ? "Agregar" : "Editar")</h5>
+                        <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="departamentoActual" OnValidSubmit="GuardarEntidad">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre:</label>
+                                <InputText class="form-control" @bind-Value="departamentoActual.Name" />
+                                <ValidationMessage For="@(() => departamentoActual.Name)" />
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-success me-2">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                                <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                    <i class="bi bi-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
 {
-    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@(departamentoActual.Id == 0 ? "Agregar" : "Editar")</h5>
-                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
-                </div>
-                <div class="modal-body">
-                    <EditForm Model="departamentoActual" OnValidSubmit="GuardarEntidad">
-                        <div class="mb-3">
-                            <label class="form-label">Nombre:</label>
-                            <InputText class="form-control" @bind-Value="departamentoActual.Name" />
-                            <ValidationMessage For="@(() => departamentoActual.Name)" />
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success me-2">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
-                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
-                                <i class="bi bi-times"></i> Cancelar
-                            </button>
-                        </div>
-                    </EditForm>
-                </div>
+    <div class="row align-content-center">
+        <div class="col-lg-11">
+            <div class="col-lg-11">
+                <h3 class="text-center mt-4">No Autorizado</h3>
             </div>
         </div>
     </div>
@@ -105,12 +120,36 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private int UserRol = 5;
+    private string username = string.Empty;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IDeparments repository { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
+
+                if (user != null)
+                {
+                    UserRol = user.EmployeeRol;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+
         try
         {
             departamento = (List<Deparments>)await repository.GetAllAsync();

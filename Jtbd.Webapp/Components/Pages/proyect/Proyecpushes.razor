@@ -4,10 +4,13 @@
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @using Jtbd.Webapp.Service
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecpushes> Logger
-@inject SessionService sessionService
+@inject AuthenticationStateProvider authenticationStateProvider
+
+@* @inject SessionService sessionService *@
 
 
 <PageTitle>Proyectos Pushes</PageTitle>
@@ -156,24 +159,49 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    
+    private int UserRol = 5;
+    private string username = string.Empty;
+
     private int cantPerm = 0;
     private int cantActi = 0;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IPushesGroups repository { get; set; } = null!;
     [Inject] private IProjects repoproyec { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
+
+                if (user != null)
+                {
+                    UserRol = user.EmployeeRol;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+
         try
         {
             proyectos = (List<Projects>)await repoproyec.GetAllAsync();
         }
         catch (Exception ex)
         {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
         }
     }
 
@@ -187,9 +215,9 @@
                 entidadActual.IdProject = Model.idProyecto;
                 entidadActual.StatusPush = -1;
                 entidadActual.CreatedDate = DateTime.Now;
-                entidadActual.CreatedUser = sessionService.UserName;
+                entidadActual.CreatedUser = username;
                 entidadActual.UpdatedDate = DateTime.Now;
-                entidadActual.UpdatedUser = sessionService.UserName;
+                entidadActual.UpdatedUser = username;
 
                 mostrarFormulario = true;
             }
@@ -215,7 +243,7 @@
                         CreatedDate = entidad.CreatedDate,
                         CreatedUser = entidad.CreatedUser,
                         UpdatedDate = DateTime.Now,
-                        UpdatedUser = sessionService.UserName,
+                        UpdatedUser = username,
                         StatusPush = entidad.StatusPush
                     };
                 mostrarFormulario = true;

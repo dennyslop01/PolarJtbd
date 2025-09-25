@@ -2,9 +2,11 @@
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Interview> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Entrevistados</PageTitle>
 <div class="row align-content-center">
@@ -30,11 +32,14 @@
             </table> *@
         </div>
         <h3 class="text-center mt-4">Gestión de Entrevistados</h3>
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-primary" title="Agregar Entrevistado" @onclick="MostrarFormulario">
+        @if (UserRol > 0 && UserRol < 3)
+        {
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" title="Agregar Entrevistado" @onclick="MostrarFormulario">
                 <i class="bi bi-plus-lg"></i> 
-            </button>
-        </div>
+                </button>
+            </div>
+        }
 
         @if (mostrarAlerta)
         {
@@ -93,12 +98,15 @@
                             <td>@p.InterNSE</td>
                             <td>@p.DateInter</td>
                             <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
-                                    <i class="bi bi-pencil"></i> 
-                                </button>
-                                <button class="btn btn-danger btn-sm me-2" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
+                                @if (UserRol > 0 && UserRol < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <i class="bi bi-pencil"></i> 
+                                    </button>
+                                    <button class="btn btn-danger btn-sm me-2" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
+                                        <i class="bi bi-trash"></i> 
+                                    </button>
+                                }
                                 <button class="btn btn-secondary btn-sm me-2" title="Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
                                     <i class="bi bi-list-columns-reverse"></i>
                                 </button>
@@ -187,14 +195,38 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private int UserRol = 5;
+    private string username = string.Empty;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IInterviews repository { get; set; } = null!;
     [Inject] private IProjects repoproyect { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
     private Projects proyecto = new();
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
+
+                if (user != null)
+                {
+                    UserRol = user.EmployeeRol;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));

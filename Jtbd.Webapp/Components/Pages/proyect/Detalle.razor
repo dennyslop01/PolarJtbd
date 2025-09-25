@@ -3,11 +3,14 @@
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @using Jtbd.Webapp.Service
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
-@inject SessionService sessionService
+@inject AuthenticationStateProvider authenticationStateProvider
+
+@* @inject SessionService sessionService *@
 
 
 <PageTitle>Historia Detalle</PageTitle>
@@ -102,7 +105,7 @@
                             <td>@p.PushesGroups.IdPush</td>
                             <td>@p.PushesGroups.PushName</td>
                             <td>
-                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+                                @if (UserRol > 0 && UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
                                         <i class="bi bi-pencil"></i> 
@@ -118,7 +121,7 @@
             </table>
         }
         <br />
-        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+        @if (UserRol > 0 && UserRol < 3)
         {
             <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes" style="font-size: 11px;">
                 <i class="bi bi-plus-lg"></i> 
@@ -156,7 +159,7 @@
                             <td>@p.PullGroups.IdPull</td>
                             <td>@p.PullGroups.PullName</td>
                             <td>
-                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+                                @if (UserRol > 0 && UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
                                         <i class="bi bi-pencil"></i>
@@ -172,7 +175,7 @@
             </table>
         }
         <br />
-        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+        @if (UserRol > 0 && UserRol < 3)
         {
             <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls" style="font-size: 11px;">
                 <i class="bi bi-plus-lg"></i> 
@@ -215,7 +218,7 @@
                             <td>@p.Habits.IdHabit</td>
                             <td>@p.Habits.HabitName</td>
                             <td>
-                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+                                @if (UserRol > 0 && UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
                                         <i class="bi bi-pencil"></i>
@@ -231,7 +234,7 @@
             </table>
         }
         <br />
-        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+        @if (UserRol > 0 && UserRol < 3)
         {
             <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits" style="font-size: 11px;">
                 <i class="bi bi-plus-lg"></i> 
@@ -269,7 +272,7 @@
                             <td>@p.Anxieties.IdAnxie</td>
                             <td>@p.Anxieties.AnxieName</td>
                             <td>
-                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+                                @if (UserRol > 0 && UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
                                         <i class="bi bi-pencil"></i>
@@ -285,7 +288,7 @@
             </table>
         }
         <br />
-        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+        @if (UserRol > 0 && UserRol < 3)
         {
             <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies" style="font-size: 11px;">
                 <i class="bi bi-plus-lg"></i> 
@@ -432,11 +435,12 @@
     public string idStorie { get; set; }
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-
     private bool mostrarPush = false;
     private bool mostrarPull = false;
     private bool mostrarHabit = false;
     private bool mostrarAnxie = false;
+    private int UserRol = 5;
+    private string username = string.Empty;
 
     [Inject] private IStories repostorie { get; set; } = null!;
     [Inject] private IPushesGroups repopush { get; set; } = null!;
@@ -444,35 +448,43 @@
     [Inject] private IHabits repohabi { get; set; } = null!;
     [Inject] private IAnxieties repoanxie { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
 
-    private Stories entidadStorie = new ();
-    
+    private Stories entidadStorie = new ();    
     private int idProyec = 0;
 
-    // private List<PushesGroups> pushes = new();
-    // private List<PushesGroups> auxpushes = new();
     private List<StoriesPush> pushstorie = new();
-
-    // private List<PullGroups> pulls = new();
-    // private List<PullGroups> auxpulls = new();
     private List<StoriesPull> pullstorie = new();
-
-    // private List<Habits> habits = new();
-    // private List<Habits> auxhabits = new();
     private List<StoriesHabbit> habitstorie = new();
-
-    // private List<Anxieties> anxies = new();
-    // private List<Anxieties> auxanxies = new();
     private List<StoriesAnxiety> anxiestorie = new();
-
     private CreatePushes pushActual = new();
     private CreatePull pullActual = new();
     private CreateAnxietie anxieActual = new();
     private CreateHabits habitActual = new();
 
-
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
+
+                if (user != null)
+                {
+                    UserRol = user.EmployeeRol;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+
         try
         {
             entidadStorie = (Stories)await repostorie.GetByIdAsync(int.Parse(idStorie));
@@ -481,27 +493,20 @@
                 idProyec = entidadStorie.Project.IdProject;
 
                 pushstorie = (List<StoriesPush>)await repostorie.GetPushesByStorieIdAsync(int.Parse(idStorie));
-                // pushes = (List<PushesGroups>)await repopush.GetByProjectIdAsync(idProyec);
-                // auxpushes = pushes;
 
                 pullstorie = (List<StoriesPull>)await repostorie.GetPullsByStorieIdAsync(int.Parse(idStorie));
-                // pulls = (List<PullGroups>)await repopull.GetByProjectIdAsync(idProyec);
-                // auxpulls = pulls;
 
                 habitstorie = (List<StoriesHabbit>)await repostorie.GetHabitsByStorieIdAsync(int.Parse(idStorie));
-                // habits = (List<Habits>)await repohabi.GetByProjectIdAsync(idProyec);
-                // auxhabits = habits;
 
                 anxiestorie = (List<StoriesAnxiety>)await repostorie.GetAxieByStorieIdAsync(int.Parse(idStorie));
-                // anxies = (List<Anxieties>)await repoanxie.GetByProjectIdAsync(idProyec);
-                // auxanxies = anxies;
             }
 
         }
         catch (Exception ex)
         {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
         }
     }
 
@@ -521,9 +526,9 @@
             pushActual.IdPush = 0;
             pushActual.IdProject = entidadStorie.Project.IdProject;
             pushActual.CreatedDate = DateTime.Now;
-            pushActual.CreatedUser = sessionService.UserName;
+            pushActual.CreatedUser = username;
             pushActual.UpdatedDate = DateTime.Now;
-            pushActual.UpdatedUser = sessionService.UserName;
+            pushActual.UpdatedUser = username;
             pushActual.StatusPush = 1;
             mostrarPush = true;
         }
@@ -545,7 +550,7 @@
                     CreatedDate = entidad.CreatedDate,
                     CreatedUser = entidad.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = sessionService.UserName,
+                    UpdatedUser = username,
                     StatusPush = entidad.StatusPush
                 };
             mostrarPush = true;
@@ -572,9 +577,9 @@
             pullActual.IdPull = 0;
             pullActual.IdProject = entidadStorie.Project.IdProject;
             pullActual.CreatedDate = DateTime.Now;
-            pullActual.CreatedUser = sessionService.UserName;
+            pullActual.CreatedUser = username;
             pullActual.UpdatedDate = DateTime.Now;
-            pullActual.UpdatedUser = sessionService.UserName;
+            pullActual.UpdatedUser = username;
             pullActual.StatusPull = 1;
             mostrarPull = true;
         }
@@ -596,7 +601,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = sessionService.UserName,
+                UpdatedUser = username,
                 StatusPull = entidad.StatusPull
             };
             mostrarPull = true;
@@ -623,9 +628,9 @@
             habitActual.IdHabit = 0;
             habitActual.IdProject = entidadStorie.Project.IdProject;
             habitActual.CreatedDate = DateTime.Now;
-            habitActual.CreatedUser = sessionService.UserName;
+            habitActual.CreatedUser = username;
             habitActual.UpdatedDate = DateTime.Now;
-            habitActual.UpdatedUser = sessionService.UserName;
+            habitActual.UpdatedUser = username;
             habitActual.StatusHabit = 1;
             mostrarHabit = true;
         }
@@ -647,7 +652,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = sessionService.UserName,
+                UpdatedUser = username,
                 StatusHabit = entidad.StatusHabit
             };
             mostrarHabit = true;
@@ -674,9 +679,9 @@
             anxieActual.IdAnxie = 0;
             anxieActual.IdProject = entidadStorie.Project.IdProject;
             anxieActual.CreatedDate = DateTime.Now;
-            anxieActual.CreatedUser = sessionService.UserName;
+            anxieActual.CreatedUser = username;
             anxieActual.UpdatedDate = DateTime.Now;
-            anxieActual.UpdatedUser = sessionService.UserName;
+            anxieActual.UpdatedUser = username;
             anxieActual.StatusAnxie = 1;
             mostrarAnxie = true;
         }
@@ -698,7 +703,7 @@
                 CreatedDate = entidad.CreatedDate,
                 CreatedUser = entidad.CreatedUser,
                 UpdatedDate = DateTime.Now,
-                UpdatedUser = sessionService.UserName,
+                UpdatedUser = username,
                 StatusAnxie = entidad.StatusAnxie
             };
             mostrarAnxie = true;

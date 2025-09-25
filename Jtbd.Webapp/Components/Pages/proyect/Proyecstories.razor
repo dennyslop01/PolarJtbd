@@ -4,10 +4,13 @@
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @using Jtbd.Webapp.Service
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
-@inject SessionService sessionService
+@inject AuthenticationStateProvider authenticationStateProvider
+
+@* @inject SessionService sessionService *@
 
 <PageTitle>Historias</PageTitle>
 <div class="row align-content-center">
@@ -43,7 +46,7 @@
         </div>
     </div>
     <div class="col-lg-10">
-        @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+        @if (UserRol > 0 && UserRol < 3)
         {
             <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-primary" title="Agregar Historia" @onclick="MostrarFormulario">
@@ -91,7 +94,7 @@
                             <td>@p.TitleStorie</td>
                             <td>@p.ContextStorie</td>
                             <td>
-                                @if (sessionService.UserRol > 0 && sessionService.UserRol < 3)
+                                @if (UserRol > 0 && UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i> 
@@ -160,14 +163,37 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    
+    private int UserRol = 5;
+    private string username = string.Empty;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IStories repository { get; set; } = null!;
     [Inject] private IInterviews repointer { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+                if (authState.User.Identity.IsAuthenticated)
+                {
+                    username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                    Employee user = await repouser.GetByUsernameAsync(username);
+
+                    if (user != null)
+                    {
+                        UserRol = user.EmployeeRol;
+                    }
+                }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+
         try
         {
             entrevistado = (Interviews)await repointer.GetByIdAsync(int.Parse(IdInter));
@@ -176,8 +202,9 @@
         }
         catch (Exception ex)
         {
-            //Logger.LogError(ex.Message);
-            await this.JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
         }
     }
 
@@ -189,9 +216,9 @@
             entidadActual.IdProject = entrevistado.Project.IdProject;
             entidadActual.IdInter = entrevistado.IdInter;
             entidadActual.CreatedDate = DateTime.Now;
-            entidadActual.CreatedUser = sessionService.UserName;
+            entidadActual.CreatedUser = username;
             entidadActual.UpdatedDate = DateTime.Now;
-            entidadActual.UpdatedUser = sessionService.UserName;
+            entidadActual.UpdatedUser = username;
             entidadActual.IdGroup = null;
 
             mostrarFormulario = true;
@@ -216,7 +243,7 @@
                     CreatedDate = entidad.CreatedDate,
                     CreatedUser = entidad.CreatedUser,
                     UpdatedDate = DateTime.Now,
-                    UpdatedUser = sessionService.UserName,
+                    UpdatedUser = username,
                     IdGroup = null
             };
 
