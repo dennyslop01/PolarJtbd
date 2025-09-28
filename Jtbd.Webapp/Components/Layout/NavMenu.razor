@@ -25,8 +25,8 @@
             </NavLink>
         </div>
 
-        @* @if (sessionService.UserRol == 1)
-        { *@
+        @if (userrol == "1")
+        {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="#" @onclick="() => isExpandSubNav = !isExpandSubNav" @onmousemove="() => isExpandSubNav = !isExpandSubNav">
                     <p><i class="bi bi-list-nested m-1"></i> Admin</p>
@@ -53,11 +53,13 @@
                     </ul>
                 }
             </div>
-        @* } *@
+        }
     </nav>
 </div>
 
 @code {
+    [Parameter]
+    public string userrol { get; set; }
 
     private bool isExpandSubNavP = false;
     private bool isExpandSubNav = false;

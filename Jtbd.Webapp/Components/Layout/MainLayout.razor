@@ -13,7 +13,7 @@
         <div class="sidebar">
             @if (!string.IsNullOrEmpty(username))
             {
-                <NavMenu />
+                <NavMenu userrol="@userrol.ToString()"/>
             }
         </div>
 
@@ -50,14 +50,17 @@ else
         <div class="col-lg-11">
             <div class="col-lg-11">
                 <h3 class="text-center mt-4">No Autorizado</h3>
+                <h6>@usernamelargo</h6>
+                <h6>@username</h6>
             </div>
         </div>
     </div>
 }
 
 @code{
-    private string username = "dusa-user";
-    private string userrol = "5";
+    private string username = string.Empty;
+    private string usernamelargo = string.Empty;
+    private int userrol = 5;
 
     [Inject] private IEmployee repouser { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -72,23 +75,25 @@ else
                 var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
                 if (authState.User.Identity.IsAuthenticated)
                 {
+                    usernamelargo = authState.User.Identity.Name;
                     username = authState.User.Identity.Name.Split(@"\")[1].Trim();
                     Employee user = await repouser.GetByUsernameAsync(username);
 
                     if (user != null)
                     {
                         sessionService.UserRol = user.EmployeeRol;
-                        userrol = user.EmployeeRol.ToString();
+                        userrol = user.EmployeeRol;
                         sessionService.UserName = username;
                         sessionService.UserDepart = user.Deparments.Id;
                     }
                 }
             }
+            else
+            {
+                username = sessionService.UserName;
+                userrol = sessionService.UserRol;
+            }
         }
         catch{}
-        // catch (Exception ex)
-        // {
-        //    Console.WriteLine(ex.Message);
-        // }
     }
 }

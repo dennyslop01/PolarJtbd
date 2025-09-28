@@ -357,8 +357,6 @@ namespace Jtbd.Infrastructure.Repositories
             {
                 Console.WriteLine("Pull");
             }
-
-            Console.WriteLine(string.Empty);
             foreach (var p in grupos)
             {
                 Console.WriteLine(p.GroupName);
