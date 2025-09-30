@@ -17,18 +17,29 @@
             }
         </div>
 
-        <main>        
-            <div class="top-row px-10">
-                <div class="col-lg-6 align-content-start">
+        <main>
+            <div class="row">
+                <div class="col-lg-6">
                     <p>
-                        <h5><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;JTBD WEB APP – Empresas Polar</strong></h5>
+                        <h5><strong>&nbsp;&nbsp;&nbsp;&nbsp;JTBD WEB APP – Empresas Polar</strong></h5>
+                    </p>
+                </div>
+                <div class="col-lg-5 d-flex justify-content-end mb-3">
+                    <strong>@usernamelargo</strong>
+                    @* <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a> *@
+                </div>
+            </div>
+            @* <div class="top-row px-10">
+                <div class="col-lg-6 justify-content-start">
+                    <p>
+                        <h5><strong>JTBD WEB APP – Empresas Polar</strong></h5>
                     </p>
                 </div>
                 <div class="col-lg-5 d-flex justify-content-end mb-3">
                     <strong>@username</strong>
-                     @* <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a> *@
+                     <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
                 </div>
-            </div>
+            </div> *@
 
             <article class="content px-4">
                @Body
@@ -41,6 +52,13 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+    @if (mostrarAlerta)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @mensajeAlerta
+            <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+        </div>
+    }
 }
 else
 {
@@ -58,42 +76,36 @@ else
 }
 
 @code{
-    private string username = string.Empty;
+    private string username = string.Empty;//"dusa-user";
     private string usernamelargo = string.Empty;
     private int userrol = 5;
+    private string? mensajeAlerta;
+    private bool mostrarAlerta = false;
 
     [Inject] private IEmployee repouser { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
-    @inject SessionService sessionService
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            if (string.IsNullOrEmpty(sessionService.UserName))
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
             {
-                var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-                if (authState.User.Identity.IsAuthenticated)
-                {
-                    usernamelargo = authState.User.Identity.Name;
-                    username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                    Employee user = await repouser.GetByUsernameAsync(username);
+                usernamelargo = authState.User.Identity.Name;
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
 
-                    if (user != null)
-                    {
-                        sessionService.UserRol = user.EmployeeRol;
-                        userrol = user.EmployeeRol;
-                        sessionService.UserName = username;
-                        sessionService.UserDepart = user.Deparments.Id;
-                    }
+                if (user != null)
+                {
+                    userrol = user.EmployeeRol;
                 }
             }
-            else
-            {
-                username = sessionService.UserName;
-                userrol = sessionService.UserRol;
-            }
         }
-        catch{}
+        catch (Exception ex)
+        {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
     }
 }

@@ -11,8 +11,6 @@
 @inject ILogger<Proyectos> Logger
 @inject AuthenticationStateProvider authenticationStateProvider
 
-@* @inject SessionService sessionService *@
-
 <PageTitle>Proyectos</PageTitle>
 
 <div class="row align-content-center">
@@ -56,7 +54,7 @@
                         <th>Nombre</th>
                         <th>Fecha</th>
                         <th>Departamento</th>
-                        <th>Categoria</th>
+                        <th>Categoría</th>
                         @* <th>Estatus</th> *@
                         <th> </th>
                     </tr>
@@ -93,7 +91,7 @@
                                     <i class="bi bi-person-add"></i> 
                                 </button>
                                 <button class="btn btn-secondary btn-sm me-2" title="Agregar Grupos" @onclick="() => AgrgarGrupos(p.IdProject.ToString())">
-                                    <i class="bi bi-grid-3x2 m-1"></i>
+                                    <i class="bi bi-grid-1x2"></i>
                                 </button>
                                 <button class="btn btn-secondary btn-sm me-2" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
                                     <i class="bi bi-ui-checks"></i>
@@ -196,7 +194,7 @@
         </div>
     </div>
 }
-<div>
+@* <div>
     <table class="table table-striped table-hover">
         <thead class="table-secondary bg-opacity-25">
             <tr>
@@ -215,7 +213,7 @@
             </tr>
         </tbody>
     </table>
-</div>
+</div> *@
 
 @code {
     private List<Deparments> departamento = new();
