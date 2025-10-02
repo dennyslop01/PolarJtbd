@@ -4,6 +4,7 @@
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
 @using System.Text
+@using System.ComponentModel.DataAnnotations
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
@@ -20,7 +21,7 @@
             <div class="col-lg-12">
                 <h3 class="text-center mt-4">Gestión de proyectos</h3>
                 <div class="d-flex justify-content-end mb-3">
-                    <button class="btn btn-primary" @onclick="ExportarCsv" title="Descargar CSV">
+                    <button class="btn btn-primary" @onclick="MostrarFormulario" title="Descargar CSV">
                         <i class="bi bi-filetype-csv"></i>
                     </button>
                 </div>
@@ -164,9 +165,53 @@
     </div>
 </div>
 
+@if (mostrarFormulario)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generar CSV</h5>
+                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="entidadActual" OnValidSubmit="GuardarEntidad">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label class="form-label">Separador:</label>
+                            <InputSelect class="form-select" @bind-Value="entidadActual.TipoSeparador">
+                                <option value="-1">-- Seleccione uno --</option>
+                                <option value="1">Coma</option>
+                                <option value="2">Punto y Coma</option>
+                                @* <option value="3">Tabulador</option> *@
+                            </InputSelect>
+                            <ValidationMessage For="@(() => entidadActual.TipoSeparador)" />
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="bi bi-save"></i> Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                <i class="bi bi-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter]
     public string IdProyecto { get; set; }
+
+    private class MatrizCSV()
+    {
+        [Range(0, 1000, ErrorMessage = "El tipo separador es obligatorio.")]
+        public int TipoSeparador { get; set; }
+    }
 
     private List<Stories> stories = new(); 
     private List<Groups> grupos = new();
@@ -174,8 +219,11 @@
     private List<StoriesPush> storiespush = new();
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private bool mostrarFormulario = false;
 
     private Projects proyecto = new();
+    private MatrizCSV entidadActual = new();
+
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IStories repository { get; set; } = null!;
     [Inject] private IProjects repoproyect { get; set; } = null!;
@@ -210,11 +258,60 @@
         }
     }
 
-    private async Task ExportarCsv()
+    private void MostrarFormulario()
     {
         try
         {
-            var csvString = GenerarCsv(); // Implementa esta función para formatear los datos
+            entidadActual = new MatrizCSV();
+            entidadActual.TipoSeparador = -1;
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private async Task GuardarEntidad()
+    {
+        try
+        {
+            string separador = string.Empty;
+
+            switch(entidadActual.TipoSeparador)
+            {
+                case 1:
+                    separador = ",";
+                    break;
+                case 2:
+                    separador = ";";
+                    break;
+                case 3:
+                    separador = @"\t";
+                    break;
+            }
+
+            mostrarFormulario = false;
+            await ExportarCsv(separador);
+            mensajeAlerta = "Archivo generado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task ExportarCsv(string separador)
+    {
+        try
+        {
+            var csvString = GenerarCsv(separador); // Implementa esta función para formatear los datos
             await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"matriz-{proyecto.ProjectName}.csv", csvString);
         }
         catch (Exception ex)
@@ -225,7 +322,7 @@
         }
     }
 
-    private string GenerarCsv()
+    private string GenerarCsv(string separador)
     {
         try
         {
@@ -233,15 +330,15 @@
             var sb = new StringBuilder();
 
             int i = 0;
-            string encabezado = " ;";
+            string encabezado = $" {separador}";
             foreach (var p in grupos)
             {
-                encabezado += $"Push - {p.GroupName};";
+                encabezado += $"Push - {p.GroupName}{separador}";
             }
 
             foreach (var p in grupos)
             {
-                encabezado += $"Pull - {p.GroupName};";
+                encabezado += $"Pull - {p.GroupName}{separador}";
             }
             sb.AppendLine(encabezado); // Encabezados
 
@@ -249,7 +346,7 @@
 
             foreach (var p in stories)
             {
-                linea = $"{p.IdInter.InterName} - {p.TitleStorie};";
+                linea = $"{p.IdInter.InterName} - {p.TitleStorie}{separador}";
 
                 foreach (var p1 in grupos)
                 {
@@ -258,17 +355,17 @@
                         int contador = storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).Count();
                         if (contador > 0)
                         {
-                            linea += $"1;";
+                            linea += $"1{separador}";
                         }
                         else
                         {
                             if (storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups == null).Count() > 0)
                             {
-                                linea += $"-;";
+                                linea += $"-{separador}";
                             }
                             else
                             {
-                                linea += $"0;";
+                                linea += $"0{separador}";
                             }
                         }
                     }
@@ -281,17 +378,17 @@
                         int contador = storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).Count();
                         if (contador > 0)
                         {
-                            linea += $"1;";
+                            linea += $"1{separador}";
                         }
                         else
                         {
                             if (storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups == null).Count() > 0)
                             {
-                                linea += $"-;";
+                                linea += $"-{separador}";
                             }
                             else
                             {
-                                linea += $"0;";
+                                linea += $"0{separador}";
                             }
                         }
                     }

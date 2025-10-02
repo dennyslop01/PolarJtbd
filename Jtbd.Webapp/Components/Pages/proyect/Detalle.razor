@@ -70,7 +70,7 @@
     </div>
 </div>
 
-<div class="row align-content-center" style="font-size: 11px;">
+<div class="row align-content-center" >
     <div class="col-lg-6">
         <label><strong>Pushes</strong></label>
         <br />
@@ -107,7 +107,7 @@
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
                                         <i class="bi bi-pencil"></i> 
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" style="font-size: 11px;">
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" >
                                         <i class="bi bi-trash"></i> 
                                     </button>
                                 }
@@ -120,7 +120,7 @@
         <br />
         @if (UserRol > 0 && UserRol < 3)
         {
-            <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes" style="font-size: 11px;">
+            <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes" >
                 <i class="bi bi-plus-lg"></i> 
             </button>
         }
@@ -161,7 +161,7 @@
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" style="font-size: 11px;">
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" >
                                         <i class="bi bi-trash"></i> 
                                     </button>
                                 }
@@ -174,7 +174,7 @@
         <br />
         @if (UserRol > 0 && UserRol < 3)
         {
-            <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls" style="font-size: 11px;">
+            <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls" >
                 <i class="bi bi-plus-lg"></i> 
             </button>
         }
@@ -183,7 +183,7 @@
 <br />
 <br />
 
-<div class="row align-content-center" style="font-size: 11px;">
+<div class="row align-content-center" >
     <div class="col-lg-6">
         <label><strong>Hábitos</strong></label>
         <br />
@@ -220,7 +220,7 @@
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" style="font-size: 11px;">
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" >
                                         <i class="bi bi-trash"></i> 
                                     </button>
                                 }
@@ -233,7 +233,7 @@
         <br />
         @if (UserRol > 0 && UserRol < 3)
         {
-            <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits" style="font-size: 11px;">
+            <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits" >
                 <i class="bi bi-plus-lg"></i> 
             </button>
         }
@@ -274,7 +274,7 @@
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" style="font-size: 11px;">
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" >
                                         <i class="bi bi-trash"></i> 
                                     </button>
                                 }
@@ -287,7 +287,7 @@
         <br />
         @if (UserRol > 0 && UserRol < 3)
         {
-            <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies" style="font-size: 11px;">
+            <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies" >
                 <i class="bi bi-plus-lg"></i> 
             </button>
         }
