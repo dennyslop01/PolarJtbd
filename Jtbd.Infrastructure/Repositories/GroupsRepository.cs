@@ -17,6 +17,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             Groups auxGroup = new Groups();
             auxGroup.GroupName = group.GroupName;
+            auxGroup.IdTipo = group.IdTipo;
 
             var project = _context.Projects.Where(x => x.IdProject == group.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
@@ -73,10 +74,19 @@ namespace Jtbd.Infrastructure.Repositories
             return Group!;
         }
 
+        public async Task<IEnumerable<Groups>> GetByProjectIdIndicadorAsync(int id, int indicador)
+        {
+            var Group = await _context.Groups
+                 .Include(x => x.Project)
+                 .Where(x => x.Project.IdProject == id && x.IdTipo == indicador).AsQueryable().AsNoTracking().ToListAsync();
+            return Group!;
+        }
+
         public async Task<bool> UpdateAsync(CreateGroup Group)
         {
             Groups auxGroup = new Groups();
             auxGroup.IdGroup = Group.IdGroup;
+            auxGroup.IdTipo = Group.IdTipo;
             auxGroup.GroupName = Group.GroupName;
 
             var project = _context.Projects.Where(x => x.IdProject == Group.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();

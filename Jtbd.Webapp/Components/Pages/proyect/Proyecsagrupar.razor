@@ -49,7 +49,7 @@
     </div>
     <div class="col-lg-8">
         <div class="row">
-            @foreach (var group in grupos)
+            @foreach (var group in grupospush)
             {
                 <div class="col-lg-4">
                     <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
@@ -101,7 +101,7 @@
     </div>
     <div class="col-lg-8">
         <div class="row">
-            @foreach (var group in grupos)
+            @foreach (var group in grupospull)
             {
                 <div class="col-lg-4">
                     <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
@@ -176,7 +176,8 @@
     [Parameter]
     public string IdProyecto { get; set; }
 
-    private List<Groups> grupos = new();
+    private List<Groups> grupospush = new();
+    private List<Groups> grupospull = new();
     private List<StoriesPush> storiespush = new();
     private List<StoriesPull> storiespull = new();
     private CreateGroup entidadActual = new();
@@ -235,9 +236,10 @@
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
 
-            grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+            grupospush = (List<Groups>)await repository.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 0);
+            grupospull = (List<Groups>)await repository.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 1);
 
-            if(grupos == null)
+            if (grupospush.Count() == 0)
             {
                 for (int i = 1; i < 12; i++)
                 {
@@ -248,13 +250,35 @@
                     CreateGroup entidadActual = new CreateGroup()
                     {
                         IdGroup = 0,
+                        IdTipo = 0,
                         IdProject = int.Parse(IdProyecto),
                         GroupName = name
                     };
 
                     await repository.CreateAsync(entidadActual);
                 }
-                grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+                grupospush = (List<Groups>)await repository.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 0);
+            }
+
+            if (grupospull.Count == 0)
+            {
+                for (int i = 1; i < 12; i++)
+                {
+                    string name = $"Grupo {i.ToString()}";
+                    if (i == 11)
+                        name = "Leftovers";
+
+                    CreateGroup entidadActual = new CreateGroup()
+                    {
+                        IdGroup = 0,
+                        IdTipo = 1,
+                        IdProject = int.Parse(IdProyecto),
+                        GroupName = name
+                    };
+
+                    await repository.CreateAsync(entidadActual);
+                }
+                grupospull = (List<Groups>)await repository.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 1);
             }
 
             storiespush = (List<StoriesPush>)await repostorie.GetPushesByProjectIdAsync(int.Parse(IdProyecto));
@@ -316,6 +340,7 @@
             {
                 IdProject = int.Parse(IdProyecto),
                 IdGroup = grupo.IdGroup,
+                IdTipo = grupo.IdTipo,
                 GroupName = grupo.GroupName
             };
             mostrarFormulario = true;
@@ -335,7 +360,9 @@
             else
                 await repository.UpdateAsync(entidadActual);
 
-            grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+            grupospush = (List<Groups>)await repository.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 0);
+            grupospull = (List<Groups>)await repository.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 1); 
+
             mostrarFormulario = false;
             mensajeAlerta = "Grupo guardado exitosamente.";
             mostrarAlerta = true;

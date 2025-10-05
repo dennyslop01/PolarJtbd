@@ -11,7 +11,8 @@ namespace Jtbd.Domain.Entities
     {
         [Key]
         public int IdGroup { get; set; }
-
+        public int IdTipo { get; set; }
+        
         [Required]
         [MaxLength(100)]
         public string GroupName { get; set; } = string.Empty;

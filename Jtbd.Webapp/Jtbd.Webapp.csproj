@@ -18,6 +18,7 @@
     <Content Remove="Components\Pages\proyect\Proyechabits.razor" />
     <Content Remove="Components\Pages\proyect\Proyecpulls.razor" />
     <Content Remove="Components\Pages\proyect\Proyecpushes.razor" />
+    <Content Remove="Components\Pages\proyect\Proyecsgroups.razor" />
   </ItemGroup>
 
   <ItemGroup>
