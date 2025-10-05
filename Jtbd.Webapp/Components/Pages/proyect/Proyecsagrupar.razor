@@ -19,23 +19,8 @@
                 <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
                     @(proyecto == null ? "-" : proyecto.ProjectName)  <i class="bi bi-arrow-return-left"></i>
                 </button>
-                @* <table class="table table-striped table-hover">
-                    <thead class="table bg-opacity-25">
-                        <tr>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Proyecto : @(proyecto == null ? "-" : proyecto.ProjectName) </td>
-                            <td>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table> *@
             </div>
-            <h3 class="text-center mt-4">Agrupar Historias</h3>
+            <h3 class="text-start mt-4">Agrupar Historias</h3>
 
             @if (mostrarAlerta)
             {
@@ -49,51 +34,59 @@
 </div>
 
 <div class="row align-content-center">
-    @* <div class="col-lg-11">  *@      
-        @* <div style="display: flex;"> *@
-            <div class="col-lg-5">
-                <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1">
-                    <h5>Historias - Pushes</h5>
-                    @foreach (var item in List1)
-                    {
-                        <div class="draggable-item" draggable="true"
-                                @ondragstart="() => HandleDragStart(item, null)"
-                                @ondragend="HandleDragEnd">
-                            @item.Name
-                        </div>
-                    }
+    <div class="col-lg-4">
+        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1">
+            <h5>Historias - Pushes</h5>
+            @foreach (var item in List1)
+            {
+                <div class="draggable-item" draggable="true"
+                        @ondragstart="() => HandleDragStart(item, null)"
+                        @ondragend="HandleDragEnd">
+                    @item.Name
                 </div>
-            </div>
-            <div class="col-lg-5">
-                @foreach (var group in grupos)
-                {
-                    <div class="col-lg-11">
-                <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
-                            <h5>@group.GroupName</h5>
-                            @foreach (var item in List2)
+            }
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="row">
+            @foreach (var group in grupos)
+            {
+                <div class="col-lg-4">
+                    <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
+                        <div>
+                            @group.GroupName&nbsp;&nbsp;&nbsp;
+                            @if (group.GroupName != "Leftovers")
                             {
-                                if(group.IdGroup == item.IdGroup)
+                                @if (UserRol > 0 && UserRol < 3)
                                 {
-                                    <div class="draggable-item" draggable="true"
-                                            @ondragstart="() => HandleDragStart(item, group.IdGroup)"
-                                            @ondragend="HandleDragEnd">
-                                        @item.Name
-                                    </div>
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <br />
                                 }
                             }
                         </div>
+                        @foreach (var item in List2)
+                        {
+                            if (group.IdGroup == item.IdGroup)
+                            {
+                                <div class="draggable-item" draggable="true"
+                                        @ondragstart="() => HandleDragStart(item, group.IdGroup)"
+                                        @ondragend="HandleDragEnd">
+                                    @item.Name
+                                </div>
+                            }
+                        }
                     </div>
-                }
-            </div>
-        @* </div> *@
-    @* </div> *@
+                </div>
+            }
+        </div>                
+    </div>
 </div>
 <br />
 <br />
 <div class="row align-content-center">
-    @* <div class="col-lg-11">  *@      
-        @* <div style="display: flex;"> *@
-    <div class="col-lg-5">
+    <div class="col-lg-4">
         <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3">
             <h5>Historias - Pulls</h5>
             @foreach (var item in List3)
@@ -106,30 +99,78 @@
             }
         </div>
     </div>
-    <div class="col-lg-5">
-        @foreach (var group in grupos)
-        {
-            <div class="col-lg-11">
-                <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
-                    <h5>@group.GroupName</h5>
-                    @foreach (var item in List4)
-                    {
-                        if (group.IdGroup == item.IdGroup)
+    <div class="col-lg-8">
+        <div class="row">
+            @foreach (var group in grupos)
+            {
+                <div class="col-lg-4">
+                    <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
+                        <div>
+                            @group.GroupName&nbsp;&nbsp;&nbsp;
+                            @if (group.GroupName != "Leftovers")
+                            {
+                                @if (UserRol > 0 && UserRol < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <br />
+                                }
+                            }
+                        </div>
+                        @foreach (var item in List4)
                         {
-                            <div class="draggable-item" draggable="true"
-                                 @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
-                                 @ondragend="HandleDragEnd2">
-                                @item.Name
-                            </div>
+                            if (group.IdGroup == item.IdGroup)
+                            {
+                                <div class="draggable-item" draggable="true"
+                                     @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
+                                     @ondragend="HandleDragEnd2">
+                                    @item.Name
+                                </div>
+                            }
                         }
-                    }
+                    </div>
+                </div>
+            }
+        </div>
+        
+    </div>
+</div>
+
+@if (mostrarFormulario)
+{
+    <div class="row align-content-center">
+        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@(entidadActual.IdGroup == 0 ? "Agregar" : "Editar")</h5>
+                        <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="entidadActual" OnValidSubmit="GuardarEntidad">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label class="form-label">Nombre:</label>
+                                <InputText class="form-control" @bind-Value="entidadActual.GroupName" />
+                                <ValidationMessage For="@(() => entidadActual.GroupName)" />
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-success me-2">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                                <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                    <i class="bi bi-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </EditForm>
+                    </div>
                 </div>
             </div>
-        }
+            </div>
     </div>
-    @* </div> *@
-    @* </div> *@
-</div>
+}
 
 @code {
     [Parameter]
@@ -185,11 +226,36 @@
             mostrarAlerta = true;
         }
 
+        await CargarEntidades();
+    }
+
+    private async Task CargarEntidades()
+    {
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
 
             grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+
+            if(grupos == null)
+            {
+                for (int i = 1; i < 12; i++)
+                {
+                    string name = $"Grupo {i.ToString()}";
+                    if (i == 11)
+                        name = "Leftovers";
+
+                    CreateGroup entidadActual = new CreateGroup()
+                    {
+                        IdGroup = 0,
+                        IdProject = int.Parse(IdProyecto),
+                        GroupName = name
+                    };
+
+                    await repository.CreateAsync(entidadActual);
+                }
+                grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+            }
 
             storiespush = (List<StoriesPush>)await repostorie.GetPushesByProjectIdAsync(int.Parse(IdProyecto));
             foreach(var push in storiespush)
@@ -239,6 +305,50 @@
         {
             Logger.LogError(ex.Message);
         }
+    }
+
+
+    private void EditarEntidad(Groups grupo)
+    {
+        try
+        {
+            entidadActual = new CreateGroup
+            {
+                IdProject = int.Parse(IdProyecto),
+                IdGroup = grupo.IdGroup,
+                GroupName = grupo.GroupName
+            };
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private async Task GuardarEntidad()
+    {
+        try
+        {
+            if (entidadActual.IdGroup == 0)
+                await repository.CreateAsync(entidadActual);
+            else
+                await repository.UpdateAsync(entidadActual);
+
+            grupos = (List<Groups>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+            mostrarFormulario = false;
+            mensajeAlerta = "Grupo guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
     }
 
     private void Regresar()

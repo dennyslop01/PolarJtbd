@@ -28,30 +28,19 @@
         @if (userrol == "1")
         {
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="#" @onclick="() => isExpandSubNav = !isExpandSubNav" @onmousemove="() => isExpandSubNav = !isExpandSubNav">
-                    <p><i class="bi bi-list-nested m-1"></i> Admin</p>
+                <NavLink class="nav-link" href="admin/categorias">
+                    <p><i class="bi bi-bezier2 m-1"></i> Categorías</p>
                 </NavLink>
-
-                @if (isExpandSubNav)
-                {
-                    <ul class="nav flex-column submenu">
-                        <li class="nav-item px-3">
-                            <NavLink class="nav-link" href="admin/categorias" >
-                                <p><i class="bi bi-bezier2 m-1"></i> Categorías</p>
-                            </NavLink>
-                        </li>
-                        <li class="nav-item px-3">
-                            <NavLink class="nav-link" href="admin/departamentos" >
-                                <p><i class="bi bi-bezier m-1"></i> Departamentos</p>
-                            </NavLink>
-                        </li>
-                        <li class="nav-item px-3">
-                            <NavLink class="nav-link" href="admin/usuarios" >
-                                <p><i class="bi bi-person m-1"></i> Usuarios</p>
-                            </NavLink>
-                        </li>
-                    </ul>
-                }
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="admin/departamentos">
+                    <p><i class="bi bi-bezier m-1"></i> Departamentos</p>
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="admin/usuarios">
+                    <p><i class="bi bi-person m-1"></i> Usuarios</p>
+                </NavLink>
             </div>
         }
     </nav>

@@ -13,7 +13,7 @@
  {   
      <div class="row align-content-center">
         <div class="col-lg-6">
-            <h3 class="text-center mt-4">Gestión de Categorías</h3>
+            <h3 class="text-start mt-4">Gestión de Categorías</h3>
             <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-primary" @onclick="MostrarFormulario" title="Agregar Categoría">
                     <i class="bi bi-plus-lg"></i> 
@@ -56,12 +56,12 @@
                             <tr>
                                 <td>@p.Id</td>
                                 <td>@p.Name</td>
-                                <td>
-                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
-                                        <i class="bi bi-pencil"></i> 
-                                    </button>
-                                <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
-                                        <i class="bi bi-trash"></i> 
+                                <td width="20%" class="justify-content-end">
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                            <i class="bi bi-pencil"></i> 
+                                        </button>
+                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                            <i class="bi bi-trash"></i> 
                                     </button>
                                 </td>
                             </tr>

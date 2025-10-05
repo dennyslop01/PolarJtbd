@@ -61,7 +61,8 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var employee = await _context.Employees
                  .Include(x => x.Deparments)
-                 .AsQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                 .Where(x => x.Id == id)
+                 .AsQueryable().AsNoTracking().FirstOrDefaultAsync();
             return employee!;
         }
 
@@ -69,7 +70,8 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var employee = await _context.Employees
                  .Include(x => x.Deparments)
-                 .AsQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.EmployeeName.Contains(user.Trim()));
+                 .Where(x => x.EmployeeName.Contains(user.Trim()))
+                 .AsQueryable().AsNoTracking().FirstOrDefaultAsync();
             return employee!;
         }
 

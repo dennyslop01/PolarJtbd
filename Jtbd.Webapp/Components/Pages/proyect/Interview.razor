@@ -15,23 +15,8 @@
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
                 @(proyecto == null ? "-" : proyecto.ProjectName)  <i class="bi bi-arrow-return-left"></i>
             </button>
-            @* <table class="table table-striped table-hover">
-                <thead class="table bg-opacity-25">
-                    <tr>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Proyecto : @(proyecto == null ? "-" : proyecto.ProjectName) </td>
-                        <td>
-                        </td>
-                    </tr>
-                </tbody>
-            </table> *@
         </div>
-        <h3 class="text-center mt-4">Gestión de Entrevistados</h3>
+        <h3 class="text-start mt-4">Gestión de Entrevistados</h3>
         @if (UserRol > 0 && UserRol < 3)
         {
             <div class="d-flex justify-content-end mb-3">
@@ -97,7 +82,7 @@
                             <td>@p.InterNickname</td>
                             <td>@p.InterNSE</td>
                             <td>@p.DateInter</td>
-                            <td>
+                            <td width="15%" class="justify-content-end">
                                 @if (UserRol > 0 && UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -196,7 +181,7 @@
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private int UserRol = 5;
-    private string username = string.Empty;
+    private string username = "dusa-user";
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IInterviews repository { get; set; } = null!;
