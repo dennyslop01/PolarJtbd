@@ -1,0 +1,326 @@
+﻿@page "/proyect/proyecsvalidar/{IdProyecto}"
+@rendermode InteractiveServer
+@using Jtbd.Application.Interfaces
+@using Jtbd.Domain.Entities
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.ComponentModel.DataAnnotations
+@inject IJSRuntime JSRuntime
+@inject IConfiguration configuration
+@inject ILogger<Interview> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
+
+<PageTitle>Validación Grupos</PageTitle>
+<div class="row align-content-center">
+    <div class="col-lg-12">
+        <div class="col-lg-11">
+            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                @(proyecto == null ? "-" : proyecto.ProjectName)  <i class="bi bi-arrow-return-left"></i>
+            </button>
+        </div>
+        <h3 class="text-start mt-4">Validar agrupación de historias</h3>
+
+        @if (mostrarAlerta)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @mensajeAlerta
+                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+            </div>
+        }
+
+
+        @if (registros is null)
+        {
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Cargando datos...</p>
+            </div>
+        }
+        else if (!registros.Any())
+        {
+            <div class="alert alert-info text-center">No hay historias disponibles.</div>
+        }
+        else
+        {
+            <table class="table table-striped table-hover">
+                <thead class="table table-secondary bg-opacity-25">
+                    <tr>
+                        <th>#</th>
+                        <th>Historia - Entrevistado</th>
+                        <th>Tipo</th>
+                        <th>Grupos Asignados</th>
+                        <th>Coincide la historia con el grupo?</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (p, index) in registros.Select((p, i) => (p, i + 1)))
+                    {
+                        <tr>
+                            <td>@p.IdStorie</td>
+                            <td>@p.Nombre</td>
+                            <td>@p.Tipo</td>
+                            <td>@p.Grupos</td>
+                            <td>@p.Valor</td>
+                            <td width="5%" class="justify-content-end">
+                                @if (UserRol > 0 && UserRol < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@if (mostrarFormulario)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(entidadActual.IdStorie == 0 ? "Agregar" : "Editar")</h5>
+                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="entidadActual" OnValidSubmit="GuardarEntidad">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label class="form-label">¿La historia @entidadActual.Nombre está relacionada a este grupo titulado @entidadActual.Grupos?</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Respuesta:</label>
+                            <InputSelect class="form-select" @bind-Value="entidadActual.ValorSeleccionado">
+                                <option value="-1">-- Seleccione uno --</option>
+                                <option value="1">Si</option>
+                                <option value="2">No</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => entidadActual.ValorSeleccionado)" />
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="bi bi-save"></i> Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary me-2" @onclick="Cancelar">
+                                <i class="bi bi-times"></i> Cancelar
+                            </button>
+                            <button type="button" class="btn btn-success me-2" @onclick="Siguiente">
+                                <i class="bi bi-chevron-double-right"></i> Siguiente
+                            </button>
+
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+        [Parameter]
+        public string IdProyecto { get; set; }
+
+    public class Tabla()
+    {
+        public int IdStorie { get; set; }
+        public string Nombre { get; set; }
+        public string Grupos { get; set; }
+        public string Tipo { get; set; }
+
+        [Range(0, 2, ErrorMessage = "El valor es requerido")]
+        public int ValorSeleccionado { get; set; }
+
+        public string Valor { get; set; }
+    }
+
+    private List<Tabla> registros = new();
+    private List<Stories> stories = new();
+    private List<StoriesPull> storiespull = new();
+    private List<StoriesPush> storiespush = new();
+
+    private Tabla entidadActual = new();
+    private bool mostrarFormulario = false;
+    private string? mensajeAlerta;
+    private bool mostrarAlerta = false;
+    private int UserRol = 5;
+    private string username = "dusa-user";
+
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IStories repository { get; set; } = null!;
+    [Inject] private IProjects repoproyect { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
+    private Projects proyecto = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
+
+                if (user != null)
+                {
+                    UserRol = user.EmployeeRol;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+
+        try
+        {
+            proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
+            await CargarDatos();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private async Task CargarDatos()
+    {
+        try
+        {
+            stories = (List<Stories>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
+            storiespull = (List<StoriesPull>)await repository.GetPullsByProjectIdAsync(int.Parse(IdProyecto));
+            storiespush = (List<StoriesPush>)await repository.GetPushesByProjectIdAsync(int.Parse(IdProyecto));
+
+            registros = new List<Tabla>();
+            foreach (Stories item in stories)
+            {
+                string grupos = string.Empty;
+
+                foreach (StoriesPush push in storiespush.Where(x => x.Stories.IdStorie == item.IdStorie))
+                {
+                    grupos += $"{push.Groups.GroupName},";
+                }
+
+                if (!string.IsNullOrEmpty(grupos))
+                {
+                    Tabla tabla = new Tabla()
+                        {
+                            IdStorie = item.IdStorie,
+                            Nombre = $"{item.TitleStorie} - {item.IdInter.InterName}",
+                            Tipo = "Push",
+                            Grupos = grupos,
+                        Valor = (item.ValorPush == null ? "-" : (item.ValorPush == 1 ? "Si" : "No"))
+                        };
+
+                    registros.Add(tabla);
+                }
+            }
+
+            foreach (Stories item in stories)
+            {
+                string grupos = string.Empty;
+
+                foreach (StoriesPull pull in storiespull.Where(x => x.Stories.IdStorie == item.IdStorie))
+                {
+                    grupos += $"{pull.Groups.GroupName},";
+                }
+
+                if (!string.IsNullOrEmpty(grupos))
+                {
+                    Tabla tabla = new Tabla()
+                        {
+                            IdStorie = item.IdStorie,
+                            Nombre = $"{item.TitleStorie} - {item.IdInter.InterName}",
+                            Tipo = "Pull",
+                            Grupos = grupos,
+                            Valor = (item.ValorPull == null ? "-" : (item.ValorPull==1? "Si": "No"))
+                        };
+
+                    registros.Add(tabla);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void EditarEntidad(Tabla tabla)
+    {
+        try
+        {
+            int valor = -1;
+            switch(tabla.Valor)
+            {
+                case "Si":
+                    valor = 1;
+                    break;
+                case "No":
+                    valor = 2;
+                    break;
+            }
+
+            entidadActual = new Tabla
+            {
+                IdStorie = tabla.IdStorie,
+                Tipo     = tabla.Tipo,
+                Nombre = tabla.Nombre,
+                Grupos = tabla.Grupos,
+                ValorSeleccionado = valor,
+                Valor = tabla.Valor
+            };
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private async Task GuardarEntidad()
+    {
+        try
+        {
+            await repository.UpdateStorieValorAsync(int.Parse(IdProyecto), entidadActual.IdStorie, (entidadActual.Tipo == "Push"? 1: 2), (entidadActual.ValorSeleccionado == 2 ? 0 : 1));
+
+            await CargarDatos();
+            mostrarFormulario = false;
+            mensajeAlerta = "Valor guardado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private void Siguiente()
+    {
+        mostrarFormulario = false;
+    }
+
+    private void Regresar()
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyectos");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+}

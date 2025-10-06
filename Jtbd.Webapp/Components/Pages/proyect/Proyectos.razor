@@ -96,6 +96,9 @@
                                 <button class="btn btn-secondary btn-sm me-2" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
                                     <i class="bi bi-ui-checks"></i>
                                 </button>
+                                <button class="btn btn-secondary btn-sm me-2" title="Validar agrupación" @onclick="() => ValidarGrupos(p.IdProject.ToString())">
+                                    <i class="bi bi-list-check"></i>
+                                </button>
                                 <button class="btn btn-secondary btn-sm me-2" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
                                     <i class="bi bi-kanban"></i>
                                 </button>
@@ -433,6 +436,18 @@
         try
         {
             NavigationManager.NavigateTo($"proyect/proyecsmatriz/{id}");
+        }
+        catch (Exception ex)
+        {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+    }
+    private void ValidarGrupos(string id)
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecsvalidar/{id}");
         }
         catch (Exception ex)
         {

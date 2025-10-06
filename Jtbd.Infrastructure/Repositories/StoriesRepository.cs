@@ -119,7 +119,6 @@ namespace Jtbd.Infrastructure.Repositories
             auxStorie.CreatedDate = stories.CreatedDate;
             auxStorie.UpdatedDate = stories.UpdatedDate;
             auxStorie.UpdatedUser = stories.UpdatedUser;
-            auxStorie.Groups = null;
 
             var project = _context.Projects.Where(x => x.IdProject == stories.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
             if (project != null)
@@ -420,6 +419,19 @@ namespace Jtbd.Infrastructure.Repositories
             }
 
             return null;// package.GetAsByteArray();
+        }
+
+        public async Task<bool> UpdateStorieValorAsync(int idproyecto, int idstorie, int tipo, int valor)
+        {
+            if(tipo == 1)
+            {
+            var result = await _context.Database.ExecuteSqlAsync($"UPDATE [Stories] SET [ValorPush] = {valor} WHERE [IdStorie] = {idstorie} AND ProjectIdProject = {idproyecto}");
+            }
+            else
+            {
+                var result = await _context.Database.ExecuteSqlAsync($"UPDATE [Stories] SET [ValorPull] = {valor} WHERE [IdStorie] = {idstorie} AND ProjectIdProject = {idproyecto}");
+            }
+            return true;
         }
     }
 }

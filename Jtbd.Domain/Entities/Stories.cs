@@ -26,7 +26,9 @@ namespace Jtbd.Domain.Entities
         public string UpdatedUser { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime UpdatedDate { get; set; } = DateTime.Now;
-        public Groups? Groups { get; set; }
+
+        public int? ValorPush { get; set; }
+        public int? ValorPull { get; set; }
 
     }
 }

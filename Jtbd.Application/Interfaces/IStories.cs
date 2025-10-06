@@ -30,5 +30,6 @@ namespace Jtbd.Application.Interfaces
         Task<bool> UpdatePushesGroupEntityAsync(int idPush, int? idGroup);
         Task<IEnumerable<StoriesPull>> GetPullsByProjectIdAsync(int id);
         Task<bool> UpdatePullsGroupEntityAsync(int idPull, int? idGroup);
+        Task<bool> UpdateStorieValorAsync(int idproyecto, int idstorie, int tipo, int valor);
     }
 }
