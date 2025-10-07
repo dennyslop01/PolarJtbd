@@ -31,12 +31,12 @@
         <table class="table table-striped table-hover">
             <thead class="table-secondary bg-opacity-25">
                 <tr>
-                    <th>Contexto</th>
+                    <th width="10%">Contexto</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>@entidadStorie.ContextStorie</td>
+                    <td width="10%">@entidadStorie.ContextStorie</td>
                 </tr>
             </tbody>
         </table>
@@ -77,17 +77,17 @@
             <table class="table table-striped table-hover">
                 <thead class="table-secondary bg-opacity-25">
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th> </th>
+                        <th width="10%">#</th>
+                        <th width="65%">Nombre</th>
+                        <th width="25%"> </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var (p, index) in pushstorie.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td>@p.PushesGroups.IdPush</td>
-                            <td>@p.PushesGroups.PushName</td>
+                            <td width="10%">@p.PushesGroups.IdPush</td>
+                            <td width="65%">@p.PushesGroups.PushName</td>
                             <td width="25%" class="justify-content-end">
                                 @if (UserRol > 0 && UserRol < 3)
                                 {
@@ -139,17 +139,17 @@
             <table class="table table-striped table-hover">
                 <thead class="table-secondary bg-opacity-25">
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th> </th>
+                        <th width="10%">#</th>
+                        <th width="65%">Nombre</th>
+                        <th width="25%"> </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var (p, index) in pullstorie.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td>@p.PullGroups.IdPull</td>
-                            <td>@p.PullGroups.PullName</td>
+                            <td width="10%">@p.PullGroups.IdPull</td>
+                            <td width="65%">@p.PullGroups.PullName</td>
                             <td width="25%" class="justify-content-end">
                                 @if (UserRol > 0 && UserRol < 3)
                                 {
@@ -206,17 +206,17 @@
             <table class="table table-striped table-hover">
                 <thead class="table-secondary bg-opacity-25">
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th> </th>
+                        <th width="10%">#</th>
+                        <th width="65%">Nombre</th>
+                        <th width="25%"> </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var (p, index) in habitstorie.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td>@p.Habits.IdHabit</td>
-                            <td>@p.Habits.HabitName</td>
+                            <td width="10%">@p.Habits.IdHabit</td>
+                            <td width="65%">@p.Habits.HabitName</td>
                             <td width="25%" class="justify-content-end">
                                 @if (UserRol > 0 && UserRol < 3)
                                 {
@@ -268,17 +268,17 @@
             <table class="table table-striped table-hover">
                 <thead class="table-secondary bg-opacity-25">
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th> </th>
+                        <th width="10%">#</th>
+                        <th width="65%">Nombre</th>
+                        <th width="25%"> </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var (p, index) in anxiestorie.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td>@p.Anxieties.IdAnxie</td>
-                            <td>@p.Anxieties.AnxieName</td>
+                            <td width="10%">@p.Anxieties.IdAnxie</td>
+                            <td width="65%">@p.Anxieties.AnxieName</td>
                             <td width="25%" class="justify-content-end">
                                 @if (UserRol > 0 && UserRol < 3)
                                 {

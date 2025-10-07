@@ -64,7 +64,7 @@
                             <td width="5%" class="justify-content-end">
                                 @if (UserRol > 0 && UserRol < 3)
                                 {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p, index)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                 }
@@ -122,26 +122,16 @@
 }
 
 @code {
-        [Parameter]
-        public string IdProyecto { get; set; }
-
-    public class Tabla()
-    {
-        public int IdStorie { get; set; }
-        public string Nombre { get; set; }
-        public string Grupos { get; set; }
-        public string Tipo { get; set; }
-
-        [Range(0, 2, ErrorMessage = "El valor es requerido")]
-        public int ValorSeleccionado { get; set; }
-
-        public string Valor { get; set; }
-    }
+    [Parameter]
+    public string IdProyecto { get; set; }
 
     private List<Tabla> registros = new();
     private List<Stories> stories = new();
-    private List<StoriesPull> storiespull = new();
-    private List<StoriesPush> storiespush = new();
+    private List<StoriesGroupsPulls> storiespull = new();
+    private List<StoriesGroupsPushes> storiespush = new();
+    private List<Groups> grupospush = new();
+    private List<Groups> grupospull = new();
+    private Projects proyecto = new();
 
     private Tabla entidadActual = new();
     private bool mostrarFormulario = false;
@@ -149,12 +139,14 @@
     private bool mostrarAlerta = false;
     private int UserRol = 5;
     private string username = "dusa-user";
+    private int indexGral = 0;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IStories repository { get; set; } = null!;
     [Inject] private IProjects repoproyect { get; set; } = null!;
     [Inject] private IEmployee repouser { get; set; } = null!;
-    private Projects proyecto = new();
+    [Inject] private IGroups repogrupos { get; set; } = null!;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -187,6 +179,8 @@
         catch (Exception ex)
         {
             Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
         }
     }
 
@@ -195,68 +189,80 @@
         try
         {
             stories = (List<Stories>)await repository.GetByProjectIdAsync(int.Parse(IdProyecto));
-            storiespull = (List<StoriesPull>)await repository.GetPullsByProjectIdAsync(int.Parse(IdProyecto));
-            storiespush = (List<StoriesPush>)await repository.GetPushesByProjectIdAsync(int.Parse(IdProyecto));
+            grupospush = (List<Groups>)await repogrupos.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 0);
+            grupospull = (List<Groups>)await repogrupos.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 1);
+
+            storiespull = (List<StoriesGroupsPulls>)await repository.GetStorieGroupPullsByProjectIdAsync(int.Parse(IdProyecto));
+            storiespush = (List<StoriesGroupsPushes>)await repository.GetStorieGroupPushesByProjectIdAsync(int.Parse(IdProyecto));
 
             registros = new List<Tabla>();
             foreach (Stories item in stories)
             {
-                string grupos = string.Empty;
-
-                foreach (StoriesPush push in storiespush.Where(x => x.Stories.IdStorie == item.IdStorie))
+                foreach (Groups grp in grupospush)
                 {
-                    grupos += $"{push.Groups.GroupName},";
-                }
+                    if (grp.GroupName != "Leftovers")
+                    {
+                        int? valor = null;
+                        foreach (StoriesGroupsPushes push in storiespush.Where(x => x.Stories.IdStorie == item.IdStorie && x.Groups.IdGroup == grp.IdGroup))
+                        {
+                            valor = push.ValorPush;
+                        }
 
-                if (!string.IsNullOrEmpty(grupos))
-                {
-                    Tabla tabla = new Tabla()
+                        Tabla tabla = new Tabla()
                         {
                             IdStorie = item.IdStorie,
                             Nombre = $"{item.TitleStorie} - {item.IdInter.InterName}",
                             Tipo = "Push",
-                            Grupos = grupos,
-                        Valor = (item.ValorPush == null ? "-" : (item.ValorPush == 1 ? "Si" : "No"))
+                            IdGroup = grp.IdGroup,
+                            Grupos = grp.GroupName,
+                            Valor = (valor == null ? "-" : (valor == 1 ? "Si" : "No"))
                         };
-
-                    registros.Add(tabla);
+                        registros.Add(tabla);
+                    }
                 }
             }
 
             foreach (Stories item in stories)
             {
-                string grupos = string.Empty;
-
-                foreach (StoriesPull pull in storiespull.Where(x => x.Stories.IdStorie == item.IdStorie))
+                foreach (Groups grp in grupospull)
                 {
-                    grupos += $"{pull.Groups.GroupName},";
-                }
+                    if (grp.GroupName != "Leftovers")
+                    {
+                        int? valor = null;
+                        foreach (StoriesGroupsPulls push in storiespull.Where(x => x.Stories.IdStorie == item.IdStorie && x.Groups.IdGroup == grp.IdGroup))
+                        {
+                            valor = push.ValorPull;
+                        }
 
-                if (!string.IsNullOrEmpty(grupos))
-                {
-                    Tabla tabla = new Tabla()
+                        Tabla tabla = new Tabla()
                         {
                             IdStorie = item.IdStorie,
                             Nombre = $"{item.TitleStorie} - {item.IdInter.InterName}",
                             Tipo = "Pull",
-                            Grupos = grupos,
-                            Valor = (item.ValorPull == null ? "-" : (item.ValorPull==1? "Si": "No"))
+                            IdGroup = grp.IdGroup,
+                            Grupos = grp.GroupName,
+                            Valor = (valor == null ? "-" : (valor == 1 ? "Si" : "No"))
                         };
-
-                    registros.Add(tabla);
+                        registros.Add(tabla);
+                    }
                 }
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
         }
     }
 
-    private void EditarEntidad(Tabla tabla)
+    private void EditarEntidad(Tabla tabla, int index)
     {
         try
         {
+            if (index <= registros.Count)
+                indexGral = index;
+
             int valor = -1;
             switch(tabla.Valor)
             {
@@ -273,6 +279,7 @@
                 IdStorie = tabla.IdStorie,
                 Tipo     = tabla.Tipo,
                 Nombre = tabla.Nombre,
+                IdGroup = tabla.IdGroup,
                 Grupos = tabla.Grupos,
                 ValorSeleccionado = valor,
                 Valor = tabla.Valor
@@ -282,6 +289,8 @@
         catch (Exception ex)
         {
             Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
         }
     }
 
@@ -289,16 +298,23 @@
     {
         try
         {
-            await repository.UpdateStorieValorAsync(int.Parse(IdProyecto), entidadActual.IdStorie, (entidadActual.Tipo == "Push"? 1: 2), (entidadActual.ValorSeleccionado == 2 ? 0 : 1));
+            // await repository.UpdateStorieValorAsync(entidadActual.IdStorie, entidadActual.IdGroup, (entidadActual.Tipo == "Push"? 1: 2), (entidadActual.ValorSeleccionado == 2 ? 0 : 1));
 
-            await CargarDatos();
-            mostrarFormulario = false;
-            mensajeAlerta = "Valor guardado exitosamente.";
-            mostrarAlerta = true;
+            // await CargarDatos();
+            // mostrarFormulario = false;
+            // mensajeAlerta = "Valor guardado exitosamente.";
+            // mostrarAlerta = true;
+
+            // indexGral++;
+            // if (indexGral <= registros.Count)
+            //     EditarEntidad(registros[indexGral-1], indexGral);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+            mostrarFormulario = false;
         }
     }
 
@@ -309,7 +325,10 @@
 
     private void Siguiente()
     {
-        mostrarFormulario = false;
+        // mostrarFormulario = false;
+        // indexGral++;
+        // if (indexGral <= registros.Count)
+        //     EditarEntidad(registros[indexGral-1], indexGral);
     }
 
     private void Regresar()
@@ -321,6 +340,8 @@
         catch (Exception ex)
         {
             Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
         }
     }
 }

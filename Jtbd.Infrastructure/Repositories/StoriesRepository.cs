@@ -421,15 +421,51 @@ namespace Jtbd.Infrastructure.Repositories
             return null;// package.GetAsByteArray();
         }
 
-        public async Task<bool> UpdateStorieValorAsync(int idproyecto, int idstorie, int tipo, int valor)
+        public async Task<IEnumerable<StoriesGroupsPushes>> GetStorieGroupPushesByProjectIdAsync(int id)
+        {
+            var pushstorie = await _context.StoriesGroupsPushes
+                .Include(x => x.Groups)
+                .Include(x => x.Stories)
+                .Where(x => x.Stories.Project.IdProject == id).AsNoTracking().ToListAsync();
+
+            return pushstorie!;
+        }
+
+        public async Task<IEnumerable<StoriesGroupsPulls>> GetStorieGroupPullsByProjectIdAsync(int id)
+        {
+            var pushstorie = await _context.StoriesGroupsPulls
+                .Include(x => x.Groups)
+                .Include(x => x.Stories)
+                .Where(x => x.Stories.Project.IdProject == id).AsNoTracking().ToListAsync();
+
+            return pushstorie!;
+        }
+
+        public async Task<bool> UpdateStorieValorAsync(int idstorie, int idgroup, int tipo, int valor)
         {
             if(tipo == 1)
             {
-            var result = await _context.Database.ExecuteSqlAsync($"UPDATE [Stories] SET [ValorPush] = {valor} WHERE [IdStorie] = {idstorie} AND ProjectIdProject = {idproyecto}");
+                var push = await _context.StoriesGroupsPushes.Where(x => x.Stories.IdStorie == idstorie && x.Groups.IdGroup == idgroup && x.Groups.IdTipo == 0).AsNoTracking().ToListAsync();
+                if(push.Count() == 0)
+                {
+                    var result = await _context.Database.ExecuteSqlAsync($"INSERT INTO StoriesGroupsPushes (StoriesIdStorie,GroupsIdGroup,ValorPush) VALUES({idstorie},{idgroup},{valor})");
+                }
+                else
+                {
+                    var result = await _context.Database.ExecuteSqlAsync($"UPDATE StoriesGroupsPushes SET ValorPush = {valor} WHERE StoriesIdStorie = {idstorie} AND GroupsIdGroup = {idgroup}");
+                }
             }
             else
             {
-                var result = await _context.Database.ExecuteSqlAsync($"UPDATE [Stories] SET [ValorPull] = {valor} WHERE [IdStorie] = {idstorie} AND ProjectIdProject = {idproyecto}");
+                var pull = await _context.StoriesGroupsPulls.Where(x => x.Stories.IdStorie == idstorie && x.Groups.IdGroup == idgroup && x.Groups.IdTipo == 1).AsNoTracking().ToListAsync();
+                if (pull.Count() == 0)
+                {
+                    var result = await _context.Database.ExecuteSqlAsync($"INSERT INTO StoriesGroupsPulls (StoriesIdStorie,GroupsIdGroup,ValorPull) VALUES({idstorie},{idgroup},{valor})");
+                }
+                else
+                {
+                    var result = await _context.Database.ExecuteSqlAsync($"UPDATE StoriesGroupsPulls SET ValorPull = {valor} WHERE StoriesIdStorie = {idstorie} AND GroupsIdGroup = {idgroup}");
+                }
             }
             return true;
         }

@@ -50,24 +50,24 @@
             <table class="table table-striped table-hover">
                 <thead class="table-secondary bg-opacity-25">
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Fecha</th>
-                        <th>Departamento</th>
-                        <th>Categoría</th>
+                        <th width="5%">#</th>
+                        <th width="30%">Nombre</th>
+                        <th width="15%">Fecha</th>
+                        <th width="10%">Departamento</th>
+                        <th width="10%">Categoría</th>
                         @* <th>Estatus</th> *@
-                        <th> </th>
+                        <th width="30%"> </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var (p, index) in proyectos.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td>@p.IdProject</td>
-                            <td>@p.ProjectName</td>
-                            <td>@p.ProjectDate</td>
-                            <td>@p.Deparment.Name</td>
-                            <td>@p.Categories.Name</td>
+                            <td width="5%">@p.IdProject</td>
+                            <td width="30%">@p.ProjectName</td>
+                            <td width="15%">@p.ProjectDate</td>
+                            <td width="10%">@p.Deparment.Name</td>
+                            <td width="10%">@p.Categories.Name</td>
                             @* @switch (p.StatusProject)
                             {
                                 case 0:
@@ -77,29 +77,29 @@
                                     <td>Activo</td>
                                     break;
                             } *@
-                            <td width="25%" class="justify-content-end">
+                            <td width="30%" class="justify-content-end mb-1">
                                 @if (UserRol > 0 && UserRol < 3)
                                 {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i> 
                                     </button>
-                                    <button class="btn btn-danger btn-sm me-2" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
+                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
                                         <i class="bi bi-trash"></i> 
                                     </button>
                                 }
-                                <button class="btn btn-secondary btn-sm me-2" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
+                                <button class="btn btn-secondary btn-sm me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
                                     <i class="bi bi-person-add"></i> 
                                 </button>
                                 @* <button class="btn btn-secondary btn-sm me-2" title="Agregar Grupos" @onclick="() => AgrgarGrupos(p.IdProject.ToString())">
                                     <i class="bi bi-grid-1x2"></i>
                                 </button> *@
-                                <button class="btn btn-secondary btn-sm me-2" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
+                                <button class="btn btn-secondary btn-sm me-1" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
                                     <i class="bi bi-ui-checks"></i>
                                 </button>
-                                <button class="btn btn-secondary btn-sm me-2" title="Validar agrupación" @onclick="() => ValidarGrupos(p.IdProject.ToString())">
+                                @* <button class="btn btn-secondary btn-sm me-1" title="Validar agrupación" @onclick="() => ValidarGrupos(p.IdProject.ToString())">
                                     <i class="bi bi-list-check"></i>
-                                </button>
-                                <button class="btn btn-secondary btn-sm me-2" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
+                                </button> *@
+                                <button class="btn btn-secondary btn-sm" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
                                     <i class="bi bi-kanban"></i>
                                 </button>
                             </td>
