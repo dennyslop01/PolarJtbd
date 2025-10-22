@@ -26,7 +26,7 @@ namespace Jtbd.Domain.Entities
         public string? Grupos { get; set; }
         public string? Tipo { get; set; }
 
-        [Range(0, 2, ErrorMessage = "El valor es requerido")]
+        //[Range(0, 2, ErrorMessage = "El valor es requerido")]
         public int ValorSeleccionado { get; set; }
 
         public string Valor { get; set; }

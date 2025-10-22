@@ -108,7 +108,7 @@
                                             if (entidad == null)
                                             {
                                                 <td>
-                                                    <button type="button" class="btn btn-secondary" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">-</button>
+                                                    <button type="button" class="btn btn-light" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">-</button>
                                                 </td>
                                             }
                                             else
@@ -122,7 +122,7 @@
                                                 else
                                                 {
                                                     <td>
-                                                        <button type="button" class="btn btn-secondary" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">0</button>
+                                                        <button type="button" class="btn btn-light" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">0</button>
                                                     </td>
                                                 }
                                             }
@@ -141,7 +141,7 @@
                                             if (entidad == null)
                                             {
                                                 <td>
-                                                    <button type="button" class="btn btn-secondary" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">-</button>
+                                                    <button type="button" class="btn btn-light" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">-</button>
                                                 </td>
                                             }
                                             else
@@ -155,7 +155,7 @@
                                                 else
                                                 {
                                                     <td>
-                                                        <button type="button" class="btn btn-secondary" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">0</button>
+                                                        <button type="button" class="btn btn-light" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">0</button>
                                                     </td>
                                                 }
                                             }
@@ -262,9 +262,9 @@
                             <ValidationMessage For="@(() => entidadValidar.ValorSeleccionado)" />
                         </div>
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success me-2">
+                            @* <button type="submit" class="btn btn-success me-2">
                                 <i class="bi bi-save"></i> Guardar
-                            </button>
+                            </button> *@
                             <button type="button" class="btn btn-secondary me-2" @onclick="() => Siguiente(-1)">
                                 <i class="bi bi-chevron-double-left"></i> Anterior
                             </button>
@@ -288,7 +288,6 @@
 
 
     private List<Tabla> registros = new();
-
     private List<Stories> stories = new(); 
     private List<Groups> grupospush = new();
     private List<Groups> grupospull = new();
@@ -613,8 +612,11 @@
         return null;
     }
 
-    private void Siguiente(int opcion)
+    private async Task Siguiente(int opcion)
     {
+        if (entidadValidar.ValorSeleccionado != -1) 
+            await GuardarEntidad2();
+
         mostrarFormulario2 = false;
         indexGral+= opcion;
         if(indexGral > -1)
@@ -681,16 +683,17 @@
     {
         try
         {
-            await repository.UpdateStorieValorAsync(entidadValidar.IdStorie, entidadValidar.IdGroup, (entidadValidar.Tipo == "Push" ? 1 : 2), (entidadValidar.ValorSeleccionado == 2 ? 0 : 1));
+            if (entidadValidar.ValorSeleccionado != -1)
+                await repository.UpdateStorieValorAsync(entidadValidar.IdStorie, entidadValidar.IdGroup, (entidadValidar.Tipo == "Push" ? 1 : 2), (entidadValidar.ValorSeleccionado == 2 ? 0 : 1));
 
             await CargarDatos();
             mostrarFormulario2 = false;
-            mensajeAlerta = "Valor guardado exitosamente.";
-            mostrarAlerta = true;
+            // mensajeAlerta = "Valor guardado exitosamente.";
+            // mostrarAlerta = true;
 
-            indexGral++;
-            if (indexGral < registros.Count)
-                EditarEntidad(registros[indexGral].IdStorie, registros[indexGral].IdGroup);
+            // indexGral++;
+            // if (indexGral < registros.Count)
+            //     EditarEntidad(registros[indexGral].IdStorie, registros[indexGral].IdGroup);
         }
         catch (Exception ex)
         {

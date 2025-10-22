@@ -51,8 +51,9 @@
         <div class="row">
             @foreach (var group in grupospush)
             {
-                <div class="col-lg-4">
-                    <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
+                <div class="col-lg-6">
+                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width:100%;"
+                         ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
                         <div>
                             @group.GroupName&nbsp;&nbsp;&nbsp;
                             @if (group.GroupName != "Leftovers")
@@ -62,10 +63,10 @@
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <br />
                                 }
                             }
                         </div>
+                        <br />
                         @foreach (var item in List2)
                         {
                             if (group.IdGroup == item.IdGroup)
@@ -103,8 +104,9 @@
         <div class="row">
             @foreach (var group in grupospull)
             {
-                <div class="col-lg-4">
-                    <div id="@group.IdGroup+@group.GroupName" class="list-container" ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
+                <div class="col-lg-6">
+                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width:100%;" 
+                         ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
                         <div>
                             @group.GroupName&nbsp;&nbsp;&nbsp;
                             @if (group.GroupName != "Leftovers")
@@ -114,10 +116,11 @@
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <br />
                                 }
                             }
                         </div>
+                        <br />
+
                         @foreach (var item in List4)
                         {
                             if (group.IdGroup == item.IdGroup)
@@ -268,7 +271,7 @@
                     List1.Add(new Item
                         {
                             Id = push.PushesGroups.IdPush,
-                            Name = push.Stories.TitleStorie + "-" + push.PushesGroups.PushName
+                            Name = push.Stories.TitleStorie + " - " + push.PushesGroups.PushName
                         });
                 }
                 else
@@ -277,7 +280,7 @@
                     {
                         Id = push.PushesGroups.IdPush,
                         IdGroup = push.Groups.IdGroup,
-                        Name = push.Stories.TitleStorie + "-" + push.PushesGroups.PushName
+                        Name = push.Stories.TitleStorie + " - " + push.PushesGroups.PushName
                     });
                 }
             }
@@ -290,7 +293,7 @@
                     List3.Add(new Item
                     {
                         Id = pull.PullGroups.IdPull,
-                        Name = pull.Stories.TitleStorie + "-" + pull.PullGroups.PullName
+                        Name = pull.Stories.TitleStorie + " - " + pull.PullGroups.PullName
                     });
                 }
                 else
@@ -299,7 +302,7 @@
                     {
                         Id = pull.PullGroups.IdPull,
                         IdGroup = pull.Groups.IdGroup,
-                        Name = pull.Stories.TitleStorie + "-" + pull.PullGroups.PullName
+                        Name = pull.Stories.TitleStorie + " - " + pull.PullGroups.PullName
                     });
                 }
             }
