@@ -14,7 +14,7 @@
     <div class="col-lg-12">
         <div class="col-lg-11">
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                @(proyecto == null ? "-" : proyecto.ProjectName)  <i class="bi bi-arrow-return-left"></i>
+                @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
             </button>
         </div>
         <h3 class="text-start mt-4">Validar agrupación de historias</h3>
@@ -62,7 +62,7 @@
                             <td>@p.Grupos</td>
                             <td>@p.Valor</td>
                             <td width="5%" class="justify-content-end">
-                                @if (UserRol > 0 && UserRol < 3)
+                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p, index)">
                                         <i class="bi bi-pencil"></i>
@@ -124,6 +124,8 @@
 @code {
     [Parameter]
     public string IdProyecto { get; set; }
+    [Parameter]
+    public string userrol { get; set; }
 
     private List<Tabla> registros = new();
     private List<Stories> stories = new();
@@ -137,8 +139,6 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private int UserRol = 5;
-    private string username = "dusa-user";
     private int indexGral = 0;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -150,27 +150,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    UserRol = user.EmployeeRol;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex.Message);
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-        }
-
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));

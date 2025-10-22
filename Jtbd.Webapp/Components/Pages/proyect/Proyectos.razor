@@ -68,40 +68,28 @@
                             <td width="15%">@p.ProjectDate</td>
                             <td width="10%">@p.Deparment.Name</td>
                             <td width="10%">@p.Categories.Name</td>
-                            @* @switch (p.StatusProject)
-                            {
-                                case 0:
-                                    <td>Inactivo</td>
-                                    break;
-                                case 1:
-                                    <td>Activo</td>
-                                    break;
-                            } *@
                             <td width="30%" class="justify-content-end mb-1">
                                 @if (UserRol > 0 && UserRol < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i> 
                                     </button>
-                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
-                                        <i class="bi bi-trash"></i> 
-                                    </button>
                                 }
                                 <button class="btn btn-secondary btn-sm me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
                                     <i class="bi bi-person-add"></i> 
                                 </button>
-                                @* <button class="btn btn-secondary btn-sm me-2" title="Agregar Grupos" @onclick="() => AgrgarGrupos(p.IdProject.ToString())">
-                                    <i class="bi bi-grid-1x2"></i>
-                                </button> *@
                                 <button class="btn btn-secondary btn-sm me-1" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
                                     <i class="bi bi-ui-checks"></i>
                                 </button>
-                                @* <button class="btn btn-secondary btn-sm me-1" title="Validar agrupación" @onclick="() => ValidarGrupos(p.IdProject.ToString())">
-                                    <i class="bi bi-list-check"></i>
-                                </button> *@
-                                <button class="btn btn-secondary btn-sm" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
+                                <button class="btn btn-secondary btn-sm me-1" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
                                     <i class="bi bi-kanban"></i>
                                 </button>
+                                @if (UserRol > 0 && UserRol < 3)
+                                {
+                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -164,25 +152,6 @@
                             <InputText class="form-control" @bind-Value="proyectoActual.ProjectDescription" />
                             <ValidationMessage For="@(() => proyectoActual.ProjectDescription)" />
                         </div>
-                        @* <div class="mb-3">
-                            <label class="form-label">Max Puches:</label>
-                            <InputNumber class="form-control" @bind-Value="proyectoActual.MaxPushes" />
-                            <ValidationMessage For="@(() => proyectoActual.MaxPushes)" />
-                        </div> *@
-                        @* <div class="mb-3">
-                            <label class="form-label">Max Pulls:</label>
-                            <InputNumber class="form-control" @bind-Value="proyectoActual.MaxPulls" />
-                            <ValidationMessage For="@(() => proyectoActual.MaxPulls)" />
-                        </div> *@
-                        @* <div class="mb-3">
-                            <label class="form-label">Estatus:</label>
-                            <InputSelect class="form-select" @bind-Value="proyectoActual.StatusProject">
-                                <option value="-1">-- Seleccione uno --</option>
-                                <option value="1">Activo</option>
-                                <option value="0">Inactivo</option>
-                            </InputSelect>
-                            <ValidationMessage For="@(() => proyectoActual.StatusProject)" />
-                        </div> *@
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success me-2">
                                 <i class="bi bi-save"></i> Guardar
@@ -197,26 +166,6 @@
         </div>
     </div>
 }
-@* <div>
-    <table class="table table-striped table-hover">
-        <thead class="table-secondary bg-opacity-25">
-            <tr>
-                <th>usernamelargo</th>
-                <th>username</th>
-                <th>UserRol</th>
-                <th>UserDepart</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@usernamelargo</td>
-                <td>@username</td>
-                <td>@UserRol</td>
-                <td>@UserDepart</td>
-            </tr>
-        </tbody>
-    </table>
-</div> *@
 
 @code {
     private List<Deparments> departamento = new();
@@ -396,7 +345,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/interview/{id}");
+            NavigationManager.NavigateTo($"proyect/interview/{id}/{UserRol}");
         }
         catch (Exception ex)
         {
@@ -409,7 +358,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/proyecsgroups/{id}");
+            NavigationManager.NavigateTo($"proyect/proyecsgroups/{id}/{UserRol}");
         }
         catch (Exception ex)
         {
@@ -422,7 +371,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/proyecsagrupar/{id}");
+            NavigationManager.NavigateTo($"proyect/proyecsagrupar/{id}/{UserRol}");
         }
         catch (Exception ex)
         {
@@ -435,7 +384,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/proyecsmatriz/{id}");
+            NavigationManager.NavigateTo($"proyect/proyecsmatriz/{id}/{UserRol}");
         }
         catch (Exception ex)
         {
@@ -447,7 +396,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/proyecsvalidar/{id}");
+            NavigationManager.NavigateTo($"proyect/proyecsvalidar/{id}/{UserRol}");
         }
         catch (Exception ex)
         {

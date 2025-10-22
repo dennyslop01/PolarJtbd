@@ -1,4 +1,4 @@
-﻿@page "/proyect/interview/{IdProyecto}"
+﻿@page "/proyect/interview/{IdProyecto}/{userrol}"
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
@@ -13,11 +13,11 @@
     <div class="col-lg-12">
         <div class="col-lg-11">
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                @(proyecto == null ? "-" : proyecto.ProjectName)  <i class="bi bi-arrow-return-left"></i>
+                @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
             </button>
         </div>
         <h3 class="text-start mt-4">Gestión de Entrevistados</h3>
-        @if (UserRol > 0 && UserRol < 3)
+        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-primary" title="Agregar Entrevistado" @onclick="MostrarFormulario">
@@ -52,11 +52,11 @@
                 <thead class="table table-secondary bg-opacity-25">
                     <tr>
                         <th width="5%">#</th>
+                        <th width="10%">Nickname</th>
                         <th width="15%">Nombre</th>
                         <th width="10%">Edad</th>
                         <th width="10%">Sexo</th>
                         <th width="10%">Ocupación</th>
-                        <th width="10%">Nickname</th>
                         <th width="10%">NSE</th>
                         <th width="10%">Fecha Entrevista</th>
                         <th width="20%"> </th>
@@ -66,7 +66,8 @@
                     @foreach (var (p, index) in entrevistados.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td width="5%">@p.IdInter</td>
+                            <td width="5%">@index</td>
+                            <td width="10%">@p.InterNickname</td>
                             <td width="15%">@p.InterName</td>
                             <td width="10%">@p.InterAge</td>
                             @switch (p.InterGender)
@@ -79,22 +80,24 @@
                                     break;
                             }
                             <td width="10%">@p.InterOccupation</td>
-                            <td width="10%">@p.InterNickname</td>
                             <td width="10%">@p.InterNSE</td>
                             <td width="10%">@p.DateInter</td>
                             <td width="20%" class="justify-content-end">
-                                @if (UserRol > 0 && UserRol < 3)
+                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i> 
                                     </button>
-                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
-                                        <i class="bi bi-trash"></i> 
-                                    </button>
                                 }
-                                <button class="btn btn-secondary btn-sm" title="Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
+                                <button class="btn btn-secondary btn-sm me-1" title="Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
                                     <i class="bi bi-list-columns-reverse"></i>
                                 </button>
+                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                {
+                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -174,14 +177,14 @@
 @code {
     [Parameter]
     public string IdProyecto { get; set; }
+    [Parameter]
+    public string userrol { get; set; }
 
     private List<Interviews> entrevistados = new();
     private CreateInterview entrevistadoActual = new();
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private int UserRol = 5;
-    private string username = "dusa-user";
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IInterviews repository { get; set; } = null!;
@@ -191,27 +194,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    UserRol = user.EmployeeRol;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex.Message);
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-        }
-
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
@@ -327,7 +309,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/proyecstories/{id}");
+            NavigationManager.NavigateTo($"proyect/proyecstories/{id}/{userrol}");
         }
         catch (Exception ex)
         {

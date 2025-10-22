@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyecsagrupar/{IdProyecto}"
+﻿@page "/proyect/proyecsagrupar/{IdProyecto}/{userrol}"
 
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
@@ -17,7 +17,7 @@
         <div class="col-lg-11">
             <div class="d-flex justify-content-start mb-3">
                 <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                    @(proyecto == null ? "-" : proyecto.ProjectName)  <i class="bi bi-arrow-return-left"></i>
+                    @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
                 </button>
             </div>
             <h3 class="text-start mt-4">Agrupar Historias</h3>
@@ -57,7 +57,7 @@
                             @group.GroupName&nbsp;&nbsp;&nbsp;
                             @if (group.GroupName != "Leftovers")
                             {
-                                @if (UserRol > 0 && UserRol < 3)
+                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
                                         <i class="bi bi-pencil"></i>
@@ -109,7 +109,7 @@
                             @group.GroupName&nbsp;&nbsp;&nbsp;
                             @if (group.GroupName != "Leftovers")
                             {
-                                @if (UserRol > 0 && UserRol < 3)
+                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
                                         <i class="bi bi-pencil"></i>
@@ -175,6 +175,8 @@
 @code {
     [Parameter]
     public string IdProyecto { get; set; }
+    [Parameter]
+    public string userrol { get; set; }
 
     private List<Groups> grupospush = new();
     private List<Groups> grupospull = new();
@@ -184,8 +186,6 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private int UserRol = 5;
-    private string username = string.Empty;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IGroups repository { get; set; } = null!;
@@ -206,27 +206,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    UserRol = user.EmployeeRol;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex.Message);
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-        }
-
         await CargarEntidades();
     }
 
@@ -392,7 +371,7 @@
 
     private void HandleDragStart(Item item, int? idGroup)
     {
-        @if (UserRol > 0 && UserRol < 3)
+        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             if (idGroup != null)
                 item.IdGroup = idGroup;
@@ -415,7 +394,7 @@
 
     private async Task HandleDropList1(DragEventArgs e)
     {
-        @if (UserRol > 0 && UserRol < 3)
+        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             if (_draggedItem != null && _sourceList != List1)
             {
@@ -430,7 +409,7 @@
 
     private async Task HandleDropList2(int? idGroup, DragEventArgs e)
     {
-        @if (UserRol > 0 && UserRol < 3)
+        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             {
                 if (idGroup != null)
@@ -446,7 +425,7 @@
 
     private void HandleDragStart2(Item item, int? idGroup)
     {
-        @if (UserRol > 0 && UserRol < 3)
+        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             if (idGroup != null)
                 item.IdGroup = idGroup;
@@ -469,7 +448,7 @@
 
     private async Task HandleDropList3(DragEventArgs e)
     {
-        @if (UserRol > 0 && UserRol < 3)
+        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             if (_draggedItem1 != null && _sourceList1 != List3)
             {
@@ -484,7 +463,7 @@
 
     private async Task HandleDropList4(int? idGroup, DragEventArgs e)
     {
-        @if (UserRol > 0 && UserRol < 3)
+        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             if (_draggedItem1 != null && _sourceList1 != List4)
             {

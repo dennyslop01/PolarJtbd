@@ -1,4 +1,4 @@
-﻿@page "/admin/categorias"
+﻿@page "/admin/categorias/{userrol}"
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
@@ -9,7 +9,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Categorias</PageTitle>
- @if (UserRol == 1)
+ @if (userrol == "1")
  {   
      <div class="row align-content-center">
         <div class="col-lg-11">
@@ -117,12 +117,14 @@ else
 }
 
 @code {
+    [Parameter]
+    public string userrol { get; set; }
+
     private List<Categories> categorias = new();
     private Categories categoriaActual = new();
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private int UserRol = 5;
     private string username = string.Empty;
 
     [Inject] private ICategories repository { get; set; } = null!;
@@ -131,27 +133,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    UserRol = user.EmployeeRol;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex.Message);
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-        }
-
         try
         {
             categorias = (List<Categories>)await repository.GetAllAsync();

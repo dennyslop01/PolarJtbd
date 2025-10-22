@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyecsmatriz/{IdProyecto}"
+﻿@page "/proyect/proyecsmatriz/{IdProyecto}/{userrol}"
 
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.Authorization
@@ -17,7 +17,7 @@
     <div class="col-lg-11">
         <div class="col-lg-11">
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
-                @(proyecto == null ? "-" : proyecto.ProjectName)  <i class="bi bi-arrow-return-left"></i>
+                @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
             </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <h3 class="text-start mt-4">Matriz de Historias y Grupos</h3>
             <div class="col-lg-12">
@@ -265,10 +265,10 @@
                             <button type="submit" class="btn btn-success me-2">
                                 <i class="bi bi-save"></i> Guardar
                             </button>
-                            <button type="button" class="btn btn-secondary me-2" @onclick="Cancelar">
-                                <i class="bi bi-times"></i> Cancelar
+                            <button type="button" class="btn btn-secondary me-2" @onclick="() => Siguiente(-1)">
+                                <i class="bi bi-chevron-double-left"></i> Anterior
                             </button>
-                            <button type="button" class="btn btn-primary me-2" @onclick="Siguiente">
+                            <button type="button" class="btn btn-primary me-2" @onclick="() => Siguiente(1)">
                                 <i class="bi bi-chevron-double-right"></i> Siguiente
                             </button>
 
@@ -283,6 +283,10 @@
 @code {
     [Parameter]
     public string IdProyecto { get; set; }
+    [Parameter]
+    public string userrol { get; set; }
+
+
     private List<Tabla> registros = new();
 
     private List<Stories> stories = new(); 
@@ -302,8 +306,6 @@
     private bool mostrarAlerta = false;
     private bool mostrarFormulario = false;
     private bool mostrarFormulario2 = false;
-    private int UserRol = 5;
-    private string username = "dusa-user";
     private int indexGral = 0;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -320,17 +322,6 @@
     {
         try
         {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    UserRol = user.EmployeeRol;
-                }
-            }
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
             await CargarDatos();
 
@@ -622,12 +613,15 @@
         return null;
     }
 
-    private void Siguiente()
+    private void Siguiente(int opcion)
     {
         mostrarFormulario2 = false;
-        indexGral++;
-        if (indexGral < registros.Count)
-            EditarEntidad(registros[indexGral].IdStorie, registros[indexGral].IdGroup);
+        indexGral+= opcion;
+        if(indexGral > -1)
+        {
+            if (indexGral < registros.Count)
+                EditarEntidad(registros[indexGral].IdStorie, registros[indexGral].IdGroup);
+        }
     }
 
     private void EditarEntidad(int idstorie, int idgroup)
@@ -635,8 +629,9 @@
         try
         {
             int index = registros.FindIndex(x => x.IdStorie == idstorie && x.IdGroup == idgroup);
+            indexGral = index;
 
-            if (UserRol > 0 && UserRol < 3)
+            if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
             {
                 if (index <= registros.Count)
                     indexGral = index;

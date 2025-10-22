@@ -1,4 +1,4 @@
-﻿@page "/admin/usuarios"
+﻿@page "/admin/usuarios/{userrol}"
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
 @using Jtbd.Domain.Entities
@@ -10,8 +10,8 @@
 
 <PageTitle>Usuarios</PageTitle>
 
- @if (UserRol == 1)
- {
+@if (userrol == "1")
+{
     <div class="row align-content-center">
         <div class="col-lg-11">
             <h3 class="text-start mt-4">Gestión de Usuarios</h3>
@@ -173,35 +173,16 @@ else
     </div>
 }
 
-@* <div>
-    <table class="table table-striped table-hover">
-        <thead class="table-secondary bg-opacity-25">
-            <tr>
-                <th>usernamelargo</th>
-                <th>username</th>
-                <th>UserRol</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@usernamelargo</td>
-                <td>@username</td>
-                <td>@UserRol</td>
-            </tr>
-        </tbody>
-    </table>
-</div> *@
-
 @code {
+    [Parameter]
+    public string userrol { get; set; }
+
     private List<Deparments> departamento = new();
     private List<Employee> usuarios = new();
     private CreateEmployee usuarioActual = new();
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private int UserRol = 5;
-    private string username = "dusa-user";//string.Empty;//
-    private string usernamelargo = string.Empty;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IEmployee repository { get; set; } = null!;
@@ -210,28 +191,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                usernamelargo = authState.User.Identity.Name;
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    UserRol = user.EmployeeRol;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex.Message);
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-        }
-
         try
         {
             usuarios = (List<Employee>)await repository.GetAllAsync();

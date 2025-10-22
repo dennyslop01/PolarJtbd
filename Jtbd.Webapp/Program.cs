@@ -55,9 +55,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseAuthentication();
-
 app.UseAntiforgery();
+app.UseAuthentication();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

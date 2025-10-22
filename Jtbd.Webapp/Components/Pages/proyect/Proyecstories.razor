@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyecstories/{IdInter}"
+﻿@page "/proyect/proyecstories/{IdInter}/{userrol}"
 
 @rendermode InteractiveServer
 @using Jtbd.Application.Interfaces
@@ -15,16 +15,16 @@
     <div class="col-lg-11">
         <div class="col-lg-11">
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
-                @(entrevistado.Project == null ? "-" : entrevistado.Project.ProjectName)  <i class="bi bi-arrow-return-left"></i>
+                @(entrevistado.Project == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
             </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                @(entrevistado == null ? "-" : entrevistado.InterName)  <i class="bi bi-arrow-return-left"></i>
+                @(entrevistado == null ? "-" : "Entrevistados")  <i class="bi bi-arrow-return-left"></i>
             </button>
-            <h3 class="text-start mt-4">Gestión de Historias</h3>
+            <h3 class="text-start mt-4">@(entrevistado == null ? "-" : entrevistado.InterName)@* Gestión de Historias *@</h3>
         </div>
     </div>
     <div class="col-lg-12">
-        @if (UserRol > 0 && UserRol < 3)
+        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-primary" title="Agregar Historia" @onclick="MostrarFormulario">
@@ -68,22 +68,25 @@
                     @foreach (var (p, index) in stories.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td width="5%">@p.IdStorie</td>
+                            <td width="5%">@index</td>
                             <td width="20%">@p.TitleStorie</td>
                             <td width="55%">@p.ContextStorie</td>
                             <td width="20%" class="justify-content-end">
-                                @if (UserRol > 0 && UserRol < 3)
+                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                 {
                                     <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i> 
-                                    </button>
-                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdStorie)">
-                                        <i class="bi bi-trash"></i> 
                                     </button>
                                 }
                                 <button class="btn btn-secondary btn-sm  me-1" title="Catalogar" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
                                     <i class="bi bi-grid m-1"></i> 
                                 </button>
+                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                {
+                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdStorie)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -134,6 +137,8 @@
 @code {
     [Parameter]
     public string IdInter { get; set; }
+    [Parameter]
+    public string userrol { get; set; }
 
     private Interviews entrevistado = new();
     private List<Stories> stories = new();
@@ -141,7 +146,6 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
-    private int UserRol = 5;
     private string username = "dusa-user";
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -157,12 +161,6 @@
             if (authState.User.Identity.IsAuthenticated)
             {
                 username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    UserRol = user.EmployeeRol;
-                }
             }
         }
         catch (Exception ex)
@@ -283,7 +281,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/detalle/{IdStorie}");
+            NavigationManager.NavigateTo($"proyect/detalle/{IdStorie}/{userrol}");
         }
         catch (Exception ex)
         {
@@ -295,7 +293,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo($"proyect/interview/{entrevistado.Project.IdProject}");
+            NavigationManager.NavigateTo($"proyect/interview/{entrevistado.Project.IdProject}/{userrol}");
         }
         catch (Exception ex)
         {
