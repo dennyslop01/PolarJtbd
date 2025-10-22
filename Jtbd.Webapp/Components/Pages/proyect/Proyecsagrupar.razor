@@ -21,6 +21,11 @@
                 </button>
             </div>
             <h3 class="text-start mt-4">Agrupar Historias</h3>
+            <div class="d-flex justify-content-end me-3">
+                <button class="btn btn-secondary" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
+                    <i class="bi bi-kanban"></i>
+                </button>
+            </div>
 
             @if (mostrarAlerta)
             {
@@ -478,6 +483,19 @@
                 await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, _draggedItem1.IdGroup);
                 StateHasChanged();
             }
+        }
+    }
+
+    private void MostrarMatriz(string id)
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecsmatriz/{id}/{userrol}");
+        }
+        catch (Exception ex)
+        {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
         }
     }
 }

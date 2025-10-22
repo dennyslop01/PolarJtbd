@@ -16,10 +16,11 @@ namespace Jtbd.Domain.Entities
         [MaxLength(100)]
         public string TitleStorie { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "El contexto es obligatorio.")]
         [MaxLength(4000)]
-        public string ContextStorie { get; set; } = string.Empty;
+        public string? ContextStorie { get; set; }
 
+        [MaxLength(4000)]
+        public string? ObservacionStorie { get; set; }
 
         [Range(0, 10000, ErrorMessage = "El entrevistado es obligatorio.")] 
         public int IdInter { get; set; }

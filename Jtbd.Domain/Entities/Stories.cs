@@ -17,9 +17,11 @@ namespace Jtbd.Domain.Entities
         [MaxLength(100)]
         public string TitleStorie { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(4000)]
-        public string ContextStorie { get;set; } = string.Empty;
+        public string? ContextStorie { get;set; }
+
+        [MaxLength(4000)]
+        public string? ObservacionStorie { get; set; }
 
         public Interviews? IdInter { get; set; }
         public string CreatedUser { get; set; } = string.Empty;

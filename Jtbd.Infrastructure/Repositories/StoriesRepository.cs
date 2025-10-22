@@ -115,6 +115,7 @@ namespace Jtbd.Infrastructure.Repositories
             auxStorie.IdStorie = stories.IdStorie;
             auxStorie.TitleStorie = stories.TitleStorie;
             auxStorie.ContextStorie = stories.ContextStorie;
+            auxStorie.ObservacionStorie = stories.ObservacionStorie;
             auxStorie.CreatedUser = stories.CreatedUser;
             auxStorie.CreatedDate = stories.CreatedDate;
             auxStorie.UpdatedDate = stories.UpdatedDate;

@@ -11,38 +11,52 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Historia Detalle</PageTitle>
-
-<div class="row align-content-center">
-    <div class="col-lg-11">
-        <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
-            @(entidadStorie.Project == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
-        </button>&nbsp;/&nbsp;
-        <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar3">
-            @(entidadStorie.IdInter == null ? "-" : "Entrevistados")  <i class="bi bi-arrow-return-left"></i>
-        </button>&nbsp;/&nbsp;
-        <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-            @(entidadStorie == null ? "-" : "Historias")  <i class="bi bi-arrow-return-left"></i>
-        </button>
-        <br />
-
-        <h3 class="text-start mt-4">Gestión de Historias Característica</h3>
+<EditForm Model="@entidadActual">
+    <div class="row align-content-center">
+        <div class="col-lg-12">
+            <div class="col-lg-11">
+                <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
+                    @(entidadStorie.Project == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
+                </button>&nbsp;/&nbsp;
+                <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar3">
+                    @(entidadStorie.IdInter == null ? "-" : "Entrevistados")  <i class="bi bi-arrow-return-left"></i>
+                </button>&nbsp;/&nbsp;
+                <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                    @(entidadStorie == null ? "-" : "Historias")  <i class="bi bi-arrow-return-left"></i>
+                </button>
+            </div>
+            <h3 class="text-start mt-4">Gestión de Historias Característica</h3>
+                <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-success me-3" @onclick="GuardarEntidad" title="Actualizar Historia">
+                    <i class="bi bi-save"></i>
+                </button>
+                <button class="btn btn-secondary me-3" @onclick="() => AgruparHistorias(entidadStorie.Project.IdProject.ToString())" title="Agrupar Historias">
+                    <i class="bi bi-ui-checks"></i>
+                </button>
+                <button class="btn btn-secondary me-3" @onclick="() => MostrarMatriz(entidadStorie.Project.IdProject.ToString())" title="Matriz Historias">
+                    <i class="bi bi-kanban"></i>
+                </button>
+            </div>
+        </div>
     </div>
-    <div class="col-lg-12">
-        <table class="table table-striped table-hover">
-            <thead class="table-secondary bg-opacity-25">
-                <tr>
-                    <th width="10%">Contexto</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td width="10%">@entidadStorie.ContextStorie</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+    @if (mostrarAlerta)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @mensajeAlerta
+            <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+        </div>
+    }
 
+    <div class="row align-content-center">
+        <div class="mb-6">
+            <label class="form-label"><strong>Contexto:</strong></label>
+            <InputTextArea class="form-control" @bind-Value="entidadActual.ContextStorie" />
+        </div>
+        <div class="mb-6">
+            <label class="form-label"><strong></strong></label>
+        </div>
+    </div>
+<br />
 <div class="row align-content-center" >
     <div class="col-lg-6">
         <div class="row">
@@ -290,6 +304,20 @@
     </div>
 </div>
 
+<div class="row align-content-center">
+    <div class="mb-6">
+        <label class="form-label"><strong></strong></label>
+    </div>
+    <div class="mb-6">
+        <label class="form-label"><strong>Observación:</strong></label>
+        <InputTextArea class="form-control" @bind-Value="entidadActual.ObservacionStorie" />
+    </div>
+</div>
+</EditForm>
+<br />
+<br />
+<br />
+<br />
 
 @if (mostrarPush)
 {
@@ -457,6 +485,7 @@
     private CreatePull pullActual = new();
     private CreateAnxietie anxieActual = new();
     private CreateHabits habitActual = new();
+    private CreateStorie entidadActual = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -489,8 +518,21 @@
                 habitstorie = (List<StoriesHabbit>)await repostorie.GetHabitsByStorieIdAsync(int.Parse(idStorie));
 
                 anxiestorie = (List<StoriesAnxiety>)await repostorie.GetAxieByStorieIdAsync(int.Parse(idStorie));
-            }
 
+                entidadActual = new CreateStorie
+                {
+                    IdStorie = entidadStorie.IdStorie,
+                    IdProject = entidadStorie.Project.IdProject,
+                    IdInter = entidadStorie.IdInter.IdInter,
+                    TitleStorie = entidadStorie.TitleStorie,
+                    ContextStorie = entidadStorie.ContextStorie,
+                    ObservacionStorie = entidadStorie.ObservacionStorie,
+                    CreatedDate = entidadStorie.CreatedDate,
+                    CreatedUser = entidadStorie.CreatedUser,
+                    UpdatedDate = DateTime.Now,
+                    UpdatedUser = username
+                };
+            }
         }
         catch (Exception ex)
         {
@@ -500,18 +542,10 @@
         }
     }
 
-    private async Task MostrarPushes()
+    private void MostrarPushes()
     {
         try
         {
-            // if (pushstorie.Count() > 0)
-            // {
-            //     var excludedIDs = new HashSet<int>(pushstorie.Select(p => p.PushesGroups.IdPush));
-            //     var auxiliar = pushes.Where(p => !excludedIDs.Contains(p.IdPush)).ToList();
-
-            //     auxpushes = (List<PushesGroups>) auxiliar;
-            // }
-
             pushActual = new CreatePushes();
             pushActual.IdPush = 0;
             pushActual.IdProject = entidadStorie.Project.IdProject;
@@ -551,18 +585,10 @@
         }
     }
 
-    private async Task MostrarPulls()
+    private void MostrarPulls()
     {
         try
         {
-            // if (pullstorie.Count() > 0)
-            // {
-            //     var excludedIDs = new HashSet<int>(pullstorie.Select(p => p.PullGroups.IdPull));
-            //     var auxiliar = pulls.Where(p => !excludedIDs.Contains(p.IdPull)).ToList();
-
-            //     auxpulls = (List<PullGroups>)auxiliar;
-            // }
-
             pullActual = new CreatePull();
             pullActual.IdPull = 0;
             pullActual.IdProject = entidadStorie.Project.IdProject;
@@ -602,18 +628,10 @@
         }
     }
 
-    private async Task MostrarHabits()
+    private void MostrarHabits()
     {
         try
         {
-            // if (habitstorie.Count() > 0)
-            // {
-            //     var excludedIDs = new HashSet<int>(habitstorie.Select(p => p.Habits.IdHabit));
-            //     var auxiliar = habits.Where(p => !excludedIDs.Contains(p.IdHabit)).ToList();
-
-            //     auxhabits = (List<Habits>)auxiliar;
-            // }
-
             habitActual = new CreateHabits();
             habitActual.IdHabit = 0;
             habitActual.IdProject = entidadStorie.Project.IdProject;
@@ -653,18 +671,10 @@
         }
     }
 
-    private async Task MostrarAnxies()
+    private void MostrarAnxies()
     {
         try
         {
-            // if (anxiestorie.Count() > 0)
-            // {
-            //     var excludedIDs = new HashSet<int>(anxiestorie.Select(p => p.Anxieties.IdAnxie));
-            //     var auxiliar = anxies.Where(p => !excludedIDs.Contains(p.IdAnxie)).ToList();
-
-            //     auxanxies = (List<Anxieties>)auxiliar;
-            // }
-
             anxieActual = new CreateAnxietie();
             anxieActual.IdAnxie = 0;
             anxieActual.IdProject = entidadStorie.Project.IdProject;
@@ -820,7 +830,6 @@
         }
     }
 
-
     private async Task EliminarEntidad(int opcion, int id)
     {
         try
@@ -897,6 +906,63 @@
         try
         {
             NavigationManager.NavigateTo($"proyect/interview/{entidadStorie.Project.IdProject}/{userrol}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void AgruparHistorias(string id)
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecsagrupar/{id}/{userrol}");
+        }
+        catch (Exception ex)
+        {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+    }
+
+    private void MostrarMatriz(string id)
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecsmatriz/{id}/{userrol}");
+        }
+        catch (Exception ex)
+        {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+    }
+
+    private async Task GuardarEntidad()
+    {
+        try
+        {
+            await repostorie.UpdateAsync(entidadActual);
+
+            entidadStorie = (Stories)await repostorie.GetByIdAsync(int.Parse(idStorie));
+
+            entidadActual = new CreateStorie
+            {
+                IdStorie = entidadStorie.IdStorie,
+                IdProject = entidadStorie.Project.IdProject,
+                IdInter = entidadStorie.IdInter.IdInter,
+                TitleStorie = entidadStorie.TitleStorie,
+                ContextStorie = entidadStorie.ContextStorie,
+                ObservacionStorie = entidadStorie.ObservacionStorie,
+                CreatedDate = entidadStorie.CreatedDate,
+                CreatedUser = entidadStorie.CreatedUser,
+                UpdatedDate = DateTime.Now,
+                UpdatedUser = username
+            };
+
+            mensajeAlerta = "Historia guardada exitosamente.";
+            mostrarAlerta = true;
         }
         catch (Exception ex)
         {
