@@ -38,112 +38,130 @@
     </div>
 </div>
 
-<div class="row align-content-center">
-    <div class="col-lg-4">
-        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1">
-            <h5>Historias - Pushes</h5>
-            @foreach (var item in List1)
-            {
-                <div class="draggable-item" draggable="true"
-                        @ondragstart="() => HandleDragStart(item, null)"
-                        @ondragend="HandleDragEnd">
-                    @item.Name
-                </div>
-            }
-        </div>
-    </div>
-    <div class="col-lg-8">
-        <div class="row">
-            @foreach (var group in grupospush)
-            {
-                <div class="col-lg-6">
-                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width:100%;"
-                         ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
-                        <div>
-                            @group.GroupName&nbsp;&nbsp;&nbsp;
-                            @if (group.GroupName != "Leftovers")
-                            {
-                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                }
-                            }
-                        </div>
-                        <br />
-                        @foreach (var item in List2)
-                        {
-                            if (group.IdGroup == item.IdGroup)
-                            {
-                                <div class="draggable-item" draggable="true"
-                                        @ondragstart="() => HandleDragStart(item, group.IdGroup)"
-                                        @ondragend="HandleDragEnd">
-                                    @item.Name
-                                </div>
-                            }
-                        }
-                    </div>
-                </div>
-            }
-        </div>                
-    </div>
-</div>
-<br />
-<br />
-<div class="row align-content-center">
-    <div class="col-lg-4">
-        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3">
-            <h5>Historias - Pulls</h5>
-            @foreach (var item in List3)
-            {
-                <div class="draggable-item" draggable="true"
-                     @ondragstart="() => HandleDragStart2(item, null)"
-                     @ondragend="HandleDragEnd2">
-                    @item.Name
-                </div>
-            }
-        </div>
-    </div>
-    <div class="col-lg-8">
-        <div class="row">
-            @foreach (var group in grupospull)
-            {
-                <div class="col-lg-6">
-                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width:100%;" 
-                         ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
-                        <div>
-                            @group.GroupName&nbsp;&nbsp;&nbsp;
-                            @if (group.GroupName != "Leftovers")
-                            {
-                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                }
-                            }
-                        </div>
-                        <br />
 
-                        @foreach (var item in List4)
-                        {
-                            if (group.IdGroup == item.IdGroup)
-                            {
-                                <div class="draggable-item" draggable="true"
-                                     @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
-                                     @ondragend="HandleDragEnd2">
-                                    @item.Name
-                                </div>
-                            }
-                        }
-                    </div>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="push-tab" data-bs-toggle="tab" data-bs-target="#push" type="button" role="tab" aria-controls="push" aria-selected="true">Historias - Pushes</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pull-tab" data-bs-toggle="tab" data-bs-target="#pull" type="button" role="tab" aria-controls="pull" aria-selected="false">Historias - Pulls</button>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="push" role="tabpanel" aria-labelledby="push-tab">
+        <div class="row align-content-center">
+            <div class="col-lg-4">
+                <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1">
+                    <h5>Historias - Pushes</h5>
+                    @foreach (var item in List1)
+                    {
+                        <div class="draggable-item" draggable="true"
+                             @ondragstart="() => HandleDragStart(item, null)"
+                             @ondragend="HandleDragEnd">
+                            @item.Name
+                        </div>
+                    }
                 </div>
-            }
+            </div>
+            <div class="col-lg-8">
+                <div class="row">
+                    @foreach (var group in grupospush)
+                    {
+                        <div class="col-lg-6">
+                            <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width:100%;"
+                                 ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
+                                <div>
+                                    @group.GroupName&nbsp;&nbsp;&nbsp;
+                                    @if (group.GroupName != "Leftovers")
+                                    {
+                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                        {
+                                            <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        }
+                                    }
+                                </div>
+                                <br />
+                                @foreach (var item in List2)
+                                {
+                                    if (group.IdGroup == item.IdGroup)
+                                    {
+                                        <div class="draggable-item" draggable="true"
+                                             @ondragstart="() => HandleDragStart(item, group.IdGroup)"
+                                             @ondragend="HandleDragEnd">
+                                            @item.Name
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
-        
+        <br />
+    </div>
+    <div class="tab-pane fade" id="pull" role="tabpanel" aria-labelledby="pull-tab">
+        <div class="row align-content-center">
+            <div class="col-lg-4">
+                <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3">
+                    <h5>Historias - Pulls</h5>
+                    @foreach (var item in List3)
+                    {
+                        <div class="draggable-item" draggable="true"
+                             @ondragstart="() => HandleDragStart2(item, null)"
+                             @ondragend="HandleDragEnd2">
+                            @item.Name
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="row">
+                    @foreach (var group in grupospull)
+                    {
+                        <div class="col-lg-6">
+                            <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width:100%;"
+                                 ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
+                                <div>
+                                    @group.GroupName&nbsp;&nbsp;&nbsp;
+                                    @if (group.GroupName != "Leftovers")
+                                    {
+                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                        {
+                                            <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        }
+                                    }
+                                </div>
+                                <br />
+
+                                @foreach (var item in List4)
+                                {
+                                    if (group.IdGroup == item.IdGroup)
+                                    {
+                                        <div class="draggable-item" draggable="true"
+                                             @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
+                                             @ondragend="HandleDragEnd2">
+                                            @item.Name
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+        <br />
     </div>
 </div>
+
+
+
 
 @if (mostrarFormulario)
 {
@@ -402,7 +420,7 @@
 
     private async Task HandleDropList1(DragEventArgs e)
     {
-        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+        if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             if (_draggedItem != null && _sourceList != List1)
             {
@@ -417,7 +435,7 @@
 
     private async Task HandleDropList2(int? idGroup, DragEventArgs e)
     {
-        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+        if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             {
                 if (idGroup != null)
@@ -433,7 +451,7 @@
 
     private void HandleDragStart2(Item item, int? idGroup)
     {
-        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+        if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             if (idGroup != null)
                 item.IdGroup = idGroup;
@@ -456,7 +474,7 @@
 
     private async Task HandleDropList3(DragEventArgs e)
     {
-        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+        if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
             if (_draggedItem1 != null && _sourceList1 != List3)
             {
@@ -471,18 +489,15 @@
 
     private async Task HandleDropList4(int? idGroup, DragEventArgs e)
     {
-        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+        if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
         {
-            if (_draggedItem1 != null && _sourceList1 != List4)
-            {
-                if (idGroup != null)
-                    _draggedItem1.IdGroup = idGroup;
+            if (idGroup != null)
+                _draggedItem1.IdGroup = idGroup;
 
-                _sourceList1.Remove(_draggedItem1);
-                List4.Add(_draggedItem1);
-                await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, _draggedItem1.IdGroup);
-                StateHasChanged();
-            }
+            _sourceList1.Remove(_draggedItem1);
+            List4.Add(_draggedItem1);
+            await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, _draggedItem1.IdGroup);
+            StateHasChanged();
         }
     }
 
