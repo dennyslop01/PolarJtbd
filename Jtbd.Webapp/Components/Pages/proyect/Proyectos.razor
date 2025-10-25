@@ -63,7 +63,7 @@
                     @foreach (var (p, index) in proyectos.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td width="5%">@p.IdProject</td>
+                            <td width="5%">@index</td>
                             <td width="30%">@p.ProjectName</td>
                             <td width="15%">@p.ProjectDate</td>
                             <td width="10%">@p.Deparment.Name</td>
