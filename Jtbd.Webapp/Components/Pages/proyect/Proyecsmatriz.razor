@@ -39,7 +39,6 @@
             </div>
         }
 
-
         @if (grupospush is null && grupospull is null)
         {
             <div class="text-center">
@@ -62,7 +61,7 @@
                             {
                                 if (p.GroupName != "Leftovers")
                                 {
-                                    <th>Push</th>
+                                    <th style="vertical-align: middle;">Push</th>
                                 }
                             }
 
@@ -70,7 +69,7 @@
                             {
                                 if (p.GroupName != "Leftovers")
                                 {
-                                    <th>Pull</th>
+                                    <th style="vertical-align: middle;">Pull</th>
                                 }
                             }
                         </tr>
@@ -80,7 +79,7 @@
                             {
                                 if (p.GroupName != "Leftovers")
                                 {
-                                    <th>@p.GroupName</th>
+                                    <th style="vertical-align: middle;">@p.GroupName</th>
                                 }
                             }
 
@@ -88,7 +87,7 @@
                             {
                                 if (p.GroupName != "Leftovers")
                                 {
-                                    <th>@p.GroupName</th>
+                                    <th style="vertical-align: middle;">@p.GroupName</th>
                                 }
                             }
                         </tr>
@@ -232,16 +231,22 @@
                             <br />
                             <label class="form-label">@entidadValidar.Contexto</label>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label"><strong>Push</strong></label>
-                            <br />
-                            <label class="form-label">@entidadValidar.Pushes</label>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label"><strong>Pull</strong></label>
-                            <br />
-                            <label class="form-label">@entidadValidar.Pulls</label>
-                        </div>
+                        @if (!string.IsNullOrEmpty(entidadValidar.Pushes))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Push</strong></label>
+                                <br />
+                                <label class="form-label">@entidadValidar.Pushes</label>  
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(entidadValidar.Pulls))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Pull</strong></label>
+                                <br />
+                                <label class="form-label">@entidadValidar.Pulls</label>
+                            </div>
+                        }
                         <div class="mb-3">
                             <label class="form-label"><strong>Hábitos</strong></label>
                             <br />
@@ -348,14 +353,16 @@
             registros = new List<Tabla>();
             foreach (Stories item in stories)
             {
-                string pushs = string.Empty;
-                string pull = string.Empty;
                 string habit = string.Empty;
                 string anxie = string.Empty;
+
                 pushstorie = (List<StoriesPush>)await repository.GetPushesByStorieIdAsync(item.IdStorie);
                 pullstorie = (List<StoriesPull>)await repository.GetPullsByStorieIdAsync(item.IdStorie);
                 habitstorie = (List<StoriesHabbit>)await repository.GetHabitsByStorieIdAsync(item.IdStorie);
                 anxiestorie = (List<StoriesAnxiety>)await repository.GetAxieByStorieIdAsync(item.IdStorie);
+
+                string pushs = string.Empty;
+                string pull = string.Empty;
 
                 foreach (var p in pushstorie)
                 {
@@ -378,11 +385,24 @@
                 {
                     if (grp.GroupName != "Leftovers")
                     {
+                        // string pushs = string.Empty;
+                        // string pull = string.Empty;
                         int? valor = null;
-                        foreach (StoriesGroupsPushes push in storiespush.Where(x => x.Stories.IdStorie == item.IdStorie && x.Groups.IdGroup == grp.IdGroup))
+
+                        foreach (StoriesGroupsPushes val in storiespush.Where(x => x.Stories?.IdStorie == item.IdStorie && x.Groups?.IdGroup == grp.IdGroup))
                         {
-                            valor = push.ValorPush;
+                            valor = val.ValorPush;
                         }
+
+                        // foreach (StoriesPush p in pushstorie.Where(x => x.Stories?.IdStorie == item.IdStorie && x.Groups?.IdGroup == grp.IdGroup))
+                        // {
+                        //     pushs += $"{p.PushesGroups.PushName}, ";
+                        // }
+
+                        // foreach (StoriesPull p in pullstorie.Where(x => x.Stories?.IdStorie == item.IdStorie && x.Groups?.IdGroup == grp.IdGroup))
+                        // {
+                        //     pull += $"{p.PullGroups.PullName}, ";
+                        // }
 
                         Tabla tabla = new Tabla()
                         {
@@ -406,11 +426,24 @@
                 {
                     if (grp.GroupName != "Leftovers")
                     {
+                        // string pushs = string.Empty;
+                        // string pull = string.Empty;
                         int? valor = null;
-                        foreach (StoriesGroupsPulls push in storiespull.Where(x => x.Stories.IdStorie == item.IdStorie && x.Groups.IdGroup == grp.IdGroup))
+
+                        foreach (StoriesGroupsPulls push in storiespull.Where(x => x.Stories?.IdStorie == item.IdStorie && x.Groups?.IdGroup == grp.IdGroup))
                         {
                             valor = push.ValorPull;
                         }
+
+                        // foreach (StoriesPush p in pushstorie.Where(x => x.Stories?.IdStorie == item.IdStorie && x.Groups?.IdGroup == grp.IdGroup))
+                        // {
+                        //     pushs += $"{p.PushesGroups.PushName}, ";
+                        // }
+
+                        // foreach (StoriesPull p in pullstorie.Where(x => x.Stories?.IdStorie == item.IdStorie && x.Groups?.IdGroup == grp.IdGroup))
+                        // {
+                        //     pull += $"{p.PullGroups.PullName}, ";
+                        // }
 
                         Tabla tabla = new Tabla()
                         {
@@ -698,9 +731,9 @@
         catch (Exception ex)
         {
             Logger.LogError(ex.Message);
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-            mostrarFormulario2 = false;
+            // mensajeAlerta = ex.Message;
+            // mostrarAlerta = true;
+            // mostrarFormulario2 = false;
         }
     }
 }

@@ -86,7 +86,7 @@
                     @foreach (var group in grupospush)
                     {
                         <div class="col-lg-6">
-                            <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 30%; overflow: auto;"
+                            <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto; resize: none;"
                                  ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
                                 <div>
                                     @group.GroupName&nbsp;&nbsp;&nbsp;
@@ -158,7 +158,7 @@
                     @foreach (var group in grupospull)
                     {
                         <div class="col-lg-6">
-                            <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 30%; overflow: auto;"
+                            <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto;"
                                  ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
                                 <div>
                                     @group.GroupName&nbsp;&nbsp;&nbsp;

@@ -156,6 +156,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var pushstorie = await _context.StoriesPushes
                 .Include(x => x.Stories)
+                .Include(x => x.Groups)
                 .Include(x => x.PushesGroups)
                 .Where(x => x.Stories.IdStorie == id).AsNoTracking().ToListAsync();
 
@@ -166,6 +167,7 @@ namespace Jtbd.Infrastructure.Repositories
         {
             var pullstorie = await _context.StoriesPulls
                 .Include(x => x.Stories)
+                .Include(x => x.Groups)
                 .Include(x => x.PullGroups)
                 .Where(x => x.Stories.IdStorie == id).AsNoTracking().ToListAsync();
 
