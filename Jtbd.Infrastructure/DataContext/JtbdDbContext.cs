@@ -1,6 +1,5 @@
 ﻿using Jtbd.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace Jtbd.Infrastructure.DataContext
 {

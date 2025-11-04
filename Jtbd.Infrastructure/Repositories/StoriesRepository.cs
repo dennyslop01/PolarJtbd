@@ -1,18 +1,7 @@
 ﻿using Jtbd.Application.Interfaces;
 using Jtbd.Domain.Entities;
 using Jtbd.Infrastructure.DataContext;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Identity.Client.Extensions.Msal;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jtbd.Infrastructure.Repositories
 {
