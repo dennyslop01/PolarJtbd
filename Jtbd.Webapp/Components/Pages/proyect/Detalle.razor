@@ -23,9 +23,15 @@
             </div>
             <h3 class="text-start mt-4">Gestión de Historias Característica</h3>
                 <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-success me-3" @onclick="GuardarEntidad" title="Actualizar Historia">
-                    <i class="bi bi-save"></i>
-                </button>
+                @if (entidadStorie.Project?.StatusProject == 1)
+                {
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-success me-3" @onclick="GuardarEntidad" title="Actualizar Historia">
+                            <i class="bi bi-save"></i>
+                        </button>
+                    }
+                }
                 <button class="btn btn-secondary me-3" @onclick="() => AgruparHistorias(entidadStorie.Project.IdProject.ToString())" title="Agrupar Historias">
                     <i class="bi bi-ui-checks"></i>
                 </button>
@@ -60,11 +66,14 @@
                 <label><strong>Pushes</strong></label>
             </div>
             <div class="col-lg-1 justify-content-end">
-                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                @if (entidadStorie.Project?.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Pushes" @onclick="MostrarPushes">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -97,14 +106,17 @@
                             <td width="10%">@index</td>
                             <td width="65%">@p.PushesGroups.PushName</td>
                             <td width="25%" class="justify-content-end">
-                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                @if (entidadStorie.Project?.StatusProject == 1)
                                 {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
-                                        <i class="bi bi-pencil"></i> 
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" >
-                                        <i class="bi bi-trash"></i> 
-                                    </button>
+                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                    {
+                                        <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
+                                            <i class="bi bi-pencil"></i> 
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" >
+                                            <i class="bi bi-trash"></i> 
+                                        </button>
+                                    }
                                 }
                             </td>
                         </tr>
@@ -119,11 +131,14 @@
                 <label><strong>Pulls</strong></label>
             </div>
             <div class="col-lg-1 align-content-end">
-                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                @if (entidadStorie.Project?.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Pulls" @onclick="MostrarPulls">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -157,14 +172,17 @@
                             <td width="10%">@index</td>
                             <td width="65%">@p.PullGroups.PullName</td>
                             <td width="25%" class="justify-content-end">
-                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                @if (entidadStorie.Project?.StatusProject == 1)
                                 {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" >
-                                        <i class="bi bi-trash"></i> 
-                                    </button>
+                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                    {
+                                        <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" >
+                                            <i class="bi bi-trash"></i> 
+                                        </button>
+                                    }
                                 }
                             </td>
                         </tr>
@@ -184,11 +202,14 @@
                 <label><strong>Hábitos</strong></label>
             </div>
             <div class="col-lg-1 align-content-end">
-                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                @if (entidadStorie.Project?.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Hábitos" @onclick="MostrarHabits">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -222,14 +243,17 @@
                             <td width="10%">@index</td>
                             <td width="65%">@p.Habits.HabitName</td>
                             <td width="25%" class="justify-content-end">
-                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                @if (entidadStorie.Project?.StatusProject == 1)
                                 {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" >
-                                        <i class="bi bi-trash"></i> 
-                                    </button>
+                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                    {
+                                        <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" >
+                                            <i class="bi bi-trash"></i> 
+                                        </button>
+                                    }
                                 }
                             </td>
                         </tr>
@@ -244,11 +268,14 @@
                 <label><strong>Ansiedades</strong></label>
             </div>
             <div class="col-lg-1 align-content-end">
-                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                @if (entidadStorie.Project?.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="MostrarAnxies">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -282,14 +309,17 @@
                             <td width="10%">@index</td>
                             <td width="65%">@p.Anxieties.AnxieName</td>
                             <td width="25%" class="justify-content-end">
-                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                @if (entidadStorie.Project?.StatusProject == 1)
                                 {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" >
-                                        <i class="bi bi-trash"></i> 
-                                    </button>
+                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                    {
+                                        <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" >
+                                            <i class="bi bi-trash"></i> 
+                                        </button>
+                                    }
                                 }
                             </td>
                         </tr>

@@ -22,6 +22,7 @@
     <Content Remove="Components\Pages\proyect\Proyecpushes.razor" />
     <Content Remove="Components\Pages\proyect\Proyecsagrupar2.razor" />
     <Content Remove="Components\Pages\proyect\Proyecsgroups.razor" />
+    <Content Remove="Components\Pages\proyect\Proyecsvalidar.razor" />
     <Content Remove="Components\PruebaDrag.razor" />
   </ItemGroup>
 

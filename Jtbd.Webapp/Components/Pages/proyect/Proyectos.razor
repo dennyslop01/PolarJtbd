@@ -42,7 +42,57 @@
         }
         else
         {
-            <table id="myTable" class="table nowrap dt-responsive align-middle table-hover table-bordered" style="width:100%">
+            <PaginationComponentEdit TItem="Projects" Items="proyectos" DefaultPageSize="10">
+                <ChildContentHeader>
+                    <tr>
+                        <th width="5%">#</th>
+                        <th width="30%">Nombre</th>
+                        <th width="15%">Fecha</th>
+                        <th width="10%">Departamento</th>
+                        <th width="10%">Categoría</th>
+                        <th width="30%"> </th>
+                    </tr>
+                </ChildContentHeader>
+                <ChildContentRow Context="p">
+                    <tr>
+                        <td width="5%">@BuscarIndex(p.IdProject)</td>
+                        <td width="30%">@p.ProjectName</td>
+                        <td width="15%">@p.ProjectDate</td>
+                        <td width="10%">@p.Deparment.Name</td>
+                        <td width="10%">@p.Categories.Name</td>
+                        <td width="30%" class="justify-content-end mb-1">
+                            @if (p.StatusProject == 1)
+                            {
+                                @if (UserRol > 0 && UserRol < 3)
+                                {
+                                    <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                }
+                            }
+                            <button class="btn btn-secondary btn-sm me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
+                                <i class="bi bi-person-add"></i>
+                            </button>
+                            <button class="btn btn-secondary btn-sm me-1" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
+                                <i class="bi bi-ui-checks"></i>
+                            </button>
+                            <button class="btn btn-secondary btn-sm me-1" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
+                                <i class="bi bi-kanban"></i>
+                            </button>
+                            @if (p.StatusProject == 1)
+                            {
+                                @if (UserRol > 0 && UserRol < 3)
+                                {
+                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                </ChildContentRow>
+            </PaginationComponentEdit>
+            @* <table id="myTable" class="table nowrap dt-responsive align-middle table-hover table-bordered" style="width:100%">
                 <thead class="table-secondary bg-opacity-25">
                     <tr>
                         <th width="5%">#</th>
@@ -50,7 +100,6 @@
                         <th width="15%">Fecha</th>
                         <th width="10%">Departamento</th>
                         <th width="10%">Categoría</th>
-                        @* <th>Estatus</th> *@
                         <th width="30%"> </th>
                     </tr>
                 </thead>
@@ -64,11 +113,14 @@
                             <td width="10%">@p.Deparment.Name</td>
                             <td width="10%">@p.Categories.Name</td>
                             <td width="30%" class="justify-content-end mb-1">
-                                @if (UserRol > 0 && UserRol < 3)
+                                @if (p.StatusProject == 1)
                                 {
-                                    <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
-                                        <i class="bi bi-pencil"></i> 
-                                    </button>
+                                    @if (UserRol > 0 && UserRol < 3)
+                                    {
+                                        <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
+                                            <i class="bi bi-pencil"></i> 
+                                        </button>
+                                    }
                                 }
                                 <button class="btn btn-secondary btn-sm me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
                                     <i class="bi bi-person-add"></i> 
@@ -79,17 +131,20 @@
                                 <button class="btn btn-secondary btn-sm me-1" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
                                     <i class="bi bi-kanban"></i>
                                 </button>
-                                @if (UserRol > 0 && UserRol < 3)
+                                @if (p.StatusProject == 1)
                                 {
-                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                    @if (UserRol > 0 && UserRol < 3)
+                                    {
+                                        <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
                                 }
                             </td>
                         </tr>
                     }
                 </tbody>
-            </table>
+            </table> *@
         }
     </div>
 </div>
@@ -174,6 +229,7 @@
     private int UserRol = 5;
     private string usernamelargo = string.Empty;
     private int UserDepart = 0;
+    private int index1 = 1;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IProjects repository { get; set; } = null!;
@@ -235,6 +291,20 @@
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
         }
+    }
+
+    private int BuscarIndex(int idProject)
+    {
+        index1 = 1;
+        foreach (var proyecto in proyectos)
+        {
+            if (proyecto.IdProject == idProject)
+            {
+                return index1;
+            }
+            index1++;
+        }
+        return index1;
     }
 
     private void MostrarFormulario()

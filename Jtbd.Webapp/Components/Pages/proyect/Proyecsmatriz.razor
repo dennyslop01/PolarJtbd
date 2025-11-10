@@ -661,41 +661,44 @@
             int index = registros.FindIndex(x => x.IdStorie == idstorie && x.IdGroup == idgroup);
             indexGral = index;
 
-            if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+            if (proyecto.StatusProject == 1)
             {
-                if (index <= registros.Count)
-                    indexGral = index;
-
-                Tabla? tabla = registros.Where(x => x.IdStorie == idstorie && x.IdGroup == idgroup).FirstOrDefault();
-                if (tabla != null)
+                if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                 {
-                    int valor = -1;
-                    switch (tabla.Valor)
-                    {
-                        case "Si":
-                            valor = 1;
-                            break;
-                        case "No":
-                            valor = 2;
-                            break;
-                    }
+                    if (index <= registros.Count)
+                        indexGral = index;
 
-                    entidadValidar = new Tabla
+                    Tabla? tabla = registros.Where(x => x.IdStorie == idstorie && x.IdGroup == idgroup).FirstOrDefault();
+                    if (tabla != null)
                     {
-                        IdStorie = tabla.IdStorie,
-                        Tipo = tabla.Tipo,
-                        Nombre = tabla.Nombre,
-                        Contexto = tabla.Contexto,
-                        IdGroup = tabla.IdGroup,
-                        Pushes = tabla.Pushes,
-                        Pulls = tabla.Pulls,
-                        Habits = tabla.Habits,
-                        Anxieties = tabla.Anxieties,
-                        Grupos = tabla.Grupos,
-                        ValorSeleccionado = valor,
-                        Valor = tabla.Valor
-                    };
-                    mostrarFormulario2 = true;
+                        int valor = -1;
+                        switch (tabla.Valor)
+                        {
+                            case "Si":
+                                valor = 1;
+                                break;
+                            case "No":
+                                valor = 2;
+                                break;
+                        }
+
+                        entidadValidar = new Tabla
+                            {
+                                IdStorie = tabla.IdStorie,
+                                Tipo = tabla.Tipo,
+                                Nombre = tabla.Nombre,
+                                Contexto = tabla.Contexto,
+                                IdGroup = tabla.IdGroup,
+                                Pushes = tabla.Pushes,
+                                Pulls = tabla.Pulls,
+                                Habits = tabla.Habits,
+                                Anxieties = tabla.Anxieties,
+                                Grupos = tabla.Grupos,
+                                ValorSeleccionado = valor,
+                                Valor = tabla.Valor
+                            };
+                        mostrarFormulario2 = true;
+                    }
                 }
             }
         }

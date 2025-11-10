@@ -16,13 +16,16 @@
         <h3 class="text-start mt-4">Gestión de Entrevistados</h3>
         
             <div class="d-flex justify-content-end mb-3">
-                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary me-3" title="Agregar Entrevistado" @onclick="MostrarFormulario">
-                    <i class="bi bi-plus-lg"></i> 
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary me-3" title="Agregar Entrevistado" @onclick="MostrarFormulario">
+                            <i class="bi bi-plus-lg"></i> 
+                        </button>
+                    }
                 }
-                <button class="btn btn-secondary me-3" @onclick="() => AgruparHistorias(IdProyecto)" title="Agrupar Historias">
+            <button class="btn btn-secondary me-3" @onclick="() => AgruparHistorias(IdProyecto)" title="Agrupar Historias">
                     <i class="bi bi-ui-checks"></i>
                 </button>
                 <button class="btn btn-secondary me-3" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
@@ -87,20 +90,26 @@
                             <td width="10%">@p.InterNSE</td>
                             <td width="10%">@p.DateInter</td>
                             <td width="20%" class="justify-content-end">
-                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
-                                        <i class="bi bi-pencil"></i> 
-                                    </button>
+                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                    {
+                                        <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
+                                            <i class="bi bi-pencil"></i> 
+                                        </button>
+                                    }
                                 }
                                 <button class="btn btn-secondary btn-sm me-1" title="Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
                                     <i class="bi bi-list-columns-reverse"></i>
                                 </button>
-                                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                    {
+                                        <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
                                 }
                             </td>
                         </tr>
