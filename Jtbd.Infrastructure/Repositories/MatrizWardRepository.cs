@@ -1,42 +1,55 @@
 ﻿using Jtbd.Application.Interfaces;
+using Jtbd.Domain.Entities;
 using Jtbd.Domain.ViewModel;
+using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Services;
 
 namespace Jtbd.Infrastructure.Repositories
 {
-    public class MatrizWardRepository : IMatrizWard
+    public class MatrizWardRepository(JtbdDbContext context) : IMatrizWard
     {
+        private readonly JtbdDbContext _context = context;
+
         public async Task<List<FinalClusterGroup>> GetMatrizWardAsync(int proyectId, int numberOfClusters)
         {
             // ===================================================================
             // PASO 1: DATOS DE ENTRADA (Matriz del proyecto)
             // ===================================================================
-            int[] storyIds = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            string[] storyNames = { "H1 (Ana)", "H2 (Carlos)", "H3 (Sofía)", "H4 (Pedro)", "H5 (Laura)", "H6 (Marcos)", "H7 (Isabel)", "H8 (Javier)", "H9 (David)", "H10 (Camila)" };
-            int[,] matrix = new int[20, 10]
+            IStories repository = new StoriesRepository(_context);
+
+            List<Stories> stories = (List<Stories>)await repository.GetByProjectIdAsync(proyectId);
+            List<StoriesGroupsPushes> storiespush = (List<StoriesGroupsPushes>)await repository.GetStorieGroupPushesByProjectIdAsync(proyectId);
+            List<StoriesGroupsPulls> storiespull = (List<StoriesGroupsPulls>)await repository.GetStorieGroupPullsByProjectIdAsync(proyectId);
+
+            //int[] storyIds = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            int[] storyIds = stories.OrderBy(x=> x.IdStorie).Select(x => x.IdStorie).ToArray();
+
+            //string[] storyNames = { "H1 (Ana)", "H2 (Carlos)", "H3 (Sofía)", "H4 (Pedro)", "H5 (Laura)", "H6 (Marcos)", "H7 (Isabel)", "H8 (Javier)", "H9 (David)", "H10 (Camila)" };
+            string[] storyNames = stories.OrderBy(x => x.IdStorie).Select(x => x.TitleStorie + " - " + x.IdInter.InterName).ToArray();
+
+            int x = storiespush.DistinctBy(x => x.Groups.IdGroup).Count() + storiespull.DistinctBy(x => x.Groups.IdGroup).Count();
+            int y = storyIds.Length;
+
+            int[,] matrix = new int[x, y];
+
+            // Llenar la matriz con datos reales del proyecto
+            int i = 0;
+            int j = 0;
+            foreach (Stories st in stories.OrderBy(x => x.IdStorie))
             {
-                // H1 H2 H3 H4 H5 H6 H7 H8 H9 H10   <-- Historias
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Push G1: Tiempo
-                {0, 1, 0, 0, 0, 0, 1, 0, 0, 0}, // Push G2: Emoción
-                {0, 0, 1, 0, 0, 0, 0, 1, 0, 0}, // Push G3: Salud
-                {0, 0, 0, 1, 1, 0, 0, 0, 0, 0}, // Push G4: Presupuesto
-                {0, 0, 0, 0, 0, 0, 1, 0, 0, 0}, // Push G5: Facilidad
-                {0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, // Push G6: 'Picky Eaters'
-                {0, 0, 0, 0, 0, 0, 0, 1, 0, 0}, // Push G7: Energía
-                {0, 0, 0, 0, 0, 1, 0, 0, 0, 0}, // Push G8: Impresionar
-                {0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, // Push G9: Escasez
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, // Push G10: Costo Negocio
-                {1, 0, 0, 1, 0, 0, 0, 0, 1, 0}, // Pull G1: Confianza
-                {0, 1, 0, 0, 0, 0, 1, 0, 0, 0}, // Pull G2: Identidad
-                {0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, // Pull G3: Versatilidad
-                {0, 0, 0, 1, 1, 0, 0, 0, 0, 1}, // Pull G4: Rendimiento
-                {0, 0, 1, 0, 0, 0, 0, 1, 0, 0}, // Pull G5: Nutrición
-                {1, 1, 0, 1, 1, 1, 1, 1, 1, 1}, // Pull G6: Sabor
-                {0, 0, 0, 1, 0, 1, 0, 0, 0, 1}, // Pull G7: Socialización
-                {0, 1, 1, 0, 0, 1, 0, 1, 0, 0}, // Pull G8: Logro
-                {0, 0, 0, 0, 1, 0, 1, 0, 0, 1}, // Pull G9: Básico
-                {0, 0, 0, 0, 0, 1, 0, 0, 0, 0}  // Pull G10: Gourmet
-            };
+                foreach(StoriesGroupsPushes gp in storiespush.Where(x => x.Stories.IdStorie == st.IdStorie).OrderBy(x => x.Groups.IdGroup).ToList())
+                {
+                    matrix[i, j] = gp.ValorPush;
+                    j++;
+                }
+
+                foreach (StoriesGroupsPulls gp in storiespull.Where(x => x.Stories.IdStorie == st.IdStorie).OrderBy(x => x.Groups.IdGroup).ToList())
+                {
+                    matrix[i, j] = gp.ValorPull;
+                    j++;
+                }
+                i++;
+            }
 
             // ===================================================================
             // PASO 2: EJECUCIÓN DEL ALGORITMO NATIVO

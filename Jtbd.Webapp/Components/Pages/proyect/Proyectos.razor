@@ -1,11 +1,6 @@
 ﻿@page "/proyect/proyectos"
 
 @rendermode InteractiveServer
-@using Jtbd.Application.Interfaces
-@using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Service
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.Extensions.Logging
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyectos> Logger
@@ -47,7 +42,7 @@
         }
         else
         {
-            <table class="table table-striped table-hover">
+            <table id="myTable" class="table nowrap dt-responsive align-middle table-hover table-bordered" style="width:100%">
                 <thead class="table-secondary bg-opacity-25">
                     <tr>
                         <th width="5%">#</th>
@@ -185,6 +180,14 @@
     [Inject] private IDeparments repodepart { get; set; } = null!;
     [Inject] private ICategories repocategoria { get; set; } = null!;
     [Inject] private IEmployee repouser { get; set; } = null!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeDataTables", "myTable");
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

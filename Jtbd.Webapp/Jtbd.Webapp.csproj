@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Components\Pages\Counter.razor" />
     <Content Remove="Components\Pages\proyect\ForceGroupingInterface.razor" />
     <Content Remove="Components\Pages\proyect\Proyecanxiets.razor" />
     <Content Remove="Components\Pages\proyect\Proyechabits.razor" />
@@ -21,6 +22,7 @@
     <Content Remove="Components\Pages\proyect\Proyecpushes.razor" />
     <Content Remove="Components\Pages\proyect\Proyecsagrupar2.razor" />
     <Content Remove="Components\Pages\proyect\Proyecsgroups.razor" />
+    <Content Remove="Components\PruebaDrag.razor" />
   </ItemGroup>
 
   <ItemGroup>
