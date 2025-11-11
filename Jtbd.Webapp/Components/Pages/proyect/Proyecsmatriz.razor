@@ -4,28 +4,42 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
-@inject AuthenticationStateProvider authenticationStateProvider
 
 
 <PageTitle>Historias</PageTitle>
 <div class="row align-content-center">
     <div class="col-lg-11">
-        <div class="col-lg-11">
+        <div class="col-lg-12">
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
                 @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
             </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <h3 class="text-start mt-4">Matriz de Historias y Grupos</h3>
             <div class="col-lg-12">
-                <h3 class="text-start mt-4">Gestión de proyectos</h3>
-                <div class="d-flex justify-content-end mb-3">
-                    <button class="btn btn-primary" @onclick="MostrarFormulario" title="Descargar CSV">
+                <div class="d-flex justify-content-end mb-1">
+                    <button class="btn btn-primary m-1" @onclick="MostrarFormulario" title="Descargar CSV">
                         <i class="bi bi-filetype-csv"></i>
                     </button>
+
+                    @if(verClusters)
+                    {
+                        <button class="btn btn-primary m-1" @onclick="VerClusteres" title="Ver Clústeres">
+                            <i class="bi bi-eye-fill"></i> Ver Clústeres
+                        </button>
+                    }
+                    @if (proyecto.StatusProject == 1)
+                    {
+                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                        {
+                            <button class="btn btn-primary m-1" @onclick="GenerarClusteres" title="Generar Clústeres">
+                                <i class="bi bi-plus-lg"></i> Generar Clústeres
+                            </button>
+                        }
+                    }
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-10">
+    <div class="col-lg-11">
         @if (mostrarAlerta)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -280,6 +294,67 @@
     </div>
 }
 
+@if (mostrarFormulario3)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generar Clústeres</h5>
+                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                </div>
+                <div class="modal-body">
+                    @if(existClusters)
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            Ya existen clústeres generados para este proyecto. ¿Desea reemplazarlos?
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary me-2" @onclick="ValidarPregunta">
+                                <i class="bi bi-times"></i> Generar
+                            </button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                <i class="bi bi-times"></i> Cancelar
+                            </button>
+                        </div>
+                    }
+
+                    @if (validarClusters)
+                    {
+                        <EditForm Model="entidadCluster" OnValidSubmit="IniciarClusteres">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label class="form-label">Número de Clústeres:</label>
+                                <InputSelect class="form-select" @bind-Value="entidadCluster.NroCluster">
+                                    <option value="-1">-- Seleccione uno --</option>
+                                    @for(int i = 2; i <= 9; i++)
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => entidadCluster.NroCluster)" />
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-success me-2">
+                                    <i class="bi bi-save"></i> Generar
+                                </button>
+                                <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                    <i class="bi bi-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
 @code {
     [Parameter]
     public string IdProyecto { get; set; }
@@ -300,12 +375,20 @@
     private Tabla entidadValidar = new();
     private Projects proyecto = new();
     private MatrizCSV entidadActual = new();
+    private GenerarCluster entidadCluster = new();
 
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private bool mostrarFormulario = false;
     private bool mostrarFormulario2 = false;
+    private bool mostrarFormulario3 = false;
     private int indexGral = 0;
+
+    private bool existClusters = false;
+    private bool replaceClusters = false;
+    private bool validarClusters = false;
+    private bool verClusters = false;
+    private bool generarClusters = false;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IStories repository { get; set; } = null!;
@@ -316,6 +399,7 @@
     [Inject] private IPullGroups repopull { get; set; } = null!;
     [Inject] private IHabits repohabi { get; set; } = null!;
     [Inject] private IAnxieties repoanxie { get; set; } = null!;
+    [Inject] private IMatrizWard repomatrix { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -458,6 +542,14 @@
                     }
                 }
             }
+        
+            verClusters = false;
+
+            List<StoriesClusters> clusteres = await repomatrix.GetStoriesClustersAsync(int.Parse(IdProyecto));
+            if (clusteres.Count > 0)
+            {
+                verClusters = true;
+            }
         }
         catch (Exception ex)
         {
@@ -525,6 +617,7 @@
     {
         mostrarFormulario = false;
         mostrarFormulario2 = false;
+        mostrarFormulario3 = false;
     }
 
     private async Task ExportarCsv(string separador)
@@ -732,6 +825,85 @@
             // mensajeAlerta = ex.Message;
             // mostrarAlerta = true;
             // mostrarFormulario2 = false;
+        }
+    }
+
+    private async Task GenerarClusteres()
+    {
+        mostrarFormulario3 = false;
+        replaceClusters = false;
+        validarClusters = false;
+
+        try
+        {
+            List<StoriesClusters> clusteres = await repomatrix.GetStoriesClustersAsync(int.Parse(IdProyecto));
+            if(clusteres.Count > 0)
+            {
+                existClusters = true;
+            }
+            else
+            {
+                existClusters = false;
+                validarClusters = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+        mostrarFormulario3 = true;
+    }
+
+    private void ValidarPregunta()
+    {
+        mostrarFormulario3 = false;
+        replaceClusters = true;
+        existClusters = false;
+        validarClusters = true;
+        try
+        {
+            entidadCluster = new GenerarCluster();
+            entidadCluster.NroCluster = -1;
+            mostrarFormulario3 = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private async Task IniciarClusteres()
+    {
+        try
+        {
+            mostrarFormulario3 = false;
+            generarClusters = false;
+            await repomatrix.GetMatrizWardAsync(int.Parse(IdProyecto), entidadCluster.NroCluster);
+            mensajeAlerta = "Clústeres generados exitosamente.";
+            mostrarAlerta = true;
+
+            mostrarFormulario3 = false;
+            await Task.Delay(2000);
+
+            NavigationManager.NavigateTo($"proyect/proyecscluster/{IdProyecto}/{userrol}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+    }
+
+    private void VerClusteres()
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecscluster/{IdProyecto}/{userrol}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 }

@@ -8,6 +8,12 @@ namespace Jtbd.Domain.Entities
         public int TipoSeparador { get; set; }
     }
 
+    public class GenerarCluster()
+    {
+        [Range(2, 10, ErrorMessage = "El número de clústeres es obligatorio.")]
+        public int NroCluster { get; set; }
+    }
+
     public class Tabla()
     {
         public int IdStorie { get; set; }

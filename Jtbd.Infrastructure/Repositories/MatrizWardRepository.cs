@@ -3,6 +3,7 @@ using Jtbd.Domain.Entities;
 using Jtbd.Domain.ViewModel;
 using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Jtbd.Infrastructure.Repositories
 {
@@ -12,6 +13,8 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<List<FinalClusterGroup>> GetMatrizWardAsync(int proyectId, int numberOfClusters)
         {
+            await DeleteStorieClustereAsync(proyectId);
+
             // ===================================================================
             // PASO 1: DATOS DE ENTRADA (Matriz del proyecto)
             // ===================================================================
@@ -35,19 +38,26 @@ namespace Jtbd.Infrastructure.Repositories
             // Llenar la matriz con datos reales del proyecto
             int i = 0;
             int j = 0;
-            foreach (Stories st in stories.OrderBy(x => x.IdStorie))
+
+            foreach (StoriesGroupsPushes grp in storiespush.DistinctBy(x => x.Groups.IdGroup).OrderBy(x => x.Groups.IdGroup))
             {
-                foreach(StoriesGroupsPushes gp in storiespush.Where(x => x.Stories.IdStorie == st.IdStorie).OrderBy(x => x.Groups.IdGroup).ToList())
+                foreach (StoriesGroupsPushes gp in storiespush.Where(x => x.Groups.IdGroup == grp.Groups.IdGroup).OrderBy(x => x.Stories.IdStorie).ToList())
                 {
                     matrix[i, j] = gp.ValorPush;
                     j++;
                 }
+                j=0;
+                i++;
+            }
 
-                foreach (StoriesGroupsPulls gp in storiespull.Where(x => x.Stories.IdStorie == st.IdStorie).OrderBy(x => x.Groups.IdGroup).ToList())
+            foreach (StoriesGroupsPulls grp in storiespull.DistinctBy(x => x.Groups.IdGroup).OrderBy(x => x.Groups.IdGroup))
+            {
+                foreach (StoriesGroupsPulls gp in storiespull.Where(x => x.Groups.IdGroup == grp.Groups.IdGroup).OrderBy(x => x.Stories.IdStorie).ToList())
                 {
                     matrix[i, j] = gp.ValorPull;
                     j++;
                 }
+                j = 0;
                 i++;
             }
 
@@ -67,6 +77,15 @@ namespace Jtbd.Infrastructure.Repositories
 
             // 4. Mapear los IDs a nuestro DTO para el reporte.
             List<FinalClusterGroup> finalGroups = MapFinalReport(finalIds, storyNames, storyIds);
+
+
+            foreach (var group in finalGroups)
+            {
+                foreach (var storieId in group.StoryIds)
+                {
+                    await CreateStorieClustereAsync(proyectId, storieId, group.ClusterId);
+                }
+            }
 
             return finalGroups;
         }
@@ -109,6 +128,43 @@ namespace Jtbd.Infrastructure.Repositories
                 });
             }
             return finalGroups;
+        }
+
+        public async Task<List<StoriesClusters>> GetStoriesClustersAsync(int proyectId)
+        {
+            var clusteres = await _context.StoriesClusters
+                 .Include(x => x.Project)
+                 .Include(x => x.Stories)
+                 .Where(x => x.Project.IdProject == proyectId).AsQueryable().AsNoTracking().ToListAsync();
+            return clusteres!;
+        }
+
+        public async Task<bool> CreateStorieClustereAsync(int proyectId, int storieId, int clustereId)
+        {
+            var storie = _context.Stories.Where(x => x.IdStorie == storieId).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (storie == null)
+            {
+                throw new InvalidOperationException("La historia no existe.");
+            }
+
+            var push = _context.Projects.Where(x => x.IdProject == proyectId).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (push == null)
+            {
+                throw new InvalidOperationException("El proyecto no existe.");
+            }
+
+            var result = await _context.Database.ExecuteSqlAsync(
+                $"Insert into StoriesClusters (ProjectIdProject, StoriesIdStorie, IdCluster) Values( {proyectId}, {storieId}, {clustereId})");
+
+            return true;
+        }
+
+        public async Task<bool> DeleteStorieClustereAsync(int proyectId)
+        {
+            var result = await _context.Database.ExecuteSqlAsync(
+                $"Delete from StoriesClusters Where ProjectIdProject = {proyectId}");
+
+            return true;
         }
     }
 }
