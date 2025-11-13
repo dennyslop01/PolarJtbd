@@ -6,6 +6,14 @@
 
 @inherits LayoutComponentBase
 
+@if (cargando)
+{
+    <div class="modal-cargando">
+        <div class="spinner"></div>
+        <p>Cargando...</p>
+    </div>
+}
+
 @if (!string.IsNullOrEmpty(username))
 {
     <div class="page">
@@ -72,12 +80,14 @@ else
     private int userrol = 5;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private bool cargando = false;
 
     [Inject] private IEmployee repouser { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
+        cargando = true;
         try
         {
             var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -98,6 +108,7 @@ else
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
         }
+        cargando = false;
     }
 }
 
