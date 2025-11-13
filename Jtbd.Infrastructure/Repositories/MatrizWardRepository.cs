@@ -135,6 +135,7 @@ namespace Jtbd.Infrastructure.Repositories
             var clusteres = await _context.StoriesClusters
                  .Include(x => x.Project)
                  .Include(x => x.Stories)
+                 .Include(x => x.Stories.IdInter)
                  .Where(x => x.Project.IdProject == proyectId).AsQueryable().AsNoTracking().ToListAsync();
             return clusteres!;
         }

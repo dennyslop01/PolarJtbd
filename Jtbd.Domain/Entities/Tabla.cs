@@ -33,4 +33,13 @@ namespace Jtbd.Domain.Entities
         public string Valor { get; set; }
     }
 
+    public class TablaCluster()
+    {
+        public int IdCluster { get; set; }
+        public int IdGroup { get; set; }
+        public string? GroupName { get; set; }
+        public int IdStorie { get; set; }
+        public string? StorieName { get; set; }
+        public int? ValorGroup { get; set; }
+    }
 }

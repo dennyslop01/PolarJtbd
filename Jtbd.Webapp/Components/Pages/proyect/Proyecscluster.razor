@@ -20,16 +20,19 @@
                     {
                         @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                         {
-                            <button class="btn btn-primary m-1" @onclick="ImprimirClusteres" title="Imprimir Clústeres">
+                            <button class="btn btn-primary m-1" @onclick="MostrarFormulario" title="Imprimir Clústeres">
                                 <i class="bi bi-printer"></i>
                             </button>
                         }
                     }
+                    <button class="btn btn-secondary m-1" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
+                        <i class="bi bi-kanban"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-11">
+    <div class="col-lg-12">
         @if (mostrarAlerta)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -52,11 +55,96 @@
         else
         {
             <div class="row align-content-center">
-
+                @foreach (var clus in clusterTabla.DistinctBy(x => x.IdCluster).OrderBy(x => x.IdCluster))
+                {   
+                    <div class="col-lg-4">
+                        <h5 class="mt-4">Clúster @clus.IdCluster</h5>
+                        <table class="table table-striped table-hover">
+                            <thead class="table-secondary bg-opacity-25">
+                                <tr>
+                                    @if (clus.IdCluster == 1 || clus.IdCluster == 4 || clus.IdCluster == 7)
+                                    {
+                                        <th>&nbsp;&nbsp;</th>
+                                    }
+                                    
+                                    @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdStorie))
+                                    {
+                                        <th style="vertical-align: middle;">@p.StorieName</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdGroup))
+                                {
+                                    <tr>
+                                        @if (clus.IdCluster == 1 || clus.IdCluster == 4 || clus.IdCluster == 7)
+                                        {
+                                            <td>@p.GroupName</td>
+                                        }
+                                        
+                                        @foreach (var y in clusterTabla.Where(x => x.IdCluster == p.IdCluster && x.IdGroup == p.IdGroup).DistinctBy(x => x.IdStorie))
+                                        {
+                                            @if (p.ValorGroup == 1)
+                                            {
+                                                <td>
+                                                    <button type="button" class="btn btn-success" title="">1</button>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    <button type="button" class="btn btn-light" title="">0</button>
+                                                </td>
+                                            }
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
             </div>
             <br />
         }
     </div>
+
+    @if (mostrarFormulario)
+    {
+        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Generar CSV</h5>
+                        <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="entidadActual" OnValidSubmit="GuardarEntidad">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label class="form-label">Separador:</label>
+                                <InputSelect class="form-select" @bind-Value="entidadActual.TipoSeparador">
+                                    <option value="-1">-- Seleccione uno --</option>
+                                    <option value="1">Coma</option>
+                                    <option value="2">Punto y Coma</option>
+                                    @* <option value="3">Tabulador</option> *@
+                                </InputSelect>
+                                <ValidationMessage For="@(() => entidadActual.TipoSeparador)" />
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-success me-2">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                                <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                    <i class="bi bi-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 
@@ -67,13 +155,23 @@
     public string userrol { get; set; }
 
     private Projects proyecto = new();
-    private List<Projects> clusteres = new();
+    private List<StoriesClusters> clusteres = new();
+    private List<TablaCluster> clusterTabla = new();
+    private List<Groups> grupospush = new();
+    private List<Groups> grupospull = new();
+    private List<StoriesGroupsPulls> storiespull = new();
+    private List<StoriesGroupsPushes> storiespush = new();
+    private MatrizCSV entidadActual = new();
 
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private bool mostrarFormulario = false;
 
     [Inject] private IProjects repoproyect { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IMatrizWard repomatrix { get; set; } = null!;
+    [Inject] private IGroups repogroups { get; set; } = null!;
+    [Inject] private IStories repository { get; set; } = null!;
 
 
     protected override async Task OnInitializedAsync()
@@ -81,7 +179,72 @@
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
-            clusteres = (List<Projects>)await repoproyect.GetAllAsync();
+            clusteres = await repomatrix.GetStoriesClustersAsync(int.Parse(IdProyecto));
+
+            grupospush = (List<Groups>)await repogroups.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 0);
+            grupospull = (List<Groups>)await repogroups.GetByProjectIdIndicadorAsync(int.Parse(IdProyecto), 1);
+            storiespull = (List<StoriesGroupsPulls>)await repository.GetStorieGroupPullsByProjectIdAsync(int.Parse(IdProyecto));
+            storiespush = (List<StoriesGroupsPushes>)await repository.GetStorieGroupPushesByProjectIdAsync(int.Parse(IdProyecto));
+
+            if (clusteres.Count > 0)
+            {
+                clusterTabla = new List<TablaCluster>();
+                //foreach (var clus in clusteres.DistinctBy(x => x.IdCluster).OrderBy(x => x.IdCluster))
+                foreach (var clus in clusteres.OrderBy(x => x.IdCluster))
+                {
+                    foreach (Groups grp in grupospush)
+                    {
+                        if (grp.GroupName != "Leftovers")
+                        {
+                            int? valor = null;
+                            int idgroup = 0;
+                            int idstorie = 0;
+
+                            TablaCluster tablaaux = new TablaCluster();
+
+                            foreach (StoriesGroupsPushes val in storiespush.Where(x => x.Stories?.IdStorie == clus.Stories?.IdStorie && x.Groups?.IdGroup == grp.IdGroup))
+                            {
+                                valor = val.ValorPush;
+                                idgroup = val.Groups.IdGroup;
+                                idstorie = val.Stories.IdStorie;
+                            }
+                            tablaaux.IdCluster = clus.IdCluster;
+                            tablaaux.IdGroup = idgroup;
+                            tablaaux.IdStorie = idstorie;
+                            tablaaux.GroupName = grp.GroupName;
+                            tablaaux.StorieName = $"{clus.Stories?.IdInter?.InterName}/{clus.Stories?.TitleStorie}";
+                            tablaaux.ValorGroup = valor;
+                            clusterTabla.Add(tablaaux);
+                        }
+                    }
+
+                    foreach (Groups grp in grupospull)
+                    {
+                        if (grp.GroupName != "Leftovers")
+                        {
+                            int? valor = null;
+                            int idgroup = 0;
+                            int idstorie = 0;
+
+                            TablaCluster tablaaux = new TablaCluster();
+
+                            foreach (StoriesGroupsPulls val in storiespull.Where(x => x.Stories?.IdStorie == clus.Stories?.IdStorie && x.Groups?.IdGroup == grp.IdGroup))
+                            {
+                                valor = val.ValorPull;
+                                idgroup = val.Groups.IdGroup;
+                                idstorie = val.Stories.IdStorie;
+                            }
+                            tablaaux.IdCluster = clus.IdCluster;
+                            tablaaux.IdGroup = idgroup;
+                            tablaaux.IdStorie = idstorie;
+                            tablaaux.GroupName = grp.GroupName;
+                            tablaaux.StorieName = $"{clus.Stories?.IdInter?.InterName}/{clus.Stories?.TitleStorie}";
+                            tablaaux.ValorGroup = valor;
+                            clusterTabla.Add(tablaaux);
+                        }
+                    }
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -91,11 +254,114 @@
         }
     }
 
-    private void ImprimirClusteres()
+    private void MostrarFormulario()
     {
+        try
+        {
+            entidadActual = new MatrizCSV();
+            entidadActual.TipoSeparador = -1;
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
     }
 
-        private void Regresar2()
+    private async Task GuardarEntidad()
+    {
+        try
+        {
+            string separador = string.Empty;
+
+            switch (entidadActual.TipoSeparador)
+            {
+                case 1:
+                    separador = ",";
+                    break;
+                case 2:
+                    separador = ";";
+                    break;
+                case 3:
+                    separador = @"\t";
+                    break;
+            }
+
+            mostrarFormulario = false;
+            await ExportarCsv(separador);
+            mensajeAlerta = "Archivo generado exitosamente.";
+            mostrarAlerta = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task ExportarCsv(string separador)
+    {
+        try
+        {
+            var csvString = GenerarCsv(separador); // Implementa esta función para formatear los datos
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"clusteres-{proyecto.ProjectName}.csv", csvString);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+    }
+
+    private string GenerarCsv(string separador)
+    {
+        try
+        {
+            // Lógica para construir la cadena CSV
+            var sb = new StringBuilder();
+
+            int i = 0;
+            string encabezado = $" {separador}";
+            foreach (var clus in clusterTabla.DistinctBy(x => x.IdCluster).OrderBy(x => x.IdCluster))
+            {
+                foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdStorie))
+                {
+                    encabezado += $"{p.StorieName}{separador}";
+                }
+            }
+
+            sb.AppendLine(encabezado); // Encabezados
+
+            string linea = string.Empty;
+            foreach (var p in clusterTabla.DistinctBy(x => x.IdGroup).OrderBy(x => x.IdCluster))
+            {
+                linea = $"{p.GroupName}{separador}";
+
+                foreach (var y in clusterTabla.Where(x => x.IdGroup == p.IdGroup).DistinctBy(x => x.IdStorie))
+                {
+                    linea += $"{y.ValorGroup}{separador}";
+                }
+
+                sb.AppendLine(linea);
+            }
+
+            return sb.ToString();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+        return null;
+    }
+
+    private void Regresar2()
     {
         try
         {
@@ -107,11 +373,34 @@
         }
     }
 
+    private void MostrarMatriz(string id)
+    {
+        try
+        {
+            NavigationManager.NavigateTo($"proyect/proyecsmatriz/{id}/{userrol}");
+        }
+        catch (Exception ex)
+        {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+    }
 }
 
 <style>
-    body {
+    body, .table {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-size: 12px;
     }
 </style>
+<script>
+    function downloadFileFromStream(fileName, content) {
+        const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
