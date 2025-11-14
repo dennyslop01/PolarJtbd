@@ -217,6 +217,23 @@
     </div>
 }
 
+@if (cargando)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-cargando">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private List<Deparments> departamento = new();
     private List<Categories> categorias = new();
@@ -230,6 +247,7 @@
     private string usernamelargo = string.Empty;
     private int UserDepart = 0;
     private int index1 = 1;
+    private bool cargando = false;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IProjects repository { get; set; } = null!;
@@ -247,6 +265,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        cargando = true;
         try
         {
             var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -291,6 +310,8 @@
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
         }
+
+        cargando = false;
     }
 
     private int BuscarIndex(int idProject)

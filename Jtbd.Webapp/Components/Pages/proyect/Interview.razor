@@ -187,6 +187,23 @@
     </div>
 }
 
+@if (cargando)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-cargando">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter]
     public string IdProyecto { get; set; }
@@ -198,6 +215,7 @@
     private bool mostrarFormulario = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
+    private bool cargando = false;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IInterviews repository { get; set; } = null!;
@@ -207,6 +225,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        cargando = true;
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
@@ -217,6 +236,7 @@
         {
             Logger.LogError(ex.Message);
         }
+        cargando = false;
     }
 
     private void MostrarFormulario()

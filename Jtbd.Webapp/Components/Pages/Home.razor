@@ -20,3 +20,30 @@
     Este proceso se basa en las agrupaciones previas de Pushes y Pulls, lo que permite organizar los datos de manera jerárquica y minimizar 
     la varianza dentro de cada grupo, asegurando que los elementos dentro de cada clúster sean lo más similares posible entre sí.
 </p>
+
+@if (cargando)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-cargando">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@code {
+    private bool cargando = false;
+    protected override async Task OnInitializedAsync()
+    {
+        cargando = true;
+        Logger.LogInformation("Home component initialized.");
+        await Task.CompletedTask;
+        cargando = false;
+    }
+}
