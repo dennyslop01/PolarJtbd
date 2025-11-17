@@ -167,5 +167,109 @@ namespace Jtbd.Infrastructure.Repositories
 
             return true;
         }
+
+        public async Task<List<StoriesClustersJobs>> GetClustersJobsAsync(int proyectId)
+        {
+            var clusteres = await _context.StoriesClustersJobs
+                .Include(x => x.Project)
+                .Where(x => x.Project.IdProject == proyectId).AsQueryable().AsNoTracking().ToListAsync();
+            return clusteres!;
+        }
+
+        public async Task<List<StoriesClustersJobs>> GetClustersJobsByClusterAsync(int proyectId, int clusterid)
+        {
+            var clusteres = await _context.StoriesClustersJobs
+                .Include(x => x.Project)
+                .Where(x => x.Project.IdProject == proyectId && x.IdCluster == clusterid).AsQueryable().AsNoTracking().ToListAsync();
+            return clusteres!;
+        }
+
+        public async Task<List<StoriesClustersJobs>> GetClustersJobsByTipoClusterAsync(int proyectId, int clusterid, int tipoid)
+        {
+            var clusteres = await _context.StoriesClustersJobs
+                .Include(x => x.Project)
+                .Where(x => x.Project.IdProject == proyectId && x.IdCluster == clusterid && x.IdTipo == tipoid).AsQueryable().AsNoTracking().ToListAsync();
+            return clusteres!;
+        }
+
+        public async Task<bool> CreateClusterJobsAsync(CreateClustersJobs jobs)
+        {
+            StoriesClustersJobs auxJobs = new StoriesClustersJobs();
+            auxJobs.IdTipo = jobs.IdTipo;
+            auxJobs.Descripcion = jobs.Descripcion;
+            auxJobs.IdCluster = jobs.IdCluster;
+
+            var project = _context.Projects.Where(x => x.IdProject == jobs.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (project != null)
+            {
+                auxJobs.Project = project;
+            }
+            else
+            {
+                throw new InvalidOperationException("El proyecto no existe.");
+            }
+
+            var cluster = _context.StoriesClusters.Where(x => x.Project.IdProject == jobs.IdProject && x.IdCluster == jobs.IdCluster).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (cluster == null)
+            {
+                throw new InvalidOperationException("El cluster no existe.");
+            }
+
+            await _context.StoriesClustersJobs.AddAsync(auxJobs);
+            _context.Entry(auxJobs.Project).State = EntityState.Unchanged;
+
+            await _context.SaveChangesAsync();
+            _context.Entry(auxJobs).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+
+            return true;
+        }
+
+        public async Task<bool> UpdateClusterJobsAsync(CreateClustersJobs jobs)
+        {
+            StoriesClustersJobs auxJobs = new StoriesClustersJobs();
+            auxJobs.Id = jobs.Id;
+            auxJobs.IdTipo = jobs.IdTipo;
+            auxJobs.Descripcion = jobs.Descripcion;
+            auxJobs.IdCluster = jobs.IdCluster;
+
+            var project = _context.Projects.Where(x => x.IdProject == jobs.IdProject).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (project != null)
+            {
+                auxJobs.Project = project;
+            }
+            else
+            {
+                throw new InvalidOperationException("El proyecto no existe.");
+            }
+
+            var cluster = _context.StoriesClusters.Where(x => x.Project.IdProject == jobs.IdProject && x.IdCluster == jobs.IdCluster).AsQueryable().AsNoTracking().FirstOrDefault();
+            if (cluster == null)
+            {
+                throw new InvalidOperationException("El cluster no existe.");
+            }
+
+            _context.StoriesClustersJobs.Update(auxJobs);
+            _context.Entry(auxJobs.Project).State = EntityState.Unchanged;
+
+            await _context.SaveChangesAsync();
+            _context.Entry(auxJobs).State = EntityState.Detached;
+            _context.Entry(project).State = EntityState.Detached;
+
+            return true;
+        }
+
+        public async Task<bool> DeleteClusterJobsAsync(int id)
+        {
+            var entidad = await _context.StoriesClustersJobs.FindAsync(id);
+            if (entidad != null)
+            {
+                _context.StoriesClustersJobs.Remove(entidad);
+                await _context.SaveChangesAsync();
+                _context.Entry(entidad).State = EntityState.Detached;
+                return true;
+            }
+            return false;
+        }
     }
 }

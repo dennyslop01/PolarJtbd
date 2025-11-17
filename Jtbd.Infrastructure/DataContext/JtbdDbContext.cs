@@ -23,5 +23,6 @@ namespace Jtbd.Infrastructure.DataContext
         public DbSet<StoriesGroupsPushes> StoriesGroupsPushes { get; set; }
         public DbSet<StoriesGroupsPulls> StoriesGroupsPulls { get; set; }
         public DbSet<StoriesClusters> StoriesClusters { get; set; }
+        public DbSet<StoriesClustersJobs> StoriesClustersJobs { get; set; }
     }
 }

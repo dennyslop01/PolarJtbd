@@ -166,52 +166,13 @@
     }
 
 
-    @if (mostrarFormulario2)
-    {
-        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Generar CSV</h5>
-                        <button type="button" class="btn-close" @onclick="Cancelar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <EditForm Model="entidadActual" OnValidSubmit="GuardarEntidad">
-                            <DataAnnotationsValidator />
-
-                            <div class="mb-3">
-                                <label class="form-label">Separador:</label>
-                                <InputSelect class="form-select" @bind-Value="entidadActual.TipoSeparador">
-                                    <option value="-1">-- Seleccione uno --</option>
-                                    <option value="1">Coma</option>
-                                    <option value="2">Punto y Coma</option>
-                                    @* <option value="3">Tabulador</option> *@
-                                </InputSelect>
-                                <ValidationMessage For="@(() => entidadActual.TipoSeparador)" />
-                            </div>
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-success me-2">
-                                    <i class="bi bi-save"></i> Guardar
-                                </button>
-                                <button type="button" class="btn btn-secondary" @onclick="Cancelar">
-                                    <i class="bi bi-times"></i> Cancelar
-                                </button>
-                            </div>
-                        </EditForm>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
-
     @if (cargando)
     {
-        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); align-content:center">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <div class="modal-cargando">
+                        <div class="modal-cargando text-lg-center">
                             <div class="spinner-border" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
@@ -221,6 +182,7 @@
             </div>
         </div>
     }
+</div>
 
 @code {
     [Parameter]
@@ -240,7 +202,6 @@
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private bool mostrarFormulario = false;
-    private bool mostrarFormulario2 = false;
     private bool cargando = false;
 
     [Inject] private IProjects repoproyect { get; set; } = null!;
@@ -379,7 +340,6 @@
     private void Cancelar()
     {
         mostrarFormulario = false;
-        mostrarFormulario2 = false;
     }
 
     private async Task ExportarCsv(string separador)
@@ -469,8 +429,7 @@
     {
         try
         {
-            mostrarFormulario2 = true;
-            //NavigationManager.NavigateTo($"proyect/proyecsdefinirjob/{id}/{userrol}");
+            NavigationManager.NavigateTo($"proyect/proyecsdefinirjob/{id}/{IdProyecto}");
         }
         catch (Exception ex)
         {
