@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
+@inject AuthenticationStateProvider authenticationStateProvider
 
 
 <PageTitle>Historias</PageTitle>
@@ -28,6 +29,15 @@
                     <button class="btn btn-secondary m-1" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
                         <i class="bi bi-kanban"></i>
                     </button>
+                    @if (proyecto.StatusProject == 1)
+                    {
+                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                        {
+                            <button class="btn btn-primary m-1" @onclick="MostrarFormulario2" title="Cerrar Proyecto">
+                                <i class="bi bi-door-closed"></i>
+                            </button>
+                        }
+                    }
                 </div>
             </div>
         </div>
@@ -165,6 +175,34 @@
         </div>
     }
 
+    @if (mostrarFormulario2)
+    {
+        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cerrar Proyecto</h5>
+                        <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning" role="alert">
+                            ¿Está seguro? Un proyecto cerrado no puede volver a editarse.
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary me-2" @onclick="CerrarProyecto">
+                                <i class="bi bi-times"></i> Guardar
+                            </button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                <i class="bi bi-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
 
     @if (cargando)
     {
@@ -202,6 +240,7 @@
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private bool mostrarFormulario = false;
+    private bool mostrarFormulario2 = false;
     private bool cargando = false;
 
     [Inject] private IProjects repoproyect { get; set; } = null!;
@@ -307,6 +346,18 @@
         }
     }
 
+    private void MostrarFormulario2()
+    {
+        try
+        {
+            mostrarFormulario2 = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+    }
+
     private async Task GuardarEntidad()
     {
         try
@@ -340,6 +391,7 @@
     private void Cancelar()
     {
         mostrarFormulario = false;
+        mostrarFormulario2 = false;
     }
 
     private async Task ExportarCsv(string separador)
@@ -433,6 +485,62 @@
         }
         catch (Exception ex)
         {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+    }
+
+    private async Task CerrarProyecto()
+    {
+        try
+        {
+            string username = string.Empty;
+
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+            }
+
+            CreateProject proyectoActual = new CreateProject
+            {
+                IdProject = proyecto.IdProject,
+                ProjectName = proyecto.ProjectName,
+                ProjectDate = proyecto.ProjectDate,
+                IdDeparmento = proyecto.Deparment.Id,
+                idCategoria = proyecto.Categories.Id,
+                ProjectDescription = proyecto.ProjectDescription,
+                MaxPushes = proyecto.MaxPushes,
+                MaxPulls = proyecto.MaxPulls,
+                RutaImage = proyecto.RutaImage,
+                CreatedDate = proyecto.CreatedDate,
+                CreatedUser = proyecto.CreatedUser,
+                UpdatedDate = DateTime.Now,
+                UpdatedUser = username,
+                StatusProject = 2
+            };
+
+            await repoproyect.UpdateAsync(proyectoActual);
+
+            mensajeAlerta = "Proyecto cerrado exitosamente.";
+            mostrarAlerta = true;
+
+            mostrarFormulario2 = false;
+
+            try
+            {
+                proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.Message);
+                mensajeAlerta = ex.Message;
+                mostrarAlerta = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
         }
