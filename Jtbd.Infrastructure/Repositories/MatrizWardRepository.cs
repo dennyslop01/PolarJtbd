@@ -163,6 +163,9 @@ namespace Jtbd.Infrastructure.Repositories
         public async Task<bool> DeleteStorieClustereAsync(int proyectId)
         {
             var result = await _context.Database.ExecuteSqlAsync(
+                $"Delete from StoriesClustersJobs Where ProjectIdProject = {proyectId}");
+
+            var result2 = await _context.Database.ExecuteSqlAsync(
                 $"Delete from StoriesClusters Where ProjectIdProject = {proyectId}");
 
             return true;

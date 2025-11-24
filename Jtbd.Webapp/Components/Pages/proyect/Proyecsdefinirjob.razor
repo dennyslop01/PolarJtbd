@@ -4,7 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Proyecstories> Logger
-@inject AuthenticationStateProvider authenticationStateProvider
+@inject AuthenticationStateProvider authenStateProvider
 
 <PageTitle>Definir Jobs</PageTitle>
 <div class="row align-content-center">
@@ -1049,14 +1049,19 @@
     {
         try
         {
-            Employee user = await repouser.GetByUsernameAsync(username);
-
-            if (user != null)
+            var authState = await authenStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
             {
-                userrol = user.EmployeeRol.ToString();
-            }
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
 
-            NavigationManager.NavigateTo($"proyect/proyecsmatriz/{int.Parse(IdProyecto)}/{userrol}");
+                if (user != null)
+                {
+                    userrol = user.EmployeeRol.ToString();
+                }
+
+                NavigationManager.NavigateTo($"proyect/proyecsmatriz/{int.Parse(IdProyecto)}/{userrol}");
+            }            
         }
         catch (Exception ex)
         {
@@ -1069,14 +1074,19 @@
     {
         try
         {
-            Employee user = await repouser.GetByUsernameAsync(username);
-
-            if (user != null)
+            var authState = await authenStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
             {
-                userrol = user.EmployeeRol.ToString();
-            }
+                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
+                Employee user = await repouser.GetByUsernameAsync(username);
 
-            NavigationManager.NavigateTo($"proyect/proyecscluster/{int.Parse(IdProyecto)}/{userrol}");
+                if (user != null)
+                {
+                    userrol = user.EmployeeRol.ToString();
+                }
+
+                NavigationManager.NavigateTo($"proyect/proyecscluster/{int.Parse(IdProyecto)}/{userrol}");
+            }
         }
         catch (Exception ex)
         {
