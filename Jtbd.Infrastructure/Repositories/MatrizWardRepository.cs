@@ -2,7 +2,6 @@
 using Jtbd.Domain.Entities;
 using Jtbd.Domain.ViewModel;
 using Jtbd.Infrastructure.DataContext;
-using Jtbd.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jtbd.Infrastructure.Repositories
@@ -11,7 +10,7 @@ namespace Jtbd.Infrastructure.Repositories
     {
         private readonly JtbdDbContext _context = context;
 
-        public async Task<List<FinalClusterGroup>> GetMatrizWardAsync(int proyectId, int numberOfClusters)
+        public async Task<bool> GetMatrizWardAsync(int proyectId, int numberOfClusters)
         {
             await DeleteStorieClustereAsync(proyectId);
 
@@ -20,114 +19,178 @@ namespace Jtbd.Infrastructure.Repositories
             // ===================================================================
             IStories repository = new StoriesRepository(_context);
 
-            List<Stories> stories = (List<Stories>)await repository.GetByProjectIdAsync(proyectId);
             List<StoriesGroupsPushes> storiespush = (List<StoriesGroupsPushes>)await repository.GetStorieGroupPushesByProjectIdAsync(proyectId);
             List<StoriesGroupsPulls> storiespull = (List<StoriesGroupsPulls>)await repository.GetStorieGroupPullsByProjectIdAsync(proyectId);
+            List<DataPoint> data = new List<DataPoint>();
 
-            //int[] storyIds = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            int[] storyIds = stories.OrderBy(x=> x.IdStorie).Select(x => x.IdStorie).ToArray();
-
-            //string[] storyNames = { "H1 (Ana)", "H2 (Carlos)", "H3 (Sofía)", "H4 (Pedro)", "H5 (Laura)", "H6 (Marcos)", "H7 (Isabel)", "H8 (Javier)", "H9 (David)", "H10 (Camila)" };
-            string[] storyNames = stories.OrderBy(x => x.IdStorie).Select(x => x.TitleStorie + " - " + x.IdInter.InterName).ToArray();
-
-            int x = storiespush.DistinctBy(x => x.Groups.IdGroup).Count() + storiespull.DistinctBy(x => x.Groups.IdGroup).Count();
-            int y = storyIds.Length;
-
-            int[,] matrix = new int[x, y];
-
-            // Llenar la matriz con datos reales del proyecto
             int i = 0;
-            int j = 0;
-
-            foreach (StoriesGroupsPushes grp in storiespush.DistinctBy(x => x.Groups.IdGroup).OrderBy(x => x.Groups.IdGroup))
+            foreach (StoriesGroupsPushes grp in storiespush.DistinctBy(x => x.Stories.IdStorie).OrderBy(x => x.Stories.IdStorie))
             {
-                foreach (StoriesGroupsPushes gp in storiespush.Where(x => x.Groups.IdGroup == grp.Groups.IdGroup).OrderBy(x => x.Stories.IdStorie).ToList())
+                DataPoint auxiliar = new DataPoint();
+
+                decimal[] feacture = new decimal[storiespush.Select(x => x.Groups.IdGroup).Distinct().Count() + storiespull.Select(x => x.Groups.IdGroup).Distinct().Count()];
+
+                int j = 0;
+                foreach (StoriesGroupsPushes gp in storiespush.Where(x => x.Stories.IdStorie == grp.Stories.IdStorie).OrderBy(x => x.Groups.IdGroup).ToList())
                 {
-                    matrix[i, j] = gp.ValorPush;
+                    feacture[j] = (decimal)gp.ValorPush;
                     j++;
                 }
-                j=0;
+
+                foreach (StoriesGroupsPulls gp in storiespull.Where(x => x.Stories.IdStorie == grp.Stories.IdStorie).OrderBy(x => x.Groups.IdGroup).ToList())
+                {
+                    feacture[j] = (decimal)gp.ValorPull;
+                    j++;
+                }
+
+                auxiliar.Index = i;
+                auxiliar.Id = $"{grp.Stories.IdInter.InterName}/{grp.Stories.TitleStorie}";
+                auxiliar.Features = feacture;
+                data.Add(auxiliar);
                 i++;
             }
 
-            foreach (StoriesGroupsPulls grp in storiespull.DistinctBy(x => x.Groups.IdGroup).OrderBy(x => x.Groups.IdGroup))
+
+            // ================================================================
+            // OPTIMIZACIÓN: "Build Once, Cut Many"
+            // ================================================================
+
+            // A. Construimos el árbol completo UNA sola vez.
+            // Esto es lo costoso computacionalmente (O(N^3)).
+            var rootNode = BuildWardTree(data);
+
+            // B. Realizamos los cortes (Clusterización)
+            // Esto es instantáneo porque el árbol ya existe en memoria.
+            var clusters = CutTree(rootNode, numberOfClusters);
+            List<Stories> stories = (List<Stories>)await repository.GetByProjectIdAsync(proyectId);
+
+            foreach (var group in clusters)
             {
-                foreach (StoriesGroupsPulls gp in storiespull.Where(x => x.Groups.IdGroup == grp.Groups.IdGroup).OrderBy(x => x.Stories.IdStorie).ToList())
-                {
-                    matrix[i, j] = gp.ValorPull;
-                    j++;
-                }
-                j = 0;
-                i++;
+                int idstorie = stories[group.Key].IdStorie;
+                await CreateStorieClustereAsync(proyectId, idstorie, group.Value);
             }
 
-            // ===================================================================
-            // PASO 2: EJECUCIÓN DEL ALGORITMO NATIVO
-            // ===================================================================
-
-            // 1. Preparar la matriz para que el constructor de la clase nativa la reciba.
-            double[][] transposedMatrix = TransposeAndConvertMatrix(matrix);
-
-            // 2. Instanciar y Ejecutar el algoritmo.
-            var clusterer = new WardNativeServices(transposedMatrix, storyIds);
-            clusterer.PerformClustering();
-
-            // 3. Obtener el resultado final
-            List<List<int>> finalIds = clusterer.GetFinalClusters(numberOfClusters);
-
-            // 4. Mapear los IDs a nuestro DTO para el reporte.
-            List<FinalClusterGroup> finalGroups = MapFinalReport(finalIds, storyNames, storyIds);
-
-
-            foreach (var group in finalGroups)
-            {
-                foreach (var storieId in group.StoryIds)
-                {
-                    await CreateStorieClustereAsync(proyectId, storieId, group.ClusterId);
-                }
-            }
-
-            return finalGroups;
+            return true;
         }
 
-        // --- FUNCIÓN DE SOPORTE: TRANSPONER Y CONVERTIR ---
-        private static double[][] TransposeAndConvertMatrix(int[,] original)
+        // Recibe 'List<DataPoint>' que puede ser nula, por eso el '?' en la firma no es estrictamente necesario si controlamos dentro, 
+        // pero para evitar warnings en la llamada, lo dejamos limpio.
+        public static Dictionary<int, int> ComputeClusters(List<DataPoint> data, int k)
         {
-            int numRows = original.GetLength(0);
-            int numCols = original.GetLength(1);
+            if (data == null || data.Count == 0) return new Dictionary<int, int>();
 
-            double[][] transposed = new double[numCols][];
-
-            for (int j = 0; j < numCols; j++)
-            {
-                transposed[j] = new double[numRows];
-                for (int i = 0; i < numRows; i++)
-                {
-                    transposed[j][i] = (double)original[i, j];
-                }
-            }
-            return transposed;
+            var rootNode = BuildWardTree(data);
+            return CutTree(rootNode, k);
         }
 
-        // --- FUNCIÓN DE SOPORTE: MAPEO DE RESULTADOS ---
-        private static List<FinalClusterGroup> MapFinalReport(List<List<int>> finalIds, string[] storyNames, int[] storyIds)
+        public static ClusterNode BuildWardTree(List<DataPoint> points)
         {
-            var finalGroups = new List<FinalClusterGroup>();
-            int clusterIdCounter = 1;
+            var activeClusters = points.Select(p => new ClusterNode(p)).ToList();
 
-            foreach (var group in finalIds)
+            while (activeClusters.Count > 1)
             {
-                // Mapear los IDs a los nombres para el reporte final.
-                List<string> groupNames = group.Select(id => storyNames[Array.IndexOf(storyIds, id)]).ToList();
+                decimal minIncrease = decimal.MaxValue;
 
-                finalGroups.Add(new FinalClusterGroup
+                // CORRECCIÓN 1: Variables anulables explícitas
+                ClusterNode? bestA = null;
+                ClusterNode? bestB = null;
+
+                for (int i = 0; i < activeClusters.Count; i++)
                 {
-                    ClusterId = clusterIdCounter++,
-                    StoryIds = group,
-                    StoryNames = groupNames
-                });
+                    for (int j = i + 1; j < activeClusters.Count; j++)
+                    {
+                        decimal increase = CalculateWardIncrease(activeClusters[i], activeClusters[j]);
+
+                        if (increase < minIncrease)
+                        {
+                            minIncrease = increase;
+                            bestA = activeClusters[i];
+                            bestB = activeClusters[j];
+                        }
+                        else if (increase == minIncrease)
+                        {
+                            // Al acceder a propiedades de un nullable, el compilador puede quejarse.
+                            // Aquí validamos que bestA/bestB no sean null antes de usarlos en la lógica de empate.
+                            if (bestA != null && bestB != null)
+                            {
+                                int currentMinId = Math.Min(activeClusters[i].GetMinOriginalIndex(), activeClusters[j].GetMinOriginalIndex());
+                                int bestMinId = Math.Min(bestA.GetMinOriginalIndex(), bestB.GetMinOriginalIndex());
+
+                                if (currentMinId < bestMinId)
+                                {
+                                    bestA = activeClusters[i];
+                                    bestB = activeClusters[j];
+                                }
+                            }
+                            else
+                            {
+                                // Si es el primer par encontrado (bestA es null), lo tomamos.
+                                bestA = activeClusters[i];
+                                bestB = activeClusters[j];
+                            }
+                        }
+                    }
+                }
+
+                // Si no se encontró par (imposible en lógica Ward, pero necesario para el compilador)
+                if (bestA == null || bestB == null) break;
+
+                var merged = new ClusterNode(bestA, bestB);
+                activeClusters.Remove(bestA);
+                activeClusters.Remove(bestB);
+                activeClusters.Add(merged);
             }
-            return finalGroups;
+
+            return activeClusters.First();
+        }
+
+        private static decimal CalculateWardIncrease(ClusterNode a, ClusterNode b)
+        {
+            decimal distSq = 0m;
+            int dims = Math.Min(a.Centroid.Length, b.Centroid.Length);
+
+            for (int k = 0; k < dims; k++)
+            {
+                decimal d = a.Centroid[k] - b.Centroid[k];
+                distSq += d * d;
+            }
+
+            decimal factor = (decimal)(a.Count * b.Count) / (decimal)(a.Count + b.Count);
+            return factor * distSq;
+        }
+
+        public static Dictionary<int, int> CutTree(ClusterNode root, int k)
+        {
+            var finalNodes = new List<ClusterNode> { root };
+
+            while (finalNodes.Count < k)
+            {
+                // CORRECCIÓN 2: 'nodeToSplit' puede ser nulo si no se encuentra candidato
+                ClusterNode? nodeToSplit = finalNodes
+                    .Where(n => n.Left != null && n.Right != null)
+                    .OrderByDescending(n => n.MergeCost)
+                    .ThenBy(n => n.GetMinOriginalIndex())
+                    .FirstOrDefault();
+
+                if (nodeToSplit == null) break;
+
+                finalNodes.Remove(nodeToSplit);
+
+                // Como ya validamos en el Where que Left/Right no son null, usamos el operador ! ("sé que no es nulo")
+                if (nodeToSplit.Left != null) finalNodes.Add(nodeToSplit.Left);
+                if (nodeToSplit.Right != null) finalNodes.Add(nodeToSplit.Right);
+            }
+
+            var assignment = new Dictionary<int, int>();
+            int label = 1;
+
+            foreach (var node in finalNodes.OrderBy(n => n.GetMinOriginalIndex()))
+            {
+                var indices = node.GetAllIndices();
+                foreach (var idx in indices) assignment[idx] = label;
+                label++;
+            }
+            return assignment;
         }
 
         public async Task<List<StoriesClusters>> GetStoriesClustersAsync(int proyectId)
