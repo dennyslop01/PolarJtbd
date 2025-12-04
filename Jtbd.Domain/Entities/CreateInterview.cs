@@ -12,15 +12,14 @@ namespace Jtbd.Domain.Entities
         [MaxLength(100)]
         public string InterName { get; set; } = string.Empty;
 
-        [Range(12, 99, ErrorMessage = "Solo se permiten valores entre 12 y 99")]
         public int InterAge { get; set; }
 
-        [Range(0, 2, ErrorMessage = "El sexo es requerido")]
         public int InterGender { get; set; }
 
         [MaxLength(100)]
         public string InterOccupation { get; set; } = string.Empty;
 
+        [Required]
         [MaxLength(100)]
         public string InterNickname { get; set; } = string.Empty;
 

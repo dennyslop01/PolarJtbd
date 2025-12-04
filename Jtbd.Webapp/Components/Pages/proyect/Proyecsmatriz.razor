@@ -42,7 +42,7 @@
     <div class="col-lg-11">
         @if (mostrarAlerta)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div id="divAlerta" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
                 @mensajeAlerta
                 <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
             </div>
@@ -62,15 +62,15 @@
         else
         {
             <div class="row align-content-center">
-                <table class="table table-striped table-hover">
-                    <thead class="table-secondary bg-opacity-25">
+                <table class="table">
+                    <thead class="table">
                         <tr>
                             <th>&nbsp;&nbsp;</th>
                             @foreach (var (p, index) in grupospush.Select((p, i) => (p, i + 1)))
                             {
                                 if (p.GroupName != "Leftovers")
                                 {
-                                    <th style="vertical-align: middle;">Push</th>
+                                    <th style="vertical-align: middle;text-align:left">Push</th>
                                 }
                             }
 
@@ -78,7 +78,7 @@
                             {
                                 if (p.GroupName != "Leftovers")
                                 {
-                                    <th style="vertical-align: middle;">Pull</th>
+                                    <th style="vertical-align: middle;text-align:left">Pull</th>
                                 }
                             }
                         </tr>
@@ -105,7 +105,7 @@
                         @foreach (var (p, index) in stories.Select((p, i) => (p, i + 1)))
                         {
                             <tr>
-                                <td>@p.IdInter.InterName - @p.TitleStorie</td>
+                                <td style="text-align:left">@p.IdInter.InterName - @p.TitleStorie</td>
                                 @foreach (var (p1, index1) in grupospush.Select((p, i) => (p, i + 1)))
                                 {
                                     try
@@ -123,8 +123,8 @@
                                             {
                                                 @if (entidad.ValorPush == 1)
                                                 {
-                                                    <td>
-                                                        <button type="button" class="btn btn-success" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">1</button>
+                                                    <td style="background-color:lightgreen;color:darkgreen;">
+                                                        <button type="button" class="btn btn-success" style="background-color:lightgreen;color:darkgreen;border:hidden" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">1</button>
                                                     </td>
                                                 }
                                                 else
@@ -156,8 +156,8 @@
                                             {
                                                 @if (entidad.ValorPull == 1)
                                                 {
-                                                    <td>
-                                                        <button type="button" class="btn btn-success" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">1</button>
+                                                    <td style="background-color:lightgreen;color:darkgreen;">
+                                                        <button type="button" class="btn btn-success" style="background-color:lightgreen;color:darkgreen;border:hidden" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">1</button>
                                                     </td>
                                                 }
                                                 else
@@ -416,6 +416,15 @@
     [Inject] private IAnxieties repoanxie { get; set; } = null!;
     [Inject] private IMatrizWard repomatrix { get; set; } = null!;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        mostrarAlerta = true;
+        if (firstRender)
+        {
+            mostrarAlerta = false;
+        }
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         cargando = true;
@@ -623,6 +632,7 @@
             await ExportarCsv(separador);
             mensajeAlerta = "Archivo generado exitosamente.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
         catch (Exception ex)
         {
@@ -649,6 +659,7 @@
             Logger.LogError(ex.Message);
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
@@ -764,7 +775,7 @@
         }
     }
 
-    private void EditarEntidad(int idstorie, int idgroup)
+    private async Task EditarEntidad(int idstorie, int idgroup)
     {
         try
         {
@@ -817,6 +828,7 @@
             Logger.LogError(ex.Message);
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
@@ -898,6 +910,7 @@
             await repomatrix.GetMatrizWardAsync(int.Parse(IdProyecto), entidadCluster.NroCluster);
             mensajeAlerta = "Clústeres generados exitosamente.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
 
             mostrarFormulario3 = false;
             await Task.Delay(2000);
@@ -909,6 +922,7 @@
             Logger.LogError(ex.Message);
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
@@ -928,6 +942,31 @@
     body, .table {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-size: 12px;
+    }
+
+    .modal-container {
+        /* Ocupa toda la ventana gráfica */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+        /* Centrado con Flexbox */
+        display: flex;
+        justify-content: center; /* Centrado horizontal */
+        align-items: center; /* Centrado vertical */
+    }
+
+    .modal-content {
+        /* Estilos para el cuadro del modal */
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        /* Opcional: define un ancho máximo */
+        max-width: 90%;
+        width: 90%;
     }
 </style>
 <script>

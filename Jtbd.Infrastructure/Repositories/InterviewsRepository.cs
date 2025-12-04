@@ -8,7 +8,7 @@ namespace Jtbd.Infrastructure.Repositories
     public class InterviewsRepository(JtbdDbContext context) : IInterviews
     {
         private readonly JtbdDbContext _context = context; 
-        public async Task<bool> CreateAsync(CreateInterview interviews)
+        public async Task<Interviews> CreateAsync(CreateInterview interviews)
         {
             Interviews auxInter = new Interviews()
             {
@@ -37,7 +37,7 @@ namespace Jtbd.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             _context.Entry(auxInter).State = EntityState.Detached;
             _context.Entry(project).State = EntityState.Detached;
-            return true;
+            return auxInter;
         }
 
         public async Task<bool> DeleteAsync(int id)

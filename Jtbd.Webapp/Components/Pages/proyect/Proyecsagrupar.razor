@@ -9,45 +9,50 @@
 <PageTitle>Agrupar Historias</PageTitle>
 <div class="row align-content-center">
     <div class="col-lg-12">
-        <div class="col-lg-11">
-            <div class="d-flex justify-content-start mb-3">
-                <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                    @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
-                </button>
-            </div>
-            <h3 class="text-start mt-4">Agrupar Historias</h3>
-            <div class="d-flex justify-content-end me-3">
-                <button class="btn btn-secondary" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
-                    <i class="bi bi-kanban"></i>
-                </button>
-            </div>
-
-            @if (mostrarAlerta)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @mensajeAlerta
-                    <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
-                </div>
-            }
+        <div class="d-flex justify-content-start mb-3">
+            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
+                @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="row align-content-center">
+    <div class="col-lg-12">
+        <h3 class="text-start mt-4">Agrupar Historias</h3>
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-secondary" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
+                <i class="bi bi-kanban"></i>
+            </button>
         </div>
     </div>
 </div>
 
+@if (mostrarAlerta)
+{
+    <br />
+    <div id="divAlerta" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
+        @mensajeAlerta
+        <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+    </div>
+}
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="push-tab" data-bs-toggle="tab" data-bs-target="#push" type="button" role="tab" aria-controls="push" aria-selected="true">Historias - Pushes</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pull-tab" data-bs-toggle="tab" data-bs-target="#pull" type="button" role="tab" aria-controls="pull" aria-selected="false">Historias - Pulls</button>
-    </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="push" role="tabpanel" aria-labelledby="push-tab">
-        <div class="row align-content-center">
-            <div class="col-lg-4">
-                <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1" style="width: 100%; height: 50%; overflow: auto;">
-                    @* <h5>Historias - Pushes</h5>
+
+<div class="row align-content-center">
+    <div class="col-12">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="push-tab" data-bs-toggle="tab" data-bs-target="#push" type="button" role="tab" aria-controls="push" aria-selected="true">Historias - Pushes</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pull-tab" data-bs-toggle="tab" data-bs-target="#pull" type="button" role="tab" aria-controls="pull" aria-selected="false">Historias - Pulls</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="push" role="tabpanel" aria-labelledby="push-tab">
+                <div class="row align-content-center">
+                    <div class="col-lg-4">
+                        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1" style="width: 100%; height: 50%; overflow: auto;">
+                            @* <h5>Historias - Pushes</h5>
                     @foreach (var item in List1)
                     {
                         <div class="draggable-item" draggable="true"
@@ -56,73 +61,81 @@
                             @item.Name
                         </div>
                     } *@
-                    <PaginationComponent TItem="Item" Items="List1" DefaultPageSize="10">
-                        <ChildContentHeader>
-                            <tr>
-                                <th>Historias - Pushes</th>
-                            </tr>
-                        </ChildContentHeader>
-                        <ChildContentRow Context="item">
-                            <tr>
-                                <td>
-                                    <div class="draggable-item" draggable="true"
-                                         @ondragstart="() => HandleDragStart(item, null)"
-                                         @ondragend="HandleDragEnd">
-                                        @item.Name
-                                    </div>
-                                </td>
-                            </tr>
-                        </ChildContentRow>
-                    </PaginationComponent>
-                </div>
-            </div>
-            <div class="col-lg-8">
-                <div class="row">
-                    @foreach (var group in grupospush)
-                    {
-                        <div class="col-lg-6">
-                            <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto; resize: none;"
-                                 ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
-                                <div>
-                                    @group.GroupName&nbsp;&nbsp;&nbsp;
-                                    @if (group.GroupName != "Leftovers")
-                                    {
-                                        @if (proyecto.StatusProject == 1)
-                                        {
-                                            @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                            {
-                                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                            }
-                                        }
-                                    }
-                                </div>
-                                <br />
-                                @foreach (var item in List2)
-                                {
-                                    if (group.IdGroup == item.IdGroup)
-                                    {
-                                        <div class="draggable-item" draggable="true"
-                                             @ondragstart="() => HandleDragStart(item, group.IdGroup)"
-                                             @ondragend="HandleDragEnd">
-                                            @item.Name
-                                        </div>
-                                    }
-                                }
-                            </div>
+                            <PaginationComponent TItem="Item" Items="List1" DefaultPageSize="10">
+                                <ChildContentHeader>
+                                    <tr>
+                                        <th>Historias - Pushes</th>
+                                    </tr>
+                                </ChildContentHeader>
+                                <ChildContentRow Context="item">
+                                    <tr>
+                                        <td>
+                                            <div class="draggable-item" draggable="true"
+                                                 @ondragstart="() => HandleDragStart(item, null)"
+                                                 @ondragend="HandleDragEnd">
+                                                @item.Name
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ChildContentRow>
+                            </PaginationComponent>
                         </div>
-                    }
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="row">
+                            @foreach (var group in grupospush)
+                            {
+                                <div class="col-lg-6">
+                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto; resize: none;"
+                                         ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
+                                        <div class="row">
+                                            <div class="col-10">
+                                                @group.GroupName&nbsp;&nbsp;&nbsp;
+                                            </div>
+                                            <div class="col-1 align-content-end">
+                                                @if (group.GroupName != "Leftovers")
+                                                {
+                                                    @if (proyecto.StatusProject == 1)
+                                                    {
+                                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                                        {
+                                                            <button class="btn btn-success btn-sm" title="Editar" @onclick="() => EditarEntidad(group)">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-12">
+                                                @foreach (var item in List2)
+                                                {
+                                                    if (group.IdGroup == item.IdGroup)
+                                                    {
+                                                        <div class="draggable-item" draggable="true"
+                                                             @ondragstart="() => HandleDragStart(item, group.IdGroup)"
+                                                             @ondragend="HandleDragEnd">
+                                                            @item.Name
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
+                <br />
             </div>
-        </div>
-        <br />
-    </div>
-    <div class="tab-pane fade" id="pull" role="tabpanel" aria-labelledby="pull-tab">
-        <div class="row align-content-center">
-            <div class="col-lg-4">
-                <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3" style="width: 100%; height: 50%; overflow: auto;">
-                    @* <h5>Historias - Pulls</h5>
+            <div class="tab-pane fade" id="pull" role="tabpanel" aria-labelledby="pull-tab">
+                <div class="row align-content-center">
+                    <div class="col-lg-4">
+                        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3" style="width: 100%; height: 50%; overflow: auto;">
+                            @* <h5>Historias - Pulls</h5>
                     @foreach (var item in List3)
                     {
                         <div class="draggable-item" draggable="true"
@@ -131,71 +144,81 @@
                             @item.Name
                         </div>
                     } *@
-                    <PaginationComponent TItem="Item" Items="List3" DefaultPageSize="10">
-                        <ChildContentHeader>
-                            <tr>
-                                <th>Historias - Pulls</th>
-                            </tr>
-                        </ChildContentHeader>
-                        <ChildContentRow Context="item">
-                            <tr>
-                                <td>
-                                    <div class="draggable-item" draggable="true"
-                                         @ondragstart="() => HandleDragStart2(item, null)"
-                                         @ondragend="HandleDragEnd2">
-                                        @item.Name
-                                    </div>
-                                </td>
-                            </tr>
-                        </ChildContentRow>
-                    </PaginationComponent>
-                </div>
-            </div>
-            <div class="col-lg-8">
-                <div class="row">
-                    @foreach (var group in grupospull)
-                    {
-                        <div class="col-lg-6">
-                            <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto;"
-                                 ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
-                                <div>
-                                    @group.GroupName&nbsp;&nbsp;&nbsp;
-                                    @if (group.GroupName != "Leftovers")
-                                    {
-                                        @if (proyecto.StatusProject == 1)
-                                        {
-                                            @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                            {
-                                                <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(group)">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                            }
-                                        }
-                                    }
-                                </div>
-                                <br />
-
-                                @foreach (var item in List4)
-                                {
-                                    if (group.IdGroup == item.IdGroup)
-                                    {
-                                        <div class="draggable-item" draggable="true"
-                                             @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
-                                             @ondragend="HandleDragEnd2">
-                                            @item.Name
-                                        </div>
-                                    }
-                                }
-                            </div>
+                            <PaginationComponent TItem="Item" Items="List3" DefaultPageSize="10">
+                                <ChildContentHeader>
+                                    <tr>
+                                        <th>Historias - Pulls</th>
+                                    </tr>
+                                </ChildContentHeader>
+                                <ChildContentRow Context="item">
+                                    <tr>
+                                        <td>
+                                            <div class="draggable-item" draggable="true"
+                                                 @ondragstart="() => HandleDragStart2(item, null)"
+                                                 @ondragend="HandleDragEnd2">
+                                                @item.Name
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ChildContentRow>
+                            </PaginationComponent>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="row">
+                            @foreach (var group in grupospull)
+                            {
+                                <div class="col-lg-6">
+                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto;"
+                                         ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
+                                        <div class="row">
+                                            <div class="col-10">
+                                                @group.GroupName&nbsp;&nbsp;&nbsp;
+                                            </div>
+                                            <div class="col-1 align-content-end">
+                                                @if (group.GroupName != "Leftovers")
+                                                {
+                                                    @if (proyecto.StatusProject == 1)
+                                                    {
+                                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                                        {
+                                                            <button class="btn btn-success btn-sm" title="Editar" @onclick="() => EditarEntidad(group)">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-12">
+                                                @foreach (var item in List4)
+                                                {
+                                                    if (group.IdGroup == item.IdGroup)
+                                                    {
+                                                        <div class="draggable-item" draggable="true"
+                                                             @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
+                                                             @ondragend="HandleDragEnd2">
+                                                            @item.Name
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
 
+                    </div>
+                </div>
+                <br />
             </div>
         </div>
-        <br />
     </div>
 </div>
+
 
 @if (mostrarFormulario)
 {
@@ -282,6 +305,15 @@
     private Item _draggedItem1;
     private List<Item> _sourceList1;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        mostrarAlerta = true;
+        if (firstRender)
+        {
+            mostrarAlerta = false;
+        }
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         cargando = true;
@@ -425,6 +457,7 @@
             mostrarFormulario = false;
             mensajeAlerta = "Grupo guardado exitosamente.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
         catch (Exception ex)
         {
@@ -568,7 +601,7 @@
         }
     }
 
-    private void MostrarMatriz(string id)
+    private async Task MostrarMatriz(string id)
     {
         try
         {
@@ -578,6 +611,7 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 }
@@ -587,11 +621,13 @@
         font-size: 11px;
     }
     .list-container {
-        border: 2px dashed #ccc;
+        border: 1px solid #000000; /* Borde sólido de 1px y color negro */
+        border-radius: 15px;
         padding: 10px;
         margin: 10px;
         min-height: 150px;
         flex: 1;
+        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.4); /* Sombra negra con opacidad */
     }
 
     .draggable-item {

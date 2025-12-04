@@ -56,6 +56,8 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<bool> DeleteAsync(int id)
         {
+            await DeleteProyectDependencyAsync(id);
+
             var project = await _context.Projects.FindAsync(id);
             if (project != null)
             {
@@ -65,6 +67,38 @@ namespace Jtbd.Infrastructure.Repositories
                 return true;
             }
             return false;
+        }
+
+        private async Task<bool> DeleteProyectDependencyAsync(int proyectId)
+        {
+            var result = await _context.Database.ExecuteSqlAsync(
+                $"Delete from StoriesClustersJobs Where ProjectIdProject = {proyectId}");
+
+            var result2 = await _context.Database.ExecuteSqlAsync(
+                $"Delete from StoriesClusters Where ProjectIdProject = {proyectId}");
+
+            var result3 = await _context.Database.ExecuteSqlAsync(
+                $"Delete from Anxieties Where ProjectIdProject = {proyectId}");
+
+            var result4 = await _context.Database.ExecuteSqlAsync(
+                $"Delete from Groups Where ProjectIdProject = {proyectId}");
+
+            var result5 = await _context.Database.ExecuteSqlAsync(
+                $"Delete from Habits Where ProjectIdProject = {proyectId}");
+
+            var result7 = await _context.Database.ExecuteSqlAsync(
+                $"Delete from PullGroups Where ProjectIdProject = {proyectId}");
+
+            var result8 = await _context.Database.ExecuteSqlAsync(
+                $"Delete from PushesGroups Where ProjectIdProject = {proyectId}");
+
+            var result9 = await _context.Database.ExecuteSqlAsync(
+                $"Delete from Stories Where ProjectIdProject = {proyectId}");
+
+            var result6 = await _context.Database.ExecuteSqlAsync(
+                $"Delete from Interviews Where ProjectIdProject = {proyectId}");
+
+            return true;
         }
 
         public async Task<IEnumerable<Projects>> GetAllAsync()

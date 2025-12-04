@@ -8,7 +8,7 @@ namespace Jtbd.Application.Interfaces
         Task<Stories> GetByIdAsync(int id);
         Task<IEnumerable<Stories>> GetByProjectIdAsync(int id);
         Task<IEnumerable<Stories>> GetByInterIdAsync(int id);
-        Task<bool> CreateAsync(CreateStorie stories);
+        Task<Stories> CreateAsync(CreateStorie stories);
         Task<bool> UpdateAsync(CreateStorie stories);
         Task<bool> DeleteAsync(int id);
         Task<IEnumerable<StoriesPush>> GetPushesByStorieIdAsync(int id);

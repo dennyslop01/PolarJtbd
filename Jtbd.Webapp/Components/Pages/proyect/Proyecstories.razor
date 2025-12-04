@@ -41,7 +41,7 @@
 
         @if (mostrarAlerta)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div id="divAlerta" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
                 @mensajeAlerta
                 <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
             </div>
@@ -60,8 +60,8 @@
         }
         else
         {
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="5%">#</th>
                         <th width="20%">Titulo</th>
@@ -76,7 +76,7 @@
                             <td width="5%">@index</td>
                             <td width="20%">@p.TitleStorie</td>
                             <td width="55%">@p.ContextStorie</td>
-                            <td width="20%" class="justify-content-end">
+                            <td width="20%" class="text-end">
                                 @if (entrevistado.Project.StatusProject == 1)
                                 {
                                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
@@ -181,6 +181,15 @@
     [Inject] private IInterviews repointer { get; set; } = null!;
     [Inject] private IEmployee repouser { get; set; } = null!;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        mostrarAlerta = true;
+        if (firstRender)
+        {
+            mostrarAlerta = false;
+        }
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         cargando = true;
@@ -263,8 +272,12 @@
     {
         try
         {
+            int id = entidadActual.IdStorie;
             if (entidadActual.IdStorie == 0)
-                await repository.CreateAsync(entidadActual);
+            {
+                Stories storie = await repository.CreateAsync(entidadActual);
+                id = storie.IdStorie;
+            }
             else
                 await repository.UpdateAsync(entidadActual);
 
@@ -273,6 +286,10 @@
             mostrarFormulario = false;
             mensajeAlerta = "Historia guardada exitosamente.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
+
+            if (entidadActual.IdStorie == 0) 
+                NavigationManager.NavigateTo($"proyect/detalle/{id}/{userrol}");
         }
         catch(Exception ex)
         {
@@ -292,12 +309,14 @@
 
                 mensajeAlerta = "Historia eliminada exitosamente.";
                 mostrarAlerta = true;
+                await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
             }
         }
         catch (Exception ex)
         {
             mensajeAlerta = "No se puede eliminar el registros ya que existen relaciones con otras tablas que no han sido eliminadas.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
             Logger.LogError(ex.Message);
         }
     }
@@ -343,7 +362,7 @@
         }
     }
 
-    private void AgruparHistorias(string id)
+    private async Task AgruparHistorias(string id)
     {
         try
         {
@@ -353,10 +372,11 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
-    private void MostrarMatriz(string id)
+    private async Task MostrarMatriz(string id)
     {
         try
         {
@@ -366,6 +386,7 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 }

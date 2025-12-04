@@ -9,23 +9,17 @@
 
 <PageTitle>Historias</PageTitle>
 <div class="row align-content-center">
-    <div class="col-lg-11">
+    <div class="col-lg-12">
         <div class="col-lg-12">
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
                 @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
             </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <h3 class="text-start mt-4">Clústeres de Historias y Grupos</h3>
             <div class="col-lg-12">
-                <div class="d-flex justify-content-end mb-1">
-                    @if (proyecto.StatusProject == 1)
-                    {
-                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                        {
-                            <button class="btn btn-primary m-1" @onclick="MostrarFormulario" title="Imprimir Clústeres">
-                                <i class="bi bi-printer"></i>
-                            </button>
-                        }
-                    }
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary m-1" @onclick="MostrarFormulario" title="Imprimir Clústeres">
+                        <i class="bi bi-filetype-csv"></i>
+                    </button>
                     <button class="btn btn-secondary m-1" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
                         <i class="bi bi-kanban"></i>
                     </button>
@@ -42,10 +36,13 @@
             </div>
         </div>
     </div>
+</div>
+<hr />
+<div class="row align-content-center">
     <div class="col-lg-12">
         @if (mostrarAlerta)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div id="divAlerta" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
                 @mensajeAlerta
                 <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
             </div>
@@ -67,63 +64,63 @@
             <div class="row align-content-center">
                 @foreach (var clus in clusterTabla.DistinctBy(x => x.IdCluster).OrderBy(x => x.IdCluster))
                 {
-                    <div class="col-lg-11">
+                    <div class="col-lg-12">
                         <div class="row align-content-center">
                             <div class="row">
                                 <div class="col-lg-11">
                                     <label><strong>Clúster @clus.IdCluster</strong></label>
                                 </div>
-                                <div class="col-lg-1 justify-content-end">
-                                    @if (proyecto.StatusProject == 1)
-                                    {
-                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                        {
-                                            <button class="btn btn-primary btn-sm" title="Definir Job" @onclick="() => DefinirJob(clus.IdCluster)">
+                                <div class="col-lg-1 text-end">
+                                     <button class="btn btn-primary btn-sm" title="Definir Job" @onclick="() => DefinirJob(clus.IdCluster)">
                                                 <i class="bi bi-plus-lg"></i>
-                                            </button>
-                                        }
-                                    }
+                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <br />
-                        <table class="table table-striped table-hover">
-                            <thead class="table-secondary bg-opacity-25">
-                                <tr>
-                                    <th>&nbsp;&nbsp;</th>
-                                    
-                                    @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdStorie))
-                                    {
-                                        <th style="vertical-align: middle;">@p.StorieName</th>
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody class="text-center">
-                                @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdGroup))
-                                {
-                                    <tr>
-                                        <td>@p.GroupName</td>
+                        <div class="row align-content-center">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <table class="table align-content-center">
+                                        <thead class="table text-center">
+                                            <tr>
+                                                <th>&nbsp;&nbsp;</th>
 
-                                        @foreach (var y in clusterTabla.Where(x => x.IdCluster == p.IdCluster && x.IdGroup == p.IdGroup).DistinctBy(x => x.IdStorie))
-                                        {
-                                            @if (y.ValorGroup == 1)
+                                                @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdStorie))
+                                                {
+                                                    <th style="vertical-align: middle;">@p.StorieName</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-center">
+                                            @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdGroup))
                                             {
-                                                <td>
-                                                    <button type="button" class="btn btn-success" title="">1</button>
-                                                </td>
+                                                <tr>
+                                                    <td style="text-align:left">@p.GroupName</td>
+
+                                                    @foreach (var y in clusterTabla.Where(x => x.IdCluster == p.IdCluster && x.IdGroup == p.IdGroup).DistinctBy(x => x.IdStorie))
+                                                    {
+                                                        @if (y.ValorGroup == 1)
+                                                        {
+                                                            <td style="background-color:lightgreen;">
+                                                                <button type="button" class="btn btn-success" style="background-color:lightgreen;color:darkgreen;border:hidden" title="">1</button>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <button type="button" class="btn btn-light" title="">0</button>
+                                                            </td>
+                                                        }
+                                                    }
+                                                </tr>
                                             }
-                                            else
-                                            {
-                                                <td>
-                                                    <button type="button" class="btn btn-light" title="">0</button>
-                                                </td>
-                                            }
-                                        }
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 }
             </div>
@@ -185,7 +182,7 @@
 
                         <div class="d-flex justify-content-end">
                             <button type="button" class="btn btn-primary me-2" @onclick="CerrarProyecto">
-                                <i class="bi bi-times"></i> Guardar
+                                <i class="bi bi-times"></i> Cerrar
                             </button>
                             <button type="button" class="btn btn-secondary" @onclick="Cancelar">
                                 <i class="bi bi-times"></i> Cancelar
@@ -214,6 +211,7 @@
             </div>
         </div>
     }
+
 </div>
 
 @code {
@@ -244,6 +242,15 @@
     [Inject] private IStories repository { get; set; } = null!;
 
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        mostrarAlerta = true;
+        if (firstRender)
+        {
+            mostrarAlerta = false;
+        }
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         cargando = true;
@@ -375,6 +382,7 @@
             await ExportarCsv(separador);
             mensajeAlerta = "Archivo generado exitosamente.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
         catch (Exception ex)
         {
@@ -400,6 +408,7 @@
             Logger.LogError(ex.Message);
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
@@ -458,7 +467,7 @@
         }
     }
 
-    private void MostrarMatriz(string id)
+    private async Task MostrarMatriz(string id)
     {
         try
         {
@@ -468,10 +477,11 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
-    private void DefinirJob(int id)
+    private async Task DefinirJob(int id)
     {
         try
         {
@@ -481,6 +491,7 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
@@ -518,6 +529,7 @@
 
             mensajeAlerta = "Proyecto cerrado exitosamente.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
 
             mostrarFormulario2 = false;
 
@@ -530,6 +542,7 @@
                 Logger.LogError(ex.Message);
                 mensajeAlerta = ex.Message;
                 mostrarAlerta = true;
+                await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
             }
         }
         catch (Exception ex)
@@ -537,6 +550,7 @@
             Logger.LogError(ex.Message);
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 }

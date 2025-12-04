@@ -3,6 +3,7 @@ using Jtbd.Domain.Entities;
 using Jtbd.Domain.ViewModel;
 using Jtbd.Infrastructure.DataContext;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Serialization;
 
 namespace Jtbd.Infrastructure.Repositories
 {
@@ -33,13 +34,27 @@ namespace Jtbd.Infrastructure.Repositories
                 int j = 0;
                 foreach (StoriesGroupsPushes gp in storiespush.Where(x => x.Stories.IdStorie == grp.Stories.IdStorie).OrderBy(x => x.Groups.IdGroup).ToList())
                 {
-                    feacture[j] = (decimal)gp.ValorPush;
+                    try
+                    {
+                        feacture[j] = Convert.ToDecimal($"{gp.ValorPush.ToString()}.00");
+                    }
+                    catch
+                    {
+                        feacture[j] = 0;
+                    }
                     j++;
                 }
 
                 foreach (StoriesGroupsPulls gp in storiespull.Where(x => x.Stories.IdStorie == grp.Stories.IdStorie).OrderBy(x => x.Groups.IdGroup).ToList())
                 {
-                    feacture[j] = (decimal)gp.ValorPull;
+                    try
+                    {
+                        feacture[j] = Convert.ToDecimal($"{gp.ValorPull.ToString()}.00");
+                    }
+                    catch
+                    {
+                        feacture[j] = 0;
+                    }
                     j++;
                 }
 
@@ -101,7 +116,7 @@ namespace Jtbd.Infrastructure.Repositories
                     {
                         decimal increase = CalculateWardIncrease(activeClusters[i], activeClusters[j]);
 
-                        if (increase < minIncrease)
+                        if (increase <= minIncrease)
                         {
                             minIncrease = increase;
                             bestA = activeClusters[i];
@@ -169,7 +184,7 @@ namespace Jtbd.Infrastructure.Repositories
                 ClusterNode? nodeToSplit = finalNodes
                     .Where(n => n.Left != null && n.Right != null)
                     .OrderByDescending(n => n.MergeCost)
-                    .ThenBy(n => n.GetMinOriginalIndex())
+                    .ThenByDescending(n => n.GetMinOriginalIndex())
                     .FirstOrDefault();
 
                 if (nodeToSplit == null) break;

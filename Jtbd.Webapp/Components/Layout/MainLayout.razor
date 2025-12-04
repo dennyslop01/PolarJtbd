@@ -61,7 +61,7 @@
     </div>
     @if (mostrarAlerta)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" id="divAlerta">
             @mensajeAlerta
             <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
         </div>
@@ -121,8 +121,23 @@ else
     }
 }
 
-<script>
+<script language="javascript">
+    window.TimeoutHelper = {
+        showAndHide: function (elementId, timeoutMs) {
+            const divElement = document.getElementById(elementId);
 
+            if (divElement) {
+                // Ya no necesitas 'display: block;' aquí si usas OnAfterRenderAsync
+                // porque Blazor ya lo ha puesto visible condicionalmente.
+                // Pero lo dejamos como seguro.
+                divElement.style.display = 'block';
+
+                setTimeout(function () {
+                    divElement.style.display = 'none';
+                }, timeoutMs);
+            }
+        }
+    };
     function toggleBootstrapCollapse() {
         var x = document.getElementById("demo");
         if (x.style.display === "none") {

@@ -8,7 +8,7 @@ namespace Jtbd.Infrastructure.Repositories
     public class StoriesRepository(JtbdDbContext context) : IStories
     {
         private readonly JtbdDbContext _context = context;
-        public async Task<bool> CreateAsync(CreateStorie stories)
+        public async Task<Stories> CreateAsync(CreateStorie stories)
         {
             Stories auxStorie = new Stories();
             auxStorie.TitleStorie = stories.TitleStorie;
@@ -47,7 +47,7 @@ namespace Jtbd.Infrastructure.Repositories
             _context.Entry(project).State = EntityState.Detached;
             _context.Entry(interview).State = EntityState.Detached;
 
-            return true;
+            return auxStorie;
         }
 
         public async Task<bool> DeleteAsync(int id)

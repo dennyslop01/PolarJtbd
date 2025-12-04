@@ -13,13 +13,22 @@
             <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
                 @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
             </button>&nbsp;/&nbsp;
+            <button class="btn btn-link btn-sm me-2 align-content-end" @onclick="MostrarMatriz" title="Regresar">
+                @(proyecto == null ? "-" : "Matriz Historias")  <i class="bi bi-arrow-return-left"></i>
+            </button>
         </div>
         <h3 class="text-start mt-4">Definir Jobs Cluster @IdCluster</h3>
         <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-secondary me-3" @onclick="MostrarMatriz" title="Matriz Historias">
-                <i class="bi bi-kanban"></i>
-            </button>
-            <button class="btn btn-secondary me-3" @onclick="MostrarClusteres" title="Ver Clusteres">
+            @if (proyecto.StatusProject == 1)
+            {
+                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                {
+                    <button class="btn btn-success me-3" @onclick="GuardarEntidad2" title="Actualizar Historia">
+                        <i class="bi bi-save"></i>
+                    </button>
+                }
+            }
+            <button class= "btn btn-secondary me-3" @onclick = "MostrarClusteres" title = "Ver Clusteres" >
                 <i class="bi bi-building"></i>
             </button>
         </div>
@@ -27,11 +36,24 @@
 </div>
 @if (mostrarAlerta)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div id="divAlerta" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
         @mensajeAlerta
         <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
     </div>
 }
+
+<EditForm Model="@entidadActual2" OnValidSubmit="GuardarEntidad2">
+    <div class="row align-content-center">
+        <div class="mb-6">
+            <label class="form-label"><strong>Enunciado :</strong></label>
+            <InputTextArea class="form-control" @bind-Value="entidadActual2.Descripcion" />
+        </div>
+        <div class="mb-6">
+            <label class="form-label"><strong></strong></label>
+        </div>
+    </div>
+    <br />
+</EditForm>
 
 
 <div class="row align-content-center">
@@ -43,9 +65,12 @@
             <div class="col-lg-1 justify-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="More About" @onclick="() => MostrarEntidad(1)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="More About" @onclick="() => MostrarEntidad(1)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -63,8 +88,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -77,7 +102,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -102,9 +127,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Less About" @onclick="() => MostrarEntidad(2)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Less About" @onclick="() => MostrarEntidad(2)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -123,8 +151,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -137,7 +165,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -167,9 +195,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Key Tradeoffs" @onclick="() => MostrarEntidad(3)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Key Tradeoffs" @onclick="() => MostrarEntidad(3)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -188,8 +219,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -202,7 +233,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -219,6 +250,12 @@
             </table>
         }
     </div>
+</div>
+<hr />
+<br />
+<br />
+
+<div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
             <div class="col-lg-11">
@@ -227,9 +264,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Pushes" @onclick="() => MostrarEntidad(4)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Pushes" @onclick="() => MostrarEntidad(4)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -248,8 +288,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -262,7 +302,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -279,11 +319,6 @@
             </table>
         }
     </div>
-</div>
-<br />
-<br />
-
-<div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
             <div class="col-lg-11">
@@ -292,9 +327,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Pulls" @onclick="() => MostrarEntidad(5)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Pulls" @onclick="() => MostrarEntidad(5)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -313,8 +351,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -327,7 +365,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -344,6 +382,12 @@
             </table>
         }
     </div>
+</div>
+<hr />
+<br />
+<br />
+
+<div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
             <div class="col-lg-11">
@@ -352,9 +396,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Aspectos Funcionales" @onclick="() => MostrarEntidad(6)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Aspectos Funcionales" @onclick="() => MostrarEntidad(6)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -373,8 +420,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -387,7 +434,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -404,11 +451,6 @@
             </table>
         }
     </div>
-</div>
-<br />
-<br />
-
-<div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
             <div class="col-lg-11">
@@ -417,9 +459,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Aspectos Emocionales" @onclick="() => MostrarEntidad(7)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Aspectos Emocionales" @onclick="() => MostrarEntidad(7)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -438,8 +483,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -452,7 +497,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -469,6 +514,12 @@
             </table>
         }
     </div>
+
+</div>
+<br />
+<br />
+
+<div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
             <div class="col-lg-11">
@@ -477,9 +528,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Aspectos Sociales" @onclick="() => MostrarEntidad(8)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Aspectos Sociales" @onclick="() => MostrarEntidad(8)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -498,8 +552,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -512,7 +566,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -529,11 +583,6 @@
             </table>
         }
     </div>
-</div>
-<br />
-<br />
-
-<div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
             <div class="col-lg-11">
@@ -542,9 +591,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="() => MostrarEntidad(9)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Ansiedades" @onclick="() => MostrarEntidad(9)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -563,8 +615,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -577,7 +629,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -594,6 +646,12 @@
             </table>
         }
     </div>
+</div>
+<hr />
+<br />
+<br />
+
+<div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
             <div class="col-lg-11">
@@ -602,9 +660,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="Set Competitivo" @onclick="() => MostrarEntidad(10)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="Set Competitivo" @onclick="() => MostrarEntidad(10)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -623,8 +684,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -637,7 +698,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -655,6 +716,7 @@
         }
     </div>
 </div>
+<hr />
 <br />
 <br />
 
@@ -667,9 +729,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="What we hear when hiring" @onclick="() => MostrarEntidad(11)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="What we hear when hiring" @onclick="() => MostrarEntidad(11)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -688,8 +753,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -702,7 +767,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -727,9 +792,12 @@
             <div class="col-lg-1 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
-                    <button class="btn btn-primary btn-sm" title="What we hear when firing" @onclick="() => MostrarEntidad(12)">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button class="btn btn-primary btn-sm" title="What we hear when firing" @onclick="() => MostrarEntidad(12)">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    }
                 }
             </div>
         </div>
@@ -748,8 +816,8 @@
         else
         {
             <br />
-            <table class="table table-striped table-hover">
-                <thead class="table-secondary bg-opacity-25">
+            <table class="table">
+                <thead class="table">
                     <tr>
                         <th width="10%">#</th>
                         <th width="65%">Nombre</th>
@@ -762,7 +830,7 @@
                         <tr>
                             <td width="10%">@index</td>
                             <td width="65%">@p.Descripcion</td>
-                            <td width="25%" class="justify-content-end">
+                            <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
@@ -885,11 +953,13 @@
     private bool mostrarEntidad = false;
     private string username = "dusa-user";
     private string userrol = "5";
+    private string enunciado = string.Empty;
+    private int idenunciado = 0;
     private bool cargando = false;
-
 
     private Projects proyecto = new();
     private CreateClustersJobs entidadActual = new();
+    private CreateClustersJobs entidadActual2 = new();
     private List<StoriesClustersJobs> listaGral = new();
     private List<StoriesClustersJobs> lista1 = new();
     private List<StoriesClustersJobs> lista2 = new();
@@ -903,15 +973,42 @@
     private List<StoriesClustersJobs> lista10 = new();
     private List<StoriesClustersJobs> lista11 = new();
     private List<StoriesClustersJobs> lista12 = new();
+    private List<StoriesClustersJobs> lista13 = new();
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IProjects repoproyect { get; set; } = null!;
     [Inject] private IEmployee repouser { get; set; } = null!;
     [Inject] private IMatrizWard repomatrix { get; set; } = null!;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        mostrarAlerta = true;
+        if (firstRender)
+        {
+            mostrarAlerta = false;
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
         cargando = true;
+        try
+        {
+            var authState = await authenStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                username = authState.User.Identity.Name.Split(@"\")[1];
+                var user = await repouser.GetByUsernameAsync(username);
+                if (user != null)
+                {
+                    userrol = user.EmployeeRol.ToString();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
@@ -946,6 +1043,22 @@
         lista10 = listaGral.Where(x => x.IdTipo == 10).ToList();
         lista11 = listaGral.Where(x => x.IdTipo == 11).ToList();
         lista12 = listaGral.Where(x => x.IdTipo == 12).ToList();
+        lista13 = listaGral.Where(x => x.IdTipo == 13).ToList();
+
+        foreach (var enumc in lista13)
+        {
+            idenunciado = enumc.Id;
+            enunciado = enumc.Descripcion;
+        }
+
+        entidadActual2 = new CreateClustersJobs
+        {
+            Id = idenunciado,
+            IdProject = int.Parse(IdProyecto),
+            IdCluster = int.Parse(IdCluster),
+            IdTipo = 13,
+            Descripcion = enunciado
+        };
     }
 
     private void MostrarEntidad(int idTipo)
@@ -1001,6 +1114,7 @@
             mostrarEntidad = false;
             mensajeAlerta = "Item guardado exitosamente.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
         catch (Exception ex)
         {
@@ -1020,6 +1134,7 @@
                 await CargarDatos();
                 mensajeAlerta = "Item eliminado exitosamente.";
                 mostrarAlerta = true;
+                await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
             }
         }
         catch (Exception ex)
@@ -1049,24 +1164,13 @@
     {
         try
         {
-            var authState = await authenStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    userrol = user.EmployeeRol.ToString();
-                }
-
-                NavigationManager.NavigateTo($"proyect/proyecsmatriz/{int.Parse(IdProyecto)}/{userrol}");
-            }            
+           NavigationManager.NavigateTo($"proyect/proyecsmatriz/{int.Parse(IdProyecto)}/{userrol}");
         }
         catch (Exception ex)
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
@@ -1074,24 +1178,37 @@
     {
         try
         {
-            var authState = await authenStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
-                {
-                    userrol = user.EmployeeRol.ToString();
-                }
-
-                NavigationManager.NavigateTo($"proyect/proyecscluster/{int.Parse(IdProyecto)}/{userrol}");
-            }
+            NavigationManager.NavigateTo($"proyect/proyecscluster/{int.Parse(IdProyecto)}/{userrol}");
         }
         catch (Exception ex)
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
+        }
+    }
+
+    private async Task GuardarEntidad2()
+    {
+        try
+        {
+            if (entidadActual2.Id == 0)
+            {
+                await repomatrix.CreateClusterJobsAsync(entidadActual2);
+            }
+            else
+                await repomatrix.UpdateClusterJobsAsync(entidadActual2);
+
+            await CargarDatos();
+
+            mostrarEntidad = false;
+            mensajeAlerta = "Enunciado guardado exitosamente.";
+            mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
         }
     }
 }

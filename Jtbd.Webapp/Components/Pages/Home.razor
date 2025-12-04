@@ -5,7 +5,7 @@
 
 <PageTitle>Home</PageTitle>
 
-<p>
+@* <p>
 <strong>Qué es el método de Ward</strong>
     <br />
     El método de Ward es un método jerárquico de agrupamiento que busca minimizar la varianza total dentro de un grupo.
@@ -19,7 +19,7 @@
     En la aplicación web JTBD, el método de Ward se emplea para agrupar las historias creadas durante las entrevistas en clusters.
     Este proceso se basa en las agrupaciones previas de Pushes y Pulls, lo que permite organizar los datos de manera jerárquica y minimizar 
     la varianza dentro de cada grupo, asegurando que los elementos dentro de cada clúster sean lo más similares posible entre sí.
-</p>
+</p> *@
 
 @if (cargando)
 {
@@ -39,6 +39,18 @@
 }
 @code {
     private bool cargando = false;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            NavigationManager.NavigateTo($"proyect/proyectos");
+        }
+        // No es necesario devolver base.OnAfterRenderAsync, solo llámalo
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
     protected override async Task OnInitializedAsync()
     {
         cargando = true;

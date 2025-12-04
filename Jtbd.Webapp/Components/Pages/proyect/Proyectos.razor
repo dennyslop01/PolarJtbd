@@ -22,7 +22,7 @@
 
         @if (mostrarAlerta)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div id="divAlerta" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
                 @mensajeAlerta
                 <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
             </div>
@@ -46,21 +46,30 @@
                 <ChildContentHeader>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="30%">Nombre</th>
+                        <th width="40%">Nombre</th>
                         <th width="15%">Fecha</th>
                         <th width="10%">Departamento</th>
                         <th width="10%">Categoría</th>
-                        <th width="30%"> </th>
+                        <th width="20%"> </th>
                     </tr>
                 </ChildContentHeader>
                 <ChildContentRow Context="p">
                     <tr>
                         <td width="5%">@BuscarIndex(p.IdProject)</td>
-                        <td width="30%">@p.ProjectName</td>
+                        <td width="40%">@p.ProjectName</td>
                         <td width="15%">@p.ProjectDate</td>
                         <td width="10%">@p.Deparment.Name</td>
                         <td width="10%">@p.Categories.Name</td>
-                        <td width="30%" class="justify-content-end mb-1">
+                        <td width="20%" class="text-end">
+                            @* @if (p.StatusProject == 2)
+                            {
+                                @if (UserRol > 0 && UserRol < 3)
+                                {
+                                    <button class="btn btn-primary btn-sm m-1" title="Abrir Proyecto" @onclick="() => EditarEntidad2(p)">
+                                        <i class="bi bi-door-open"></i>
+                                    </button>
+                                }
+                            } *@
                             @if (p.StatusProject == 1)
                             {
                                 @if (UserRol > 0 && UserRol < 3)
@@ -79,21 +88,18 @@
                             <button class="btn btn-secondary btn-sm me-1" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
                                 <i class="bi bi-kanban"></i>
                             </button>
-                            @if (p.StatusProject == 1)
+                            @if (UserRol > 0 && UserRol < 3)
                             {
-                                @if (UserRol > 0 && UserRol < 3)
-                                {
-                                    <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                }
+                                <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             }
                         </td>
                     </tr>
                 </ChildContentRow>
             </PaginationComponentEdit>
             @* <table id="myTable" class="table nowrap dt-responsive align-middle table-hover table-bordered" style="width:100%">
-                <thead class="table-secondary bg-opacity-25">
+                <thead class="table">
                     <tr>
                         <th width="5%">#</th>
                         <th width="30%">Nombre</th>
@@ -217,6 +223,33 @@
     </div>
 }
 
+@if (mostrarFormulario2)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Abrir Proyecto</h5>
+                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        ¿Está seguro? Desea volver abrir el proyecto.
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary me-2" @onclick="CerrarProyecto">
+                            <i class="bi bi-times"></i> Abrir
+                        </button>
+                        <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                            <i class="bi bi-times"></i> Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @if (cargando)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); align-content:center">
@@ -241,6 +274,7 @@
     private List<Projects> proyectos = new();
     private CreateProject proyectoActual = new();
     private bool mostrarFormulario = false;
+    private bool mostrarFormulario2 = false;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private string username = "dusa-user";
@@ -258,9 +292,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        mostrarAlerta = true;
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("initializeDataTables", "myTable");
+            mostrarAlerta = false;
         }
     }
 
@@ -329,7 +364,7 @@
         return index1;
     }
 
-    private void MostrarFormulario()
+    private async Task MostrarFormulario()
     {
         try
         {
@@ -341,7 +376,7 @@
                 int aux = (UserDepart == null ? -1 : int.Parse(UserDepart.ToString()));
                 proyectoActual.IdDeparmento = aux;
             }
-           
+
             proyectoActual.idCategoria = -1;
             proyectoActual.StatusProject = 1;
             proyectoActual.ProjectDate = DateTime.Now;
@@ -356,10 +391,42 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
-    private void EditarEntidad(Projects proyecto)
+    private async Task EditarEntidad(Projects proyecto)
+    {
+        try
+        {
+            proyectoActual = new CreateProject
+            {
+                IdProject = proyecto.IdProject,
+                ProjectName = proyecto.ProjectName,
+                ProjectDate = proyecto.ProjectDate,
+                IdDeparmento = proyecto.Deparment.Id,
+                idCategoria = proyecto.Categories.Id,
+                ProjectDescription = proyecto.ProjectDescription,
+                MaxPushes = proyecto.MaxPushes,
+                MaxPulls = proyecto.MaxPulls,
+                RutaImage = proyecto.RutaImage,
+                CreatedDate = proyecto.CreatedDate,
+                CreatedUser = proyecto.CreatedUser,
+                UpdatedDate = DateTime.Now,
+                UpdatedUser = username,
+                StatusProject = proyecto.StatusProject
+            };
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
+        }
+    }
+
+    private async Task EditarEntidad2(Projects proyecto)
     {
         try
         {
@@ -378,14 +445,15 @@
                     CreatedUser = proyecto.CreatedUser,
                     UpdatedDate = DateTime.Now,
                     UpdatedUser = username,
-                    StatusProject = proyecto.StatusProject
+                    StatusProject = 1
                 };
-            mostrarFormulario = true;
+            mostrarFormulario2 = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
@@ -402,11 +470,13 @@
             mostrarFormulario = false;
             mensajeAlerta = "Proyecto guardado exitosamente.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
         catch(Exception ex)
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
@@ -421,12 +491,14 @@
                 proyectos = (List<Projects>)await repository.GetAllAsync();
                 mensajeAlerta = "Proyecto eliminado exitosamente.";
                 mostrarAlerta = true;
+                await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
             }
         }
         catch (Exception ex)
         {
             mensajeAlerta = "No se puede eliminar el registros ya que existen relaciones con otras tablas que no han sido eliminadas.";
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
             Logger.LogError(ex.Message);
         }
     }
@@ -434,9 +506,10 @@
     private void Cancelar()
     {
         mostrarFormulario = false;
+        mostrarFormulario2 = false;
     }
 
-    private void AgrgarEntrvistado(string id)
+    private async Task AgrgarEntrvistado(string id)
     {
         try
         {
@@ -446,10 +519,11 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
-    private void AgrgarGrupos(string id)
+    private async Task AgrgarGrupos(string id)
     {
         try
         {
@@ -459,10 +533,11 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
-    private void AgruparHistorias(string id)
+    private async Task AgruparHistorias(string id)
     {
         try
         {
@@ -472,10 +547,11 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
-    private void MostrarMatriz(string id)
+    private async Task MostrarMatriz(string id)
     {
         try
         {
@@ -485,10 +561,11 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 
-    private void ValidarGrupos(string id)
+    private async Task ValidarGrupos(string id)
     {
         try
         {
@@ -498,6 +575,40 @@
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
+        }
+    }
+
+    private async Task CerrarProyecto()
+    {
+        try
+        {
+            await repository.UpdateAsync(proyectoActual);
+
+            mensajeAlerta = "Proyecto re-abierto exitosamente.";
+            mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
+
+            mostrarFormulario2 = false;
+
+            try
+            {
+                proyectos = (List<Projects>)await repository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.Message);
+                mensajeAlerta = ex.Message;
+                mostrarAlerta = true;
+                await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+            await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
     }
 }

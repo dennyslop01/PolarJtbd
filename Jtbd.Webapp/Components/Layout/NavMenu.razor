@@ -13,15 +13,16 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
-        <div class="nav-item px-3">
+
+        @* <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <p><i class="bi bi-house-door m-1"></i> Home</p>
+                <div><i class="bi bi-house-door m-1"></i> Home</div>
             </NavLink>
-        </div>
+        </div> *@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="proyect/proyectos">
-                <p><i class="bi bi-clipboard-data m-1"></i> Proyectos</p>
+                <div><i class="bi bi-clipboard-data m-1"></i> Proyectos</div>
             </NavLink>
         </div>
 
@@ -29,17 +30,17 @@
         {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="@($"admin/categorias/{userrol}")">
-                    <p><i class="bi bi-bezier2 m-1"></i> Categorías</p>
+                    <div><i class="bi bi-bezier2 m-1"></i> Categorías</div>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="@($"admin/departamentos/{userrol}")">
-                    <p><i class="bi bi-bezier m-1"></i> Departamentos</p>
+                    <div><i class="bi bi-bezier m-1"></i> Departamentos</div>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="@($"admin/usuarios/{userrol}")">
-                    <p><i class="bi bi-person m-1"></i> Usuarios</p>
+                    <div><i class="bi bi-person m-1"></i> Usuarios</div>
                 </NavLink>
             </div>
         }
