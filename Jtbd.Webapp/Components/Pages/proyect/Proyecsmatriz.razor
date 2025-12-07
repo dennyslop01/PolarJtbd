@@ -271,13 +271,23 @@
                             <br />
                             <label class="form-label">@entidadValidar.Anxieties</label>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Respuesta:</label>
-                            <InputSelect class="form-select" @bind-Value="entidadValidar.ValorSeleccionado">
+                        <div class="mb-3" >
+                            <strong><label class="form-label">Respuesta:</label></strong>&nbsp;&nbsp;
+                           @*  <InputSelect class="form-select" @bind-Value="entidadValidar.ValorSeleccionado">
                                 <option value="-1">-- Seleccione uno --</option>
                                 <option value="1">Si</option>
                                 <option value="2">No</option>
-                            </InputSelect>
+                            </InputSelect> *@
+                            <InputRadioGroup class="form-control" @bind-value="entidadValidar.ValorSeleccionado" >
+                                <div class="row">
+                                    <div class="col-2">
+                                        <InputRadio Value="1"></InputRadio>&nbsp;&nbsp;Si&nbsp;&nbsp;
+                                    </div>
+                                    <div class="col-2">
+                                        <InputRadio Value="2"></InputRadio>&nbsp;&nbsp;No
+                                    </div>
+                                </div>
+                            </InputRadioGroup>
                             <ValidationMessage For="@(() => entidadValidar.ValorSeleccionado)" />
                         </div>
                         <div class="d-flex justify-content-end">

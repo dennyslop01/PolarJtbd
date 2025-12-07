@@ -2,10 +2,8 @@ using Jtbd.Application.Interfaces;
 using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Repositories;
 using Jtbd.Webapp.Components;
-using Jtbd.Webapp.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
