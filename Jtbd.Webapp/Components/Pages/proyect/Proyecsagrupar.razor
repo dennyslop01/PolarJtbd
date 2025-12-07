@@ -30,7 +30,7 @@
 @if (mostrarAlerta)
 {
     <br />
-    <div id="divAlerta" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
+    <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container" role="alert" style="display:none;">
         @mensajeAlerta
         <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
     </div>
@@ -86,7 +86,7 @@
                             @foreach (var group in grupospush)
                             {
                                 <div class="col-lg-6">
-                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto; resize: none;"
+                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow:scroll; resize:none;"
                                          ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
                                         <div class="row">
                                             <div class="col-10">
@@ -621,13 +621,13 @@
         font-size: 11px;
     }
     .list-container {
-        border: 1px solid #000000; /* Borde sólido de 1px y color negro */
+        border: 1px solid #D3D3D3; /* Borde sólido de 1px y color negro */
         border-radius: 15px;
         padding: 10px;
         margin: 10px;
         min-height: 150px;
         flex: 1;
-        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.4); /* Sombra negra con opacidad */
+        box-shadow: 4px 4px 8px rgba(150, 150, 150, 0.5); /* Sombra negra con opacidad */
     }
 
     .draggable-item {

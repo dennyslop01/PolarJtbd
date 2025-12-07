@@ -59,3 +59,54 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* En tu archivo .css principal */
+
+/* Ancho de la barra */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px; /* Para scroll horizontal */
+}
+
+/* El carril (fondo) de la barra */
+/* Truco: Usar margen transparente para que no toque las esquinas del contenedor */
+::-webkit-scrollbar-track {
+    background: transparent;
+    margin-top: 4px; /* Margen arriba y abajo para alejarlo de las esquinas */
+    border-radius: 100vh;
+    margin-bottom: 12px;
+}
+
+/* El "pulgar" (la parte que arrastras) */
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* Color gris claro (Tailwind gray-300) */
+    border-radius: 100vh; /* Redondeo total */
+    border: 2px solid transparent; /* Truco para que parezca más delgado y flotante */
+    background-clip: content-box;
+}
+
+/* Hover sobre el pulgar */
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* Color gris medio (Tailwind gray-400) */
+    background-clip: content-box;
+    border: 2px solid transparent;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+.sidebar {
+    width: 250px; /* Define el ancho fijo para el menú */
+    position: fixed; /* Lo fija en la posición */
+    height: 100vh;
+    overflow-y: hidden; /* Permite el scroll si el contenido es largo */
+}
+
+.toast-container {
+    position: fixed; /* Fija la posición en la ventana */
+    top: 20px; /* Distancia desde la parte superior */
+    right: 20px; /* Distancia desde la derecha */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    /* Estilos adicionales para apariencia si no usas Bootstrap */
+}
