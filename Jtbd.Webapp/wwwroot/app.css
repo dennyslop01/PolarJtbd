@@ -96,12 +96,12 @@ h1:focus {
     background: transparent;
 }
 
-.sidebar {
-    width: 250px; /* Define el ancho fijo para el menú */
-    position: fixed; /* Lo fija en la posición */
-    height: 100vh;
-    overflow-y: hidden; /* Permite el scroll si el contenido es largo */
-}
+/*.sidebar {
+    width: 250px;*/ /* Define el ancho fijo para el menú */
+    /*position: fixed;*/ /* Lo fija en la posición */
+    /*height: 100vh;
+    overflow-y: hidden;*/ /* Permite el scroll si el contenido es largo */
+/*}*/
 
 .toast-container {
     position: fixed; /* Fija la posición en la ventana */
@@ -110,3 +110,17 @@ h1:focus {
     z-index: 1000; /* Asegura que esté por encima de otros elementos */
     /* Estilos adicionales para apariencia si no usas Bootstrap */
 }
+
+.sidebar {
+    width: 230px; /* Ancho completo original */
+    background-color: #001f3f; /* Color azul oscuro de la imagen */
+    transition: width 0.5s ease; /* Transición suave del ancho */
+    overflow-x: hidden; /* Oculta el contenido que se desborde horizontalmente */
+    position: fixed;
+    height: 100%;
+    overflow: hidden;
+}
+
+    .sidebar.collapsed {
+        width: 70px !important;
+    }

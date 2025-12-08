@@ -26,32 +26,38 @@
 @if (!string.IsNullOrEmpty(username))
 {
     <div class="page">
-        <div class="sidebar" id="demo">
-            @if (!string.IsNullOrEmpty(username))
-            {
-                <NavMenu userrol="@userrol.ToString()"/>
-            }
+        <div class="sidebar" id="sidebardemo">
+            <div class="sidebar-content">
+                @if (!string.IsNullOrEmpty(username))
+                {
+                    <NavMenu userrol="@userrol.ToString()" />
+                }
+            </div>            
         </div>
 
-        <main>
-           @*  <button type="button" class="btn btn-xs btn-primary" onclick="toggleBootstrapCollapse();">
+        <div class="main-content" id="maindemo" style="width:100%">
+            <main>
+                @*  <button type="button" class="btn btn-xs btn-primary" onclick="toggleBootstrapCollapse();">
                 ☰
             </button> *@
-            <div class="row">
-                <div class="col-lg-6">
-                    <p>
-                        <h5><strong>&nbsp;&nbsp;&nbsp;&nbsp;JTBD WEB APP – Empresas Polar</strong></h5>
-                    </p>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <p>
+                            <h5><strong>&nbsp;&nbsp;&nbsp;&nbsp;JTBD WEB APP – Empresas Polar</strong></h5>
+                        </p>
+                    </div>
+                    <div class="col-lg-5 d-flex justify-content-end mb-3">
+                        <strong>@usernamelargo</strong>
+                    </div>
                 </div>
-                <div class="col-lg-5 d-flex justify-content-end mb-3">
-                    <strong>@usernamelargo</strong>
-                </div>
-            </div>
 
-            <article class="content px-4">
-               @Body
-            </article>
-        </main>
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
+        </div>
+
+       
     </div>
 
     <div id="blazor-error-ui" data-nosnippet>
@@ -122,7 +128,32 @@ else
 }
 
 <script language="javascript">
-    window.TimeoutHelper = {
+    $(document).ready(function () {
+            var EstadoMenu = localStorage.getItem('sidebarState');
+
+            if(EstadoMenu == "collapsed"){
+               var sidebar = document.getElementById("sidebardemo");
+               var mainContent = document.getElementById("maindemo");
+               var miDiv = document.getElementById('divtexto');
+               var miDiv2 = document.getElementById('diviconos');
+
+               if (sidebar) {
+                   sidebar.classList.toggle("collapsed");
+                   miDiv.style.display = 'none';
+                   miDiv2.style.display = 'block';
+               } else {
+                   console.error("Error: No se encontró elementos ('sidebar')");
+               }
+               if (mainContent) {
+                   mainContent.classList.toggle("expanded");
+               } else {
+                   console.error("Error: No se encontró elementos ('main-content')");
+               }
+            }
+            console.log("Estado del menú: " + EstadoMenu);
+       });
+       
+       window.TimeoutHelper = {
         showAndHide: function (elementId, timeoutMs) {
             const divElement = document.getElementById(elementId);
 
@@ -138,12 +169,33 @@ else
             }
         }
     };
-    function toggleBootstrapCollapse() {
-        var x = document.getElementById("demo");
-        if (x.style.display === "none") {
-            x.style.display = "block";
-        } else {
-            x.style.display = "none";
-        }
+
+    function toggleBootstrapCollapse(event) {
+        if (event.target.classList.contains('navbar-toggler')) {
+            var sidebar = document.getElementById("sidebardemo");
+            var mainContent = document.getElementById("maindemo");
+            var miDiv = document.getElementById('divtexto');
+            var miDiv2 = document.getElementById('diviconos');
+
+            // Asegúrate de que los elementos existan antes de intentar usarlos
+            if (sidebar) {
+                sidebar.classList.toggle("collapsed");
+                if(sidebar.classList.contains('collapsed')){
+                    miDiv.style.display = 'none';
+                    miDiv2.style.display = 'block';
+                }else{
+                    miDiv2.style.display = 'none';
+                    miDiv.style.display = 'block';
+                }
+            } else {
+                console.error("Error: No se encontró elementos ('sidebar')");
+            }
+            if (mainContent) {
+                mainContent.classList.toggle("expanded");
+            } else {
+                console.error("Error: No se encontró elementos ('main-content')");
+            }
+            localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+        }        
     }
 </script>
