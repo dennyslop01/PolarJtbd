@@ -121,6 +121,6 @@ h1:focus {
     overflow: hidden;
 }
 
-    .sidebar.collapsed {
-        width: 70px !important;
-    }
+.sidebar.collapsed {
+    width: 100px !important;
+}

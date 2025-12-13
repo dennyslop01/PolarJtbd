@@ -6,9 +6,9 @@
         <input type="checkbox" id="menuToggle" title="Navigation menu" class="navbar-toggler" onclick="toggleBootstrapCollapse(event);" />
     </div>
 
-    <div class="container-fluid align-content-center">
+    <div class="container-fluid align-content-center" >
         <a class="navbar-brand" href="">
-            <img src="logoinnova.png" />
+            <img src="logoinnova.png" id="imgLogo" />
         </a>
     </div>
 </div>
@@ -43,34 +43,36 @@
         </div>
     </nav>
 
-    <nav class="nav">
-         <div id="diviconos" style="display:none;">
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="proyect/proyectos">
-                    <div><i class="bi bi-clipboard-data m-1" title="Proyectos"></i></div>
-                </NavLink>
-            </div>
+    <div>
+        <nav class="nav flex justify-content-center">
+            <div id="diviconos" style="display:none;">
+                <div class="nav-item">
+                    <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:10px" href="proyect/proyectos">
+                        <div><i class="bi bi-clipboard-data m-1" title="Proyectos"></i></div>
+                    </NavLink>
+                </div>
 
-            @if (userrol == "1")
-            {
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@($"admin/categorias/{userrol}")">
-                        <div><i class="bi bi-bezier2 m-1" title="Categorías"></i></div>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@($"admin/departamentos/{userrol}")">
-                        <div><i class="bi bi-bezier m-1" title="Departamentos"></i></div>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@($"admin/usuarios/{userrol}")">
-                        <div><i class="bi bi-person m-1" title="Usuarios"></i></div>
-                    </NavLink>
-                </div>
-            }
-        </div>
-    </nav>
+                @if (userrol == "1")
+                {
+                    <div class="nav-item">
+                        <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:10px" href="@($"admin/categorias/{userrol}")">
+                            <div><i class="bi bi-bezier2 m-1" title="Categorías"></i></div>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:10px" href="@($"admin/departamentos/{userrol}")">
+                            <div><i class="bi bi-bezier m-1" title="Departamentos"></i></div>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:10px" href="@($"admin/usuarios/{userrol}")">
+                            <div><i class="bi bi-person m-1" title="Usuarios"></i></div>
+                        </NavLink>
+                    </div>
+                }
+            </div>
+        </nav>
+    </div>    
 </div>
 
 @code {
