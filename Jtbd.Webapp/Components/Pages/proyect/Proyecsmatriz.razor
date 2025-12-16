@@ -271,13 +271,8 @@
                             <br />
                             <label class="form-label">@entidadValidar.Anxieties</label>
                         </div>
-                        <div class="mb-3" >
+                        @* <div class="mb-3" >
                             <strong><label class="form-label">Respuesta:</label></strong>&nbsp;&nbsp;
-                           @*  <InputSelect class="form-select" @bind-Value="entidadValidar.ValorSeleccionado">
-                                <option value="-1">-- Seleccione uno --</option>
-                                <option value="1">Si</option>
-                                <option value="2">No</option>
-                            </InputSelect> *@
                             <InputRadioGroup class="form-control" @bind-value="entidadValidar.ValorSeleccionado" >
                                 <div class="row">
                                     <div class="col-2">
@@ -287,6 +282,18 @@
                                         <InputRadio Value="2"></InputRadio>&nbsp;&nbsp;No
                                     </div>
                                 </div>
+                            </InputRadioGroup>
+                            <ValidationMessage For="@(() => entidadValidar.ValorSeleccionado)" />
+                        </div> *@
+                        <div class="mb-3" >
+                            <strong><label class="form-label">Respuesta:</label></strong>&nbsp;&nbsp;<br />
+                            <InputRadioGroup @bind-Value="entidadValidar.ValorSeleccionado" Class="radio-buttons-group">
+                                <label class="btn-radio-label">
+                                    <InputRadio Value="1"></InputRadio> Si
+                                </label>
+                                <label class="btn-radio-label-no">
+                                    <InputRadio Value="2"></InputRadio> No
+                                </label>
                             </InputRadioGroup>
                             <ValidationMessage For="@(() => entidadValidar.ValorSeleccionado)" />
                         </div>
@@ -389,7 +396,6 @@
     public string IdProyecto { get; set; }
     [Parameter]
     public string userrol { get; set; }
-
 
     private List<Tabla> registros = new();
     private List<Stories> stories = new(); 
@@ -1005,6 +1011,46 @@
         /* Opcional: un padding para que no se vea pegado */
         padding: 8px;
     }
+
+    /* Oculta el input de radio nativo */
+    .btn-radio-label, .btn-radio-label-no, input[type="radio"] {
+        display: none;
+    }
+
+    /* Estilo por defecto para el label (botón no seleccionado) */
+    .btn-radio-label, .btn-radio-label-no {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        background-color: #f4f4f4;
+        border-radius: 4px;
+        text-align: center;
+        transition: background-color 0.3s;
+    }
+
+    /* Estilo al pasar el ratón (hover) */
+    .btn-radio-label:hover, .btn-radio-label-no:hover {
+        background-color: #e9e9e9;
+    }
+
+    /* Estilo cuando el input de radio asociado está marcado (:checked) */
+    .btn-radio-label input[type="radio"]:checked + span,
+    .btn-radio-label:has(input[type="radio"]:checked) {
+        background-color: #007bff; /* Color de botón seleccionado (Bootstrap primary) */
+        color: white;
+        border-color: #007bff;
+    }
+
+    /* Estilo cuando el input de radio asociado está marcado (:checked) */
+    .btn-radio-label-no input[type="radio"]:checked + span,
+    .btn-radio-label-no:has(input[type="radio"]:checked) {
+        background-color: #F44336; /* Color de botón seleccionado (Bootstrap primary) */
+        color: white;
+        border-color: #F44336;
+    }
+
 </style>
 <script>
     function downloadFileFromStream(fileName, content) {
