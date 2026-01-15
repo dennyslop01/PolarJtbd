@@ -128,34 +128,35 @@ else
 }
 
 <script language="javascript">
-    $(document).ready(function () {
-            var EstadoMenu = localStorage.getItem('sidebarState');
+    $(document).ready(function() {
+        $(document).on('click', '.navbar-toggler', function(event) {
+            // ... (resto de tus variables)
+            var $sidebar = $("#sidebardemo");
+            var $slideBoton = $('#slideBoton');
 
-            if(EstadoMenu == "collapsed"){
-               var sidebar = document.getElementById("sidebardemo");
-               var mainContent = document.getElementById("maindemo");
-               var miDiv = document.getElementById('divtexto');
-               var miDiv2 = document.getElementById('diviconos');
-               var miDiv3 = document.getElementById('imgLogo');
+            if ($sidebar.length && $slideBoton.length) {
+                $sidebar.toggleClass("collapsed");
+                var isCollapsed = $sidebar.hasClass('collapsed');
 
-               if (sidebar) {
-                   sidebar.classList.toggle("collapsed");
-                   miDiv.style.display = 'none';
-                   miDiv2.style.display = 'block';
-                   miDiv3.style.display = 'none';
-               } else {
-                   console.error("Error: No se encontró elementos ('sidebar')");
-               }
-               if (mainContent) {
-                   mainContent.classList.toggle("expanded");
-               } else {
-                   console.error("Error: No se encontró elementos ('main-content')");
-               }
+                // ... (resto de tu lógica de visibilidad de divtexto, diviconos, etc.)
+
+                // ALINEACIÓN CON CLASES DE BOOTSTRAP 5
+                // 1. Asegura que el contenedor del botón use display: flex y ocupe todo el ancho
+                $slideBoton.parent().addClass('d-flex w-100');
+
+                if (isCollapsed) {
+                    // Centrar: quita la clase de justificar al final y añade la de centrar
+                    $slideBoton.parent().removeClass('justify-content-end').addClass('justify-content-center');
+                } else {
+                    // Derecha: quita la clase de centrar y añade la de justificar al final
+                    $slideBoton.parent().removeClass('justify-content-center').addClass('justify-content-end');
+                }
             }
-            console.log("Estado del menú: " + EstadoMenu);
-       });
-       
-       window.TimeoutHelper = {
+            // ... (resto de tu código para mainContent y localStorage)
+        });
+    });
+
+    window.TimeoutHelper = {
         showAndHide: function (elementId, timeoutMs) {
             const divElement = document.getElementById(elementId);
 
@@ -175,32 +176,40 @@ else
     function toggleBootstrapCollapse(event) {
         if (event.target.classList.contains('navbar-toggler')) {
             var sidebar = document.getElementById("sidebardemo");
-            var mainContent = document.getElementById("maindemo");
             var miDiv = document.getElementById('divtexto');
             var miDiv2 = document.getElementById('diviconos');
             var miDiv3 = document.getElementById('imgLogo');
+            var slideBoton = document.getElementById('slideBoton'); // ID correcto con B mayúscula
 
-            // Asegúrate de que los elementos existan antes de intentar usarlos
             if (sidebar) {
                 sidebar.classList.toggle("collapsed");
-                if(sidebar.classList.contains('collapsed')){
-                    miDiv.style.display = 'none';
-                    miDiv2.style.display = 'block';
-                    miDiv3.style.display = 'none';
-                }else{
-                    miDiv2.style.display = 'none';
-                    miDiv.style.display = 'block';
-                    miDiv3.style.display = 'block';
+                var isCollapsed = sidebar.classList.contains('collapsed');
+
+                // Visibilidad de secciones
+                miDiv.style.display = isCollapsed ? 'none' : 'block';
+                miDiv2.style.display = isCollapsed ? 'block' : 'none';
+                miDiv3.style.display = isCollapsed ? 'none' : 'block';
+
+                // ALINEACIÓN DEL BOTÓN
+                if (slideBoton) {
+                    // Forzamos que el contenedor ocupe el ancho y use flex para alinear
+                    slideBoton.parentElement.style.display = 'flex';
+                    slideBoton.parentElement.style.flexDirection = 'column'; // Apila elementos si es necesario
+
+                    if (isCollapsed) {
+                        // Centrar en el sidebar colapsado
+                        slideBoton.style.display = 'flex';
+                        slideBoton.style.justifyContent = 'center';
+                        slideBoton.style.width = '100%';
+                    } else {
+                        // Volver a la derecha (o su posición original)
+                        slideBoton.style.display = 'flex';
+                        slideBoton.style.justifyContent = 'flex-end';
+                        slideBoton.style.width = '100%';
+                    }
                 }
-            } else {
-                console.error("Error: No se encontró elementos ('sidebar')");
             }
-            if (mainContent) {
-                mainContent.classList.toggle("expanded");
-            } else {
-                console.error("Error: No se encontró elementos ('main-content')");
-            }
-            localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
-        }        
+            // ... resto de tu código para mainContent y localStorage
+        }
     }
 </script>

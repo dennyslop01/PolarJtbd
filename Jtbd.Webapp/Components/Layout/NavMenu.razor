@@ -1,79 +1,94 @@
 ﻿@using Jtbd.Webapp.Service
+@inject UIStateService UIState
 @rendermode InteractiveServer
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div>
-        <input type="checkbox" id="menuToggle" title="Navigation menu" class="navbar-toggler" onclick="toggleBootstrapCollapse(event);" />
-    </div>
-
-    <div class="container-fluid align-content-center" >
-        <a class="navbar-brand" href="">
-            <img src="logoinnova.png" id="imgLogo" />
-        </a>
-    </div>
-</div>
-
-<div class="nav-scrollable">
-    <nav class="nav flex-column">
-        <div id="divtexto">
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="proyect/proyectos">
-                    <div><i class="bi bi-clipboard-data m-1"></i> Proyectos</div>
-                </NavLink>
-            </div>
-
-            @if (userrol == "1")
-            {
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@($"admin/categorias/{userrol}")">
-                        <div><i class="bi bi-bezier2 m-1"></i> Categorías</div>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@($"admin/departamentos/{userrol}")">
-                        <div><i class="bi bi-bezier m-1"></i> Departamentos</div>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@($"admin/usuarios/{userrol}")">
-                        <div><i class="bi bi-person m-1"></i> Usuarios</div>
-                    </NavLink>
-                </div>
-            }
+@* <div class="sidebar" style="width: @(UIState.SidebarWidth)px;"> *@
+    <div class="top-row ps-3 navbar navbar-dark">
+        <div id="slideBoton">
+            <input type="checkbox" id="menuToggle" title="Navigation menu" class="navbar-toggler" onclick="toggleBootstrapCollapse(event);" />
         </div>
-    </nav>
 
-    <div>
-        <nav class="nav flex justify-content-center">
-            <div id="diviconos" style="display:none;">
-                <div class="nav-item">
-                    <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:10px" href="proyect/proyectos">
-                        <div><i class="bi bi-clipboard-data m-1" title="Proyectos"></i></div>
+        <div class="container-fluid align-content-center">
+            <a class="navbar-brand" href="">
+                <img src="logoinnova.png" id="imgLogo" />
+            </a>
+        </div>
+    </div>
+
+    <div class="nav-scrollable">
+        <nav class="nav flex-column">
+            <div id="divtexto">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="proyect/proyectos">
+                        <div><i class="bi bi-clipboard-data m-1"></i> Proyectos</div>
                     </NavLink>
                 </div>
 
                 @if (userrol == "1")
                 {
-                    <div class="nav-item">
-                        <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:10px" href="@($"admin/categorias/{userrol}")">
-                            <div><i class="bi bi-bezier2 m-1" title="Categorías"></i></div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@($"admin/categorias/{userrol}")">
+                            <div><i class="bi bi-bezier2 m-1"></i> Categorías</div>
                         </NavLink>
                     </div>
-                    <div class="nav-item">
-                        <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:10px" href="@($"admin/departamentos/{userrol}")">
-                            <div><i class="bi bi-bezier m-1" title="Departamentos"></i></div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@($"admin/departamentos/{userrol}")">
+                            <div><i class="bi bi-bezier m-1"></i> Departamentos</div>
                         </NavLink>
                     </div>
-                    <div class="nav-item">
-                        <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:10px" href="@($"admin/usuarios/{userrol}")">
-                            <div><i class="bi bi-person m-1" title="Usuarios"></i></div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@($"admin/usuarios/{userrol}")">
+                            <div><i class="bi bi-person m-1"></i> Usuarios</div>
                         </NavLink>
                     </div>
                 }
             </div>
         </nav>
-    </div>    
-</div>
+
+        <div>
+            <nav class="nav flex justify-content-center">
+                <div id="diviconos" style="display:none;">
+                    <div class="nav-item">
+                        <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:3px" href="proyect/proyectos">
+                            <div><i class="bi bi-clipboard-data m-1" title="Proyectos"></i></div>
+                        </NavLink>
+                    </div>
+
+                    @if (userrol == "1")
+                    {
+                        <div class="nav-item">
+                            <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:3px" href="@($"admin/categorias/{userrol}")">
+                                <div><i class="bi bi-bezier2 m-1" title="Categorías"></i></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item">
+                            <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:3px" href="@($"admin/departamentos/{userrol}")">
+                                <div><i class="bi bi-bezier m-1" title="Departamentos"></i></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item">
+                            <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:3px" href="@($"admin/usuarios/{userrol}")">
+                                <div><i class="bi bi-person m-1" title="Usuarios"></i></div>
+                            </NavLink>
+                        </div>
+                    }
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    @* Slider para controlar el ancho *@
+    @* <div class="px-3 mt-4">
+        <label class="text-white small">Ancho Menú: @UIState.SidebarWidth px</label>
+        <input type="range" class="form-range"
+               min="150" max="400"
+               value="@UIState.SidebarWidth"
+               @oninput="UpdateWidth" />
+    </div>
+</div> *@
+
+
+
 
 @code {
     [Parameter]
@@ -81,4 +96,12 @@
 
     private bool isExpandSubNavP = false;
     private bool isExpandSubNav = false;
+
+    private void UpdateWidth(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var width))
+        {
+            UIState.SetWidth(width);
+        }
+    }
 }

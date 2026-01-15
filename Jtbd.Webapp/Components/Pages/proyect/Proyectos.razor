@@ -70,15 +70,25 @@
                                     </button>
                                 }
                             } *@
-                            @if (p.StatusProject == 1)
+                            @* @if (p.StatusProject == 1)
+                            { *@
+                            @if (UserRol > 0 && UserRol < 3)
                             {
-                                @if (UserRol > 0 && UserRol < 3)
+
+                                @if (p.StatusProject == 1)
                                 {
                                     <button class="btn btn-success btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                 }
+                                else
+                                {
+                                    <button class="btn btn-primary btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                }
                             }
+                            @* } *@
                             <button class="btn btn-secondary btn-sm me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
                                 <i class="bi bi-person-add"></i>
                             </button>
@@ -170,19 +180,19 @@
 
                         <div class="mb-3">
                             <label class="form-label">Nombre:</label>
-                            <InputText class="form-control" @bind-Value="proyectoActual.ProjectName" />
+                            <InputText class="form-control" @bind-Value="proyectoActual.ProjectName" disabled="@(proyectoActual.StatusProject != 1)" />
                             <ValidationMessage For="@(() => proyectoActual.ProjectName)" />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha:</label>
-                            <InputDate class="form-control" @bind-Value="proyectoActual.ProjectDate" />
+                            <InputDate class="form-control" @bind-Value="proyectoActual.ProjectDate" disabled="@(proyectoActual.StatusProject != 1)" />
                             <ValidationMessage For="@(() => proyectoActual.ProjectDate)" />
                         </div>
                         @if (UserRol == 1)
                         {
                             <div class="mb-3">
                                 <label class="form-label">Departamentos:</label>
-                                <InputSelect class="form-select" @bind-Value="proyectoActual.IdDeparmento">
+                                <InputSelect class="form-select" @bind-Value="proyectoActual.IdDeparmento" disabled="@(proyectoActual.StatusProject != 1)">
                                     <option value="-1">-- Seleccione uno --</option>
                                     @foreach (var item in departamento)
                                     {
@@ -194,7 +204,7 @@
                         }
                         <div class="mb-3">
                             <label class="form-label">Categorías:</label>
-                            <InputSelect class="form-select" @bind-Value="proyectoActual.idCategoria">
+                            <InputSelect class="form-select" @bind-Value="proyectoActual.idCategoria" disabled="@(proyectoActual.StatusProject != 1)">
                                 <option value="-1">-- Seleccione uno --</option>
                                 @foreach (var item in categorias)
                                 {
@@ -205,13 +215,16 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Descripcion:</label>
-                            <InputText class="form-control" @bind-Value="proyectoActual.ProjectDescription" />
+                            <InputText class="form-control" @bind-Value="proyectoActual.ProjectDescription" disabled="@(proyectoActual.StatusProject != 1)" />
                             <ValidationMessage For="@(() => proyectoActual.ProjectDescription)" />
                         </div>
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success me-2">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
+                            @if (proyectoActual.StatusProject != 2)
+                            {
+                                <button type="submit" class="btn btn-success me-2">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                            }
                             <button type="button" class="btn btn-secondary" @onclick="Cancelar">
                                 <i class="bi bi-times"></i> Cancelar
                             </button>
@@ -614,29 +627,32 @@
     }
 }
 <script>
-    $(document).ready(function () {
-         var EstadoMenu = localStorage.getItem('sidebarState');
+    $(document).ready(function() {
+        $(document).on('click', '.navbar-toggler', function(event) {
+            // ... (resto de tus variables)
+            var $sidebar = $("#sidebardemo");
+            var $slideBoton = $('#slideBoton');
 
-         if(EstadoMenu == "collapsed"){
-            var sidebar = document.getElementById("sidebardemo");
-            var mainContent = document.getElementById("maindemo");
-            var miDiv = document.getElementById('divtexto');
-            var miDiv2 = document.getElementById('diviconos');
+            if ($sidebar.length && $slideBoton.length) {
+                $sidebar.toggleClass("collapsed");
+                var isCollapsed = $sidebar.hasClass('collapsed');
 
-            if (sidebar) {
-                sidebar.classList.toggle("collapsed");
-                miDiv.style.display = 'none';
-                miDiv2.style.display = 'block';
-            } else {
-                console.error("Error: No se encontró elementos ('sidebar')");
+                // ... (resto de tu lógica de visibilidad de divtexto, diviconos, etc.)
+
+                // ALINEACIÓN CON CLASES DE BOOTSTRAP 5
+                // 1. Asegura que el contenedor del botón use display: flex y ocupe todo el ancho
+                $slideBoton.parent().addClass('d-flex w-100');
+
+                if (isCollapsed) {
+                    // Centrar: quita la clase de justificar al final y añade la de centrar
+                    $slideBoton.parent().removeClass('justify-content-end').addClass('justify-content-center');
+                } else {
+                    // Derecha: quita la clase de centrar y añade la de justificar al final
+                    $slideBoton.parent().removeClass('justify-content-center').addClass('justify-content-end');
+                }
             }
-            if (mainContent) {
-                mainContent.classList.toggle("expanded");
-            } else {
-                console.error("Error: No se encontró elementos ('main-content')");
-            }
-         }
-         console.log("Estado del menú: " + EstadoMenu);
+            // ... (resto de tu código para mainContent y localStorage)
+        });
     });
 
 </script>

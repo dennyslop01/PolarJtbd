@@ -124,3 +124,32 @@ h1:focus {
 .sidebar.collapsed {
     width: 100px !important;
 }
+
+/* 1. Obligamos a la tabla a tener un comportamiento rígido y ocupar el 100% */
+.tabla-gral {
+    table-layout: fixed; /* La clave para la uniformidad */
+    width: 100%; /* Ocupa todo el ancho disponible del monitor */
+}
+
+/* 2. El estilo para CUALQUIER celda (td) dentro de esa tabla */
+.tabla-gral td, .tabla-gral th {
+    /* Truco visual */
+    white-space: wrap; /* Texto en una sola línea */
+    overflow: hidden; /* Cortar lo que sobre */
+    text-overflow: ellipsis; /* Poner los "..." */
+    /* Opcional: un padding para que no se vea pegado */
+    padding: 8px;
+}
+
+/* Esto hace que el cambio sea suave y automático al cambiar la clase del sidebar */
+#sidebardemo.collapsed #slideBoton {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#sidebardemo:not(.collapsed) #slideBoton {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}

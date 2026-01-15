@@ -51,7 +51,7 @@
             <div class="tab-pane fade show active" id="push" role="tabpanel" aria-labelledby="push-tab">
                 <div class="row align-content-center">
                     <div class="col-lg-4">
-                        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1" style="width: 100%; height: 50%; overflow: auto;">
+                        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1" style="width: 100%; height: 50%; overflow: auto; overflow-x:hidden">
                             @* <h5>Historias - Pushes</h5>
                     @foreach (var item in List1)
                     {
@@ -86,7 +86,7 @@
                             @foreach (var group in grupospush)
                             {
                                 <div class="col-lg-6">
-                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow:scroll; resize:none;"
+                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow:scroll; resize:none; overflow-x:hidden"
                                          ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
                                         <div class="row">
                                             <div class="col-10">
@@ -134,7 +134,7 @@
             <div class="tab-pane fade" id="pull" role="tabpanel" aria-labelledby="pull-tab">
                 <div class="row align-content-center">
                     <div class="col-lg-4">
-                        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3" style="width: 100%; height: 50%; overflow: auto;">
+                        <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3" style="width: 100%; height: 50%; overflow: auto; overflow-x:hidden">
                             @* <h5>Historias - Pulls</h5>
                     @foreach (var item in List3)
                     {
@@ -169,7 +169,7 @@
                             @foreach (var group in grupospull)
                             {
                                 <div class="col-lg-6">
-                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto;"
+                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto; overflow-x:hidden"
                                          ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
                                         <div class="row">
                                             <div class="col-10">
@@ -622,7 +622,7 @@
     }
     .list-container {
         border: 1px solid #D3D3D3; /* Borde sólido de 1px y color negro */
-        border-radius: 20px;
+        border-radius: 3px;
         padding: 10px;
         margin: 10px;
         min-height: 150px;

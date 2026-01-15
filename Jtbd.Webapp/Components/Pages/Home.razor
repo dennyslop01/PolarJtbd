@@ -65,24 +65,26 @@
          var EstadoMenu = localStorage.getItem('sidebarState');
 
          if(EstadoMenu == "collapsed"){
-            var sidebar = document.getElementById("sidebardemo");
-            var mainContent = document.getElementById("maindemo");
-            var miDiv = document.getElementById('divtexto');
-            var miDiv2 = document.getElementById('diviconos');
+               var sidebar = document.getElementById("sidebardemo");
+               var mainContent = document.getElementById("maindemo");
+               var miDiv = document.getElementById('divtexto');
+               var miDiv2 = document.getElementById('diviconos');
+               var miDiv3 = document.getElementById('imgLogo');
 
-            if (sidebar) {
-                sidebar.classList.toggle("collapsed");
-                miDiv.style.display = 'none';
-                miDiv2.style.display = 'block';
-            } else {
-                console.error("Error: No se encontró elementos ('sidebar')");
+               if (sidebar) {
+                   sidebar.classList.toggle("collapsed");
+                   miDiv.style.display = 'none';
+                   miDiv2.style.display = 'block';
+                   miDiv3.style.display = 'none';
+               } else {
+                   console.error("Error: No se encontró elementos ('sidebar')");
+               }
+               if (mainContent) {
+                   mainContent.classList.toggle("expanded");
+               } else {
+                   console.error("Error: No se encontró elementos ('main-content')");
+               }
             }
-            if (mainContent) {
-                mainContent.classList.toggle("expanded");
-            } else {
-                console.error("Error: No se encontró elementos ('main-content')");
-            }
-         }
          console.log("Estado del menú: " + EstadoMenu);
     });
 

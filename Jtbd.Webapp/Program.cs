@@ -2,6 +2,7 @@ using Jtbd.Application.Interfaces;
 using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Repositories;
 using Jtbd.Webapp.Components;
+using Jtbd.Webapp.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,6 +42,7 @@ builder.Services.AddScoped<IPushesGroups, PushesGroupsRepository>();
 builder.Services.AddScoped<IStories, StoriesRepository>();
 builder.Services.AddScoped<IGroups, GroupsRepository>();
 builder.Services.AddScoped<IMatrizWard, MatrizWardRepository>();
+builder.Services.AddScoped<UIStateService>();
 
 builder.WebHost.UseStaticWebAssets();
 
