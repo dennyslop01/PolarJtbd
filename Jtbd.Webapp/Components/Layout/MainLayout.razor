@@ -128,32 +128,23 @@ else
 }
 
 <script language="javascript">
-    $(document).ready(function() {
-        $(document).on('click', '.navbar-toggler', function(event) {
-            // ... (resto de tus variables)
-            var $sidebar = $("#sidebardemo");
-            var $slideBoton = $('#slideBoton');
-
-            if ($sidebar.length && $slideBoton.length) {
-                $sidebar.toggleClass("collapsed");
-                var isCollapsed = $sidebar.hasClass('collapsed');
-
-                // ... (resto de tu lógica de visibilidad de divtexto, diviconos, etc.)
-
-                // ALINEACIÓN CON CLASES DE BOOTSTRAP 5
-                // 1. Asegura que el contenedor del botón use display: flex y ocupe todo el ancho
-                $slideBoton.parent().addClass('d-flex w-100');
-
-                if (isCollapsed) {
-                    // Centrar: quita la clase de justificar al final y añade la de centrar
-                    $slideBoton.parent().removeClass('justify-content-end').addClass('justify-content-center');
-                } else {
-                    // Derecha: quita la clase de centrar y añade la de justificar al final
-                    $slideBoton.parent().removeClass('justify-content-center').addClass('justify-content-end');
-                }
+    $(document).ready(function () {
+         var EstadoMenu = localStorage.getItem('sidebarState');
+         if(EstadoMenu == "collapsed"){
+            var sidebar = document.getElementById("sidebardemo");
+            var mainContent = document.getElementById("maindemo");
+            if (sidebar) {
+                sidebar.classList.toggle("collapsed");
+            } else {
+                console.error("Error: No se encontró elementos ('sidebar')");
             }
-            // ... (resto de tu código para mainContent y localStorage)
-        });
+            if (mainContent) {
+                mainContent.classList.toggle("expanded");
+            } else {
+                console.error("Error: No se encontró elementos ('main-content')");
+            }
+         }
+
     });
 
     window.TimeoutHelper = {
