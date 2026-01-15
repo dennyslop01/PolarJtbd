@@ -1063,22 +1063,5 @@
         URL.revokeObjectURL(url);
     }
     
-    $(document).ready(function () {
-         var EstadoMenu = localStorage.getItem('sidebarState');
-         if(EstadoMenu == "collapsed"){
-            var sidebar = document.getElementById("sidebardemo");
-            var mainContent = document.getElementById("maindemo");
-            if (sidebar) {
-                sidebar.classList.toggle("collapsed");
-            } else {
-                console.error("Error: No se encontró elementos ('sidebar')");
-            }
-            if (mainContent) {
-                mainContent.classList.toggle("expanded");
-            } else {
-                console.error("Error: No se encontró elementos ('main-content')");
-            }
-         }
-
-    });
+    window.initSidebarState();
 </script>
