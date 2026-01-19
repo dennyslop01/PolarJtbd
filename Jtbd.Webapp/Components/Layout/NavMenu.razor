@@ -83,6 +83,23 @@
     private bool isExpandSubNavP = false;
     private bool isExpandSubNav = false;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
+                if (!string.IsNullOrEmpty(userrolaux.Value))
+                {
+                    userrol = userrolaux.Value;
+                }
+            }
+            catch {}
+            StateHasChanged();
+        }
+    }
+
     private void UpdateWidth(ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out var width))

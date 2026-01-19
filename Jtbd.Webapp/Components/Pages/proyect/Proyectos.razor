@@ -310,58 +310,79 @@
         if (firstRender)
         {
             mostrarAlerta = false;
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        cargando = true;
-        try
-        {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
+            cargando = true;
+            StateHasChanged();
+            try
             {
-                usernamelargo = authState.User.Identity.Name;
-                username = authState.User.Identity.Name.Split(@"\")[1].Trim();
-                Employee user = await repouser.GetByUsernameAsync(username);
-
-                if (user != null)
+                var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
+                if (!string.IsNullOrEmpty(userrolaux.Value))
                 {
-                    UserRol = user.EmployeeRol;
-                    UserDepart = user.Deparments.Id;
+                    UserRol = int.Parse(userrolaux.Value);
+                    var userdepartaux = await SessionStorage.GetAsync<string>("UserDepart");
+                    UserDepart = int.Parse(userdepartaux.Value);
+                }
+                else
+                {
+                    var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+                    if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+                    {
+                        usernamelargo = authState.User.Identity.Name ?? "";
+                        var splitName = authState.User.Identity.Name?.Split(@"\");
+                        if (splitName != null && splitName.Length > 1)
+                        {
+                            username = splitName[1].Trim();
+                        }
+
+                        // Evitamos llamar a DB si username es nulo
+                        if (!string.IsNullOrEmpty(username))
+                        {
+                            Employee user = await repouser.GetByUsernameAsync(username);
+                            if (user != null)
+                            {
+                                UserRol = user.EmployeeRol;
+                                UserDepart = user.Deparments.Id;
+
+                                await SessionStorage.SetAsync("UserRol", user.EmployeeRol.ToString());
+                                await SessionStorage.SetAsync("UserDepart", user.Deparments.Id.ToString());
+                                await SessionStorage.SetAsync("UserName", username);
+                            }
+                        }
+                    }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex.Message);
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-        }
-
-        try
-        {
-            categorias = (List<Categories>)await repocategoria.GetAllAsync();
-
-            if (UserRol == 1)
+            catch (Exception ex)
             {
-                departamento = (List<Deparments>)await repodepart.GetAllAsync();
-                proyectos = (List<Projects>)await repository.GetAllAsync();
+                Logger.LogError(ex.Message);
+                mensajeAlerta = ex.Message;
+                mostrarAlerta = true;
             }
-            else
-            {
-                int aux = (UserDepart == null ? -1 : int.Parse(UserDepart.ToString()));
-                proyectos = (List<Projects>)await repository.GetByDeparmentIdAsync(aux);
-            }
-        }
-        catch(Exception ex)
-        {
-            //Logger.LogError(ex.Message);
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-        }
 
-        cargando = false;
+            try
+            {
+                categorias = (List<Categories>)await repocategoria.GetAllAsync();
+
+                if (UserRol == 1)
+                {
+                    departamento = (List<Deparments>)await repodepart.GetAllAsync();
+                    proyectos = (List<Projects>)await repository.GetAllAsync();
+                }
+                else
+                {
+                    int aux = (UserDepart == null ? -1 : int.Parse(UserDepart.ToString()));
+                    proyectos = (List<Projects>)await repository.GetByDeparmentIdAsync(aux);
+                }
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                //Logger.LogError(ex.Message);
+                mensajeAlerta = ex.Message;
+                mostrarAlerta = true;
+            }
+
+            cargando = false;
+            StateHasChanged();
+        }
     }
 
     private int BuscarIndex(int idProject)

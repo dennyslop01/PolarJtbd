@@ -986,29 +986,27 @@
         if (firstRender)
         {
             mostrarAlerta = false;
+            try
+            {
+                var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
+                if (!string.IsNullOrEmpty(userrolaux.Value))
+                {
+                    userrol = userrolaux.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.Message);
+                mensajeAlerta = ex.Message;
+                mostrarAlerta = true;
+            }
+            StateHasChanged();
         }
     }
+    
     protected override async Task OnInitializedAsync()
     {
         cargando = true;
-        try
-        {
-            var authState = await authenStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
-                username = authState.User.Identity.Name.Split(@"\")[1];
-                var user = await repouser.GetByUsernameAsync(username);
-                if (user != null)
-                {
-                    userrol = user.EmployeeRol.ToString();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex.Message);
-        }
-
         try
         {
             proyecto = (Projects)await repoproyect.GetByIdAsync(int.Parse(IdProyecto));
