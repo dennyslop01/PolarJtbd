@@ -1,5 +1,7 @@
 ﻿@using Jtbd.Webapp.Service
 @inject UIStateService UIState
+@inject AuthenticationStateProvider authenticationStateProvider
+
 @rendermode InteractiveServer
 
 <div class="top-row ps-3 navbar navbar-dark">
@@ -23,7 +25,7 @@
                 </NavLink>
             </div>
 
-            @if (userrol == "1")
+            @if (userrol == 1)
             {
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="@($"admin/categorias/{userrol}")">
@@ -53,7 +55,7 @@
                     </NavLink>
                 </div>
 
-                @if (userrol == "1")
+                @if (userrol == 1)
                 {
                     <div class="nav-item">
                         <NavLink class="nav-link" style="border: 1px solid #D3D3D3; border-radius:3px; width: 40px; height: 40px;" href="@($"admin/categorias/{userrol}")">
@@ -77,11 +79,30 @@
 </div>
 
 @code {
-    [Parameter]
-    public string userrol { get; set; }
+
+    public int userrol { get; set; }
+    private string username = "dusa-user";
 
     private bool isExpandSubNavP = false;
     private bool isExpandSubNav = false;
+    [Inject] private IEmployee repouser { get; set; } = null!;
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         try
+    //         {
+    //             var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
+    //             if (!string.IsNullOrEmpty(userrolaux.Value))
+    //             {
+    //                 userrol = userrolaux.Value;
+    //             }
+    //         }
+    //         catch {}
+    //         StateHasChanged();
+    //     }
+    // }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -92,7 +113,33 @@
                 var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
                 if (!string.IsNullOrEmpty(userrolaux.Value))
                 {
-                    userrol = userrolaux.Value;
+                    userrol = int.Parse(userrolaux.Value);
+                }
+                else
+                {
+                    var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+                    if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+                    {
+                        var splitName = authState.User.Identity.Name?.Split(@"\");
+                        if (splitName != null && splitName.Length > 1)
+                        {
+                            username = splitName[1].Trim();
+                        }
+
+                        // Evitamos llamar a DB si username es nulo
+                        if (!string.IsNullOrEmpty(username))
+                        {
+                            Employee user = await repouser.GetByUsernameAsync(username);
+                            if (user != null)
+                            {
+                                userrol = user.EmployeeRol;
+
+                                await SessionStorage.SetAsync("UserRol", user.EmployeeRol.ToString());
+                                await SessionStorage.SetAsync("UserDepart", user.Deparments.Id.ToString());
+                                await SessionStorage.SetAsync("UserName", username);
+                            }
+                        }
+                    }
                 }
             }
             catch {}

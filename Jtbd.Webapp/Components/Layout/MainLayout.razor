@@ -14,7 +14,7 @@
             <div class="sidebar-content">
                 @if (!string.IsNullOrEmpty(username))
                 {
-                    <NavMenu userrol="@userrol.ToString()" />
+                    <NavMenu />
                 }
             </div>            
         </div>
@@ -70,7 +70,7 @@ else
 @code{
     private string username = "dusa-user"; // Ojo: esto hardcodeado hará que se renderice antes de auth
     private string usernamelargo = string.Empty;
-    private int userrol = 0;
+    //private int userrol = 0;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private bool cargando = false;
@@ -93,15 +93,15 @@ else
                     username = splitName[1].Trim();
                 }
                
-                // Evitamos llamar a DB si username es nulo
-                if(!string.IsNullOrEmpty(username))
-                {
-                    Employee user = await repouser.GetByUsernameAsync(username);
-                    if (user != null)
-                    {
-                        userrol = user.EmployeeRol;
-                    }
-                }
+                // // Evitamos llamar a DB si username es nulo
+                // if(!string.IsNullOrEmpty(username))
+                // {
+                //     Employee user = await repouser.GetByUsernameAsync(username);
+                //     if (user != null)
+                //     {
+                //         userrol = user.EmployeeRol;
+                //     }
+                // }
             }
         }
         catch (Exception ex)
