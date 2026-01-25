@@ -140,16 +140,3 @@ h1:focus {
     /* Opcional: un padding para que no se vea pegado */
     padding: 8px;
 }
-
-/* Esto hace que el cambio sea suave y automático al cambiar la clase del sidebar */
-#sidebardemo.collapsed #slideBoton {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-#sidebardemo:not(.collapsed) #slideBoton {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-}

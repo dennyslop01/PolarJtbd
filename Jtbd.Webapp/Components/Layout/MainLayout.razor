@@ -164,7 +164,7 @@ else
         var miDiv = document.getElementById('divtexto');
         var miDiv2 = document.getElementById('diviconos');
         var miDiv3 = document.getElementById('imgLogo');
-        var slideBoton = document.getElementById('slideBoton');
+        var slideBoton = document.getElementById('menuToggle');
 
         if (sidebar && mainContent) {
             // Alternar clases
@@ -187,22 +187,16 @@ else
 
              // ALINEACIÓN DEL BOTÓN
             if (slideBoton) {
-                // 1. Obtenemos el contenedor padre del botón
                 var contenedorPadre = slideBoton.parentElement;
-
-                // 2. Configuramos el padre como Flexbox para poder alinear sus hijos
-                contenedorPadre.style.display = 'flex';
-                contenedorPadre.style.width = '100%'; // Que ocupe todo el ancho disponible
+                //contenedorPadre.style.display = 'flex';
+                contenedorPadre.style.width = '100%';
 
                 if (isCollapsed) {
-                    // CASO COLAPSADO: Centramos el contenido
-                    contenedorPadre.style.justifyContent = 'center';
-
-                    // Opcional: Quitamos márgenes del botón por si estorban
-                    slideBoton.style.margin = '0';
+                    contenedorPadre.style.textAlign = 'center';
+                    slideBoton.style.margin = '0 auto';
                 } else {
-                    // CASO EXPANDIDO: Lo mandamos a la derecha (o izquierda según prefieras)
-                    contenedorPadre.style.justifyContent = 'flex-end';
+                    contenedorPadre.style.textAlign = 'flex-end';
+                    slideBoton.style.margin = '0'; // Quita el centrado manual al expandir
                 }
             }
         }
