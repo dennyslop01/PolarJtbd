@@ -2,24 +2,9 @@
 @rendermode InteractiveServer
 @inject ILogger<Home> Logger
 @inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <PageTitle>Home</PageTitle>
-
-@* <p>
-<strong>Qué es el método de Ward</strong>
-    <br />
-    El método de Ward es un método jerárquico de agrupamiento que busca minimizar la varianza total dentro de un grupo.
-</p>
-
-<br />
-
-<p>
-    <strong>Para qué utilizamos el método de Ward en la App Web JTBD</strong>
-    <br />
-    En la aplicación web JTBD, el método de Ward se emplea para agrupar las historias creadas durante las entrevistas en clusters.
-    Este proceso se basa en las agrupaciones previas de Pushes y Pulls, lo que permite organizar los datos de manera jerárquica y minimizar 
-    la varianza dentro de cada grupo, asegurando que los elementos dentro de cada clúster sean lo más similares posible entre sí.
-</p> *@
 
 @if (cargando)
 {
@@ -39,12 +24,54 @@
 }
 @code {
     private bool cargando = false;
+    private string username = "dusa-user"; // Ojo: esto hardcodeado hará que se renderice antes de auth
+    private string usernamelargo = "dusa-user";
+    private int userdepart = 0;
+    private int userrol = 0;
+
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IEmployee repouser { get; set; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            try
+            {
+                var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+                if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+                {
+                    usernamelargo = authState.User.Identity.Name ?? "";
+                    var splitName = authState.User.Identity.Name?.Split(@"\");
+                    if (splitName != null && splitName.Length > 1)
+                    {
+                        username = splitName[1].Trim();
+                    }
+                    var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
+                    if (!string.IsNullOrEmpty(userrolaux.Value))
+                    {
+                        userrol = int.Parse(userrolaux.Value);
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(username))
+                        {
+                            Employee user = await repouser.GetByUsernameAsync(username);
+                            if (user != null)
+                            {
+                                userrol = user.EmployeeRol;
+                                userdepart = user.Deparments.Id;
+
+                                await SessionStorage.SetAsync("UserRol", user.EmployeeRol.ToString());
+                                await SessionStorage.SetAsync("UserDepart", user.Deparments.Id.ToString());
+                                await SessionStorage.SetAsync("UserName", username);
+                                await SessionStorage.SetAsync("UserNameLargo", usernamelargo);                                
+                            }
+                        }
+                    }
+                }
+            }
+            catch{}
             NavigationManager.NavigateTo($"proyect/proyectos");
         }
         // No es necesario devolver base.OnAfterRenderAsync, solo llámalo

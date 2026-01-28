@@ -63,7 +63,7 @@ namespace Jtbd.Infrastructure.Repositories
 
         public async Task<Employee> GetByUsernameAsync(string user)
         {
-            Thread.Sleep(1300);
+            Thread.Sleep(300);
             var employee = await _context.Employees
                  .Include(x => x.Deparments)
                  .Where(x => x.EmployeeName.Contains(user.Trim()))

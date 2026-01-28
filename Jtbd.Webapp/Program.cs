@@ -27,8 +27,13 @@ builder.Services.AddDbContext<JtbdDbContext>(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-//string apiBack = builder.Configuration.GetSection("ApiBack").Value.ToString();
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBack) });
+builder.Services.AddDistributedMemoryCache(); // Requerido para almacenar la sesión en memoria
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tiempo de expiración
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddScoped<IAnxieties, AnxietiesRepository>();
 builder.Services.AddScoped<ICategories, CategoriesRepository>();
@@ -42,7 +47,6 @@ builder.Services.AddScoped<IPushesGroups, PushesGroupsRepository>();
 builder.Services.AddScoped<IStories, StoriesRepository>();
 builder.Services.AddScoped<IGroups, GroupsRepository>();
 builder.Services.AddScoped<IMatrizWard, MatrizWardRepository>();
-builder.Services.AddScoped<UIStateService>();
 
 builder.WebHost.UseStaticWebAssets();
 
@@ -62,7 +66,7 @@ app.UseAuthentication();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
+app.UseSession();
 app.UsePathBase("/JTBD/");
 app.UseStaticFiles();
 

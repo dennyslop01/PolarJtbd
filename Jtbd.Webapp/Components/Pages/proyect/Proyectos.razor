@@ -256,34 +256,6 @@
                     var userdepartaux = await SessionStorage.GetAsync<string>("UserDepart");
                     UserDepart = int.Parse(userdepartaux.Value);
                 }
-                else
-                {
-                    var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-                    if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
-                    {
-                        usernamelargo = authState.User.Identity.Name ?? "";
-                        var splitName = authState.User.Identity.Name?.Split(@"\");
-                        if (splitName != null && splitName.Length > 1)
-                        {
-                            username = splitName[1].Trim();
-                        }
-
-                        // Evitamos llamar a DB si username es nulo
-                        if (!string.IsNullOrEmpty(username))
-                        {
-                            Employee user = await repouser.GetByUsernameAsync(username);
-                            if (user != null)
-                            {
-                                UserRol = user.EmployeeRol;
-                                UserDepart = user.Deparments.Id;
-
-                                await SessionStorage.SetAsync("UserRol", user.EmployeeRol.ToString());
-                                await SessionStorage.SetAsync("UserDepart", user.Deparments.Id.ToString());
-                                await SessionStorage.SetAsync("UserName", username);
-                            }
-                        }
-                    }
-                }
             }
             catch (Exception ex)
             {

@@ -1,11 +1,7 @@
-﻿@using Jtbd.Webapp.Service
-@inject UIStateService UIState
-@inject AuthenticationStateProvider authenticationStateProvider
-
-@rendermode InteractiveServer
+﻿@rendermode InteractiveServer
 
 <div class="top-row ps-3 navbar navbar-dark">
-    <div id="slideBoton">
+    <div class="container-fluid align-content-center" id="slideBoton">
         <input type="checkbox" id="menuToggle" title="Navigation menu" class="navbar-toggler" onclick="toggleBootstrapCollapse(event);" />
     </div>
     <div class="container-fluid align-content-center">
@@ -78,79 +74,19 @@
 </div>
 
 @code {
-
     public int userrol { get; set; }
-    private string username = "dusa-user";
 
-    private bool isExpandSubNavP = false;
-    private bool isExpandSubNav = false;
-    [Inject] private IEmployee repouser { get; set; } = null!;
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         try
-    //         {
-    //             var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
-    //             if (!string.IsNullOrEmpty(userrolaux.Value))
-    //             {
-    //                 userrol = userrolaux.Value;
-    //             }
-    //         }
-    //         catch {}
-    //         StateHasChanged();
-    //     }
-    // }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        try
         {
-            try
+            var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
+            if (!string.IsNullOrEmpty(userrolaux.Value))
             {
-                var userrolaux = await SessionStorage.GetAsync<string>("UserRol");
-                if (!string.IsNullOrEmpty(userrolaux.Value))
-                {
-                    userrol = int.Parse(userrolaux.Value);
-                }
-                else
-                {
-                    var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-                    if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
-                    {
-                        var splitName = authState.User.Identity.Name?.Split(@"\");
-                        if (splitName != null && splitName.Length > 1)
-                        {
-                            username = splitName[1].Trim();
-                        }
-
-                        // Evitamos llamar a DB si username es nulo
-                        if (!string.IsNullOrEmpty(username))
-                        {
-                            Employee user = await repouser.GetByUsernameAsync(username);
-                            if (user != null)
-                            {
-                                userrol = user.EmployeeRol;
-
-                                await SessionStorage.SetAsync("UserRol", user.EmployeeRol.ToString());
-                                await SessionStorage.SetAsync("UserDepart", user.Deparments.Id.ToString());
-                                await SessionStorage.SetAsync("UserName", username);
-                            }
-                        }
-                    }
-                }
+                userrol = int.Parse(userrolaux.Value);
             }
-            catch {}
-            StateHasChanged();
         }
-    }
-
-    private void UpdateWidth(ChangeEventArgs e)
-    {
-        if (int.TryParse(e.Value?.ToString(), out var width))
-        {
-            UIState.SetWidth(width);
-        }
+        catch { }
+        StateHasChanged();
     }
 }

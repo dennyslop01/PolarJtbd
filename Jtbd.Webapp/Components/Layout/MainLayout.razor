@@ -14,7 +14,7 @@
             <div class="sidebar-content">
                 @if (!string.IsNullOrEmpty(username))
                 {
-                    <NavMenu />
+                    <NavMenu @key="sessionKey" />
                 }
             </div>            
         </div>
@@ -69,13 +69,14 @@ else
 
 @code{
     private string username = "dusa-user"; // Ojo: esto hardcodeado hará que se renderice antes de auth
-    private string usernamelargo = string.Empty;
-    //private int userrol = 0;
+    private string usernamelargo = "dusa-user";
+    private int userdepart = 0;
+    private int userrol = 0;
     private string? mensajeAlerta;
     private bool mostrarAlerta = false;
     private bool cargando = false;
+    private Guid sessionKey = Guid.NewGuid();
 
-    [Inject] private IEmployee repouser { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
@@ -91,17 +92,8 @@ else
                 if (splitName != null && splitName.Length > 1)
                 {
                     username = splitName[1].Trim();
+                    NotificarCambio();
                 }
-               
-                // // Evitamos llamar a DB si username es nulo
-                // if(!string.IsNullOrEmpty(username))
-                // {
-                //     Employee user = await repouser.GetByUsernameAsync(username);
-                //     if (user != null)
-                //     {
-                //         userrol = user.EmployeeRol;
-                //     }
-                // }
             }
         }
         catch (Exception ex)
@@ -111,31 +103,42 @@ else
         }
         cargando = false;
     }
-   
-    // IMPORTANTE: Esto ayuda a que el JS se ejecute justo después de renderizar el HTML de Blazor
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+
+    private void NotificarCambio()
     {
-        if (firstRender)
-        {
-            // Llamamos a la función de inicio manual para asegurar estado
-            await JS.InvokeVoidAsync("initSidebarState");
-        }
+        sessionKey = Guid.NewGuid(); // Cambiamos la clave
+        StateHasChanged();           // Forzamos el render del Layout
     }
 }
 
 <script>
-    // 1. Función de inicialización inmediata (sin esperar a jQuery ready)
-    // Se llamará desde Blazor OnAfterRenderAsync y también corre sola por si acaso.
     window.initSidebarState = function() {
         var estado = localStorage.getItem('sidebarState');
         var sidebar = document.getElementById("sidebardemo");
         var mainContent = document.getElementById("maindemo");
 
         if (sidebar && mainContent) {
+            // Obtenemos el contenedor del botón y el botón mismo
+            var contenedorBoton = document.getElementById('slideBoton');
+            var boton = document.getElementById('menuToggle');
+
             if (estado === "collapsed") {
                 sidebar.classList.add("collapsed");
                 mainContent.classList.add("expanded");
-                
+
+                // --- AJUSTE PARA EL BOTÓN CENTRADO ---
+                if (contenedorBoton) {
+                    // Forzamos el centrado con Flexbox eliminando paddings
+                    contenedorBoton.classList.add('d-flex', 'justify-content-center', 'p-0');
+                    contenedorBoton.style.width = '100%';
+                }
+                if (boton) {
+                    // Quitamos el posicionamiento absoluto y cualquier margen lateral
+                    boton.style.position = 'static';
+                    boton.style.margin = '0 auto';
+                }
+                // -------------------------------------
+
                 var miDiv = document.getElementById('divtexto');
                 var miDiv2 = document.getElementById('diviconos');
                 var miDiv3 = document.getElementById('imgLogo');
@@ -147,60 +150,79 @@ else
             } else {
                 sidebar.classList.remove("collapsed");
                 mainContent.classList.remove("expanded");
+
+                // Revertir estilos cuando NO esté colapsado
+                if (contenedorBoton) {
+                    contenedorBoton.classList.remove('justify-content-center');
+                    contenedorBoton.classList.add('d-flex', 'justify-content-end', 'p-0');
+                }
+                if (boton) {
+                    boton.style.position = ''; // Vuelve al estilo original del CSS
+                    boton.style.margin = '';
+                }
             }
         }
     };
 
+
     // Intentamos correrlo inmediatamente por si el HTML ya existe
     window.initSidebarState();
 
-    // 2. Función Toggle mejorada (Guarda el estado)
-    // Asigna esta función al onclick de tu botón de hamburguesa
     window.toggleBootstrapCollapse = function() {
         var sidebar = document.getElementById("sidebardemo");
         var mainContent = document.getElementById("maindemo");
-       
-        // Elementos opcionales (agrega null check)
+        var contenedorBoton = document.getElementById('slideBoton');
+        var boton = document.getElementById('menuToggle'); // Necesitamos el botón
+
         var miDiv = document.getElementById('divtexto');
         var miDiv2 = document.getElementById('diviconos');
         var miDiv3 = document.getElementById('imgLogo');
-        var slideBoton = document.getElementById('menuToggle');
 
         if (sidebar && mainContent) {
-            // Alternar clases
             sidebar.classList.toggle("collapsed");
             mainContent.classList.toggle("expanded");
 
             var isCollapsed = sidebar.classList.contains('collapsed');
 
-            // GUARDAR EN LOCALSTORAGE (Esto faltaba en tu código)
-            if (isCollapsed) {
-                localStorage.setItem('sidebarState', 'collapsed');
-            } else {
-                localStorage.setItem('sidebarState', 'expanded');
-            }
+            // Guardar estado
+            localStorage.setItem('sidebarState', isCollapsed ? 'collapsed' : 'expanded');
 
-            // Manejo de visibilidad de elementos internos (si existen)
+            // Visibilidad de elementos
             if(miDiv) miDiv.style.display = isCollapsed ? 'none' : 'block';
             if(miDiv2) miDiv2.style.display = isCollapsed ? 'block' : 'none';
             if(miDiv3) miDiv3.style.display = isCollapsed ? 'none' : 'block';
 
-             // ALINEACIÓN DEL BOTÓN
-            if (slideBoton) {
-                var contenedorPadre = slideBoton.parentElement;
-                //contenedorPadre.style.display = 'flex';
-                contenedorPadre.style.width = '100%';
+            // ALINEACIÓN ACORDE AL INIT
+            if (contenedorBoton) {
+                // Aseguramos que el padre ocupe el 100%
+                // if (contenedorBoton.parentElement) {
+                //     contenedorBoton.parentElement.style.width = '100%';
+                //     contenedorBoton.parentElement.classList.remove('ps-3'); // Quita padding de Blazor
+                // }
 
                 if (isCollapsed) {
-                    contenedorPadre.style.textAlign = 'center';
-                    slideBoton.style.margin = '0 auto';
+                    // Mismo comportamiento que tu Init: CENTRADO
+                    contenedorBoton.classList.remove('justify-content-end');
+                    contenedorBoton.classList.add('d-flex', 'justify-content-center', 'p-0');
+
+                    if (boton) {
+                        boton.style.position = 'static';
+                        boton.style.margin = '0 auto';
+                    }
                 } else {
-                    contenedorPadre.style.textAlign = 'flex-end';
-                    slideBoton.style.margin = '0'; // Quita el centrado manual al expandir
+                    // Mismo comportamiento que tu Init: DERECHA
+                    contenedorBoton.classList.remove('justify-content-center');
+                    contenedorBoton.classList.add('d-flex', 'justify-content-end', 'p-0', 'm-2');
+
+                    if (boton) {
+                        boton.style.position = 'static';
+                        boton.style.margin = '0';
+                    }
                 }
             }
         }
     };
+
 
     // Helper para timeouts
     window.TimeoutHelper = {
