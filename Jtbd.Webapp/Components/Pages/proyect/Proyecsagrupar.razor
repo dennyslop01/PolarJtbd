@@ -154,41 +154,44 @@
                             @foreach (var group in grupospull)
                             {
                                 <div class="col-lg-6">
-                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow: auto; overflow-x:hidden"
-                                         ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
-                                        <div class="row">
-                                            <div class="col-10">
-                                                <strong><h7>@group.GroupName&nbsp;&nbsp;&nbsp;</h7></strong>
-                                            </div>
-                                            <div class="col-1 align-content-end">
-                                                @if (group.GroupName != "Leftovers")
-                                                {
-                                                    @if (proyecto.StatusProject == 1)
+                                    <div class="list-container" style="width: 100%; resize:none; overflow-x:hidden; overflow-y:hidden;">
+                                        <div style="width: 100%; height: 15px;">
+                                            <div class="row">
+                                                <div class="col-10">
+                                                    <strong><h7>@group.GroupName&nbsp;&nbsp;&nbsp;</h7></strong>
+                                                </div>
+                                                <div class="col-1 align-content-end">
+                                                    @if (group.GroupName != "Leftovers")
                                                     {
-                                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                                        @if (proyecto.StatusProject == 1)
                                                         {
-                                                            <button class="btn boton-primario btn-sm" title="Editar" @onclick="() => EditarEntidad(group)">
-                                                                <i class="bi bi-pencil"></i>
-                                                            </button>
+                                                            @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                                            {
+                                                                <button class="btn boton-primario btn-sm" title="Editar" @onclick="() => EditarEntidad(group)">
+                                                                    <i class="bi bi-pencil"></i>
+                                                                </button>
+                                                            }
                                                         }
                                                     }
-                                                }
+                                                </div>
                                             </div>
-                                        </div>
-                                        <br />
-                                        <div class="row">
-                                            <div class="col-12">
-                                                @foreach (var item in List4)
-                                                {
-                                                    if (group.IdGroup == item.IdGroup)
-                                                    {
-                                                        <div class="draggable-item" draggable="true"
-                                                             @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
-                                                             @ondragend="HandleDragEnd2">
-                                                            @item.Name
-                                                        </div>
-                                                    }
-                                                }
+                                            <div id="@group.IdGroup+@group.GroupName" class="list-container2" style="width: 98%; height: 140px; overflow:scroll; resize:none; overflow-x:hidden"
+                                                 ondragover="event.preventDefault();" @ondrop="() => HandleDropList4(group.IdGroup, new DragEventArgs())">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        @foreach (var item in List4)
+                                                        {
+                                                            if (group.IdGroup == item.IdGroup)
+                                                            {
+                                                                <div class="draggable-item" draggable="true"
+                                                                     @ondragstart="() => HandleDragStart2(item, group.IdGroup)"
+                                                                     @ondragend="HandleDragEnd2">
+                                                                    @item.Name
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
