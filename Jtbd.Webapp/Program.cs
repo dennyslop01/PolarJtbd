@@ -5,6 +5,7 @@ using Jtbd.Webapp.Components;
 using Jtbd.Webapp.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +48,7 @@ builder.Services.AddScoped<IPushesGroups, PushesGroupsRepository>();
 builder.Services.AddScoped<IStories, StoriesRepository>();
 builder.Services.AddScoped<IGroups, GroupsRepository>();
 builder.Services.AddScoped<IMatrizWard, MatrizWardRepository>();
-
+builder.Services.AddMudServices();
 builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();

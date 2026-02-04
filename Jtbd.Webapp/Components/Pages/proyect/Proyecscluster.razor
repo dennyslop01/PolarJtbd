@@ -17,17 +17,17 @@
             <h3 class="text-start mt-4">Clústeres de Historias y Grupos</h3>
             <div class="col-lg-12">
                 <div class="d-flex justify-content-end">
-                    <button class="btn btn-primary m-1" @onclick="MostrarFormulario" title="Imprimir Clústeres">
-                        <i class="bi bi-filetype-csv"></i>
-                    </button>
-                    <button class="btn btn-secondary m-1" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
+                    <button class="btn boton-secundario m-1" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
                         <i class="bi bi-kanban"></i>
+                    </button>
+                    <button class="btn boton-primario m-1" @onclick="MostrarFormulario" title="Imprimir Clústeres">
+                        <i class="bi bi-filetype-csv"></i>
                     </button>
                     @if (proyecto.StatusProject == 1)
                     {
                         @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                         {
-                            <button class="btn btn-primary m-1" @onclick="MostrarFormulario2" title="Cerrar Proyecto">
+                            <button class="btn boton-primario m-1" @onclick="MostrarFormulario2" title="Cerrar Proyecto">
                                 <i class="bi bi-door-closed"></i>
                             </button>
                         }
@@ -71,7 +71,7 @@
                                     <label><strong>Clúster @clus.IdCluster</strong></label>
                                 </div>
                                 <div class="col-lg-1 text-end">
-                                     <button class="btn btn-primary btn-sm" title="Definir Job" @onclick="() => DefinirJob(clus.IdCluster)">
+                                     <button class="btn boton-primario btn-sm" title="Definir Job" @onclick="() => DefinirJob(clus.IdCluster)">
                                         @if(proyecto.StatusProject == 1)
                                         {
                                             <i class="bi bi-plus-lg"></i>
@@ -583,6 +583,4 @@
         a.click();
         URL.revokeObjectURL(url);
     }
-    
-    window.initSidebarState();
 </script>

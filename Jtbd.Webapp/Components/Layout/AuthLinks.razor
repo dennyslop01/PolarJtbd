@@ -1,0 +1,62 @@
+﻿@inject AuthenticationStateProvider authenticationStateProvider
+@rendermode InteractiveServer
+
+
+<nav class="nav flex-column">
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="proyect/proyectos">
+            <div><i class="bi bi-clipboard-data m-1"></i> Proyectos</div>
+        </NavLink>
+    </div>
+
+    @if (userrol == 1)
+    {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="@($"admin/categorias/{userrol}")">
+                <div><i class="bi bi-bezier2 m-1"></i> Categorías</div>
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="@($"admin/departamentos/{userrol}")">
+                <div><i class="bi bi-bezier m-1"></i> Departamentos</div>
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="@($"admin/usuarios/{userrol}")">
+                <div><i class="bi bi-person m-1"></i> Usuarios</div>
+            </NavLink>
+        </div>
+    }
+</nav>
+
+@code {
+    public int userrol = 0;
+    private string username = "dusa-user";
+    [Inject] private IEmployee repouser { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+            {
+                var splitName = authState.User.Identity.Name?.Split(@"\");
+                if (splitName != null && splitName.Length > 1)
+                {
+                    username = splitName[1].Trim();
+                }
+
+                if (!string.IsNullOrEmpty(username))
+                {
+                    Employee user = await repouser.GetByUsernameAsync(username);
+                    if (user != null)
+                    {
+                        userrol = user.EmployeeRol;
+                    }
+                }
+            }
+        }
+        catch { }
+    }
+}

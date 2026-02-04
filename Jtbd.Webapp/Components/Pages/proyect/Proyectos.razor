@@ -14,8 +14,8 @@
         @if (UserRol > 0 && UserRol < 3)
         {
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-primary" @onclick="MostrarFormulario" title="Agregar Proyecto">
-                <i class="bi bi-plus-lg"></i> 
+                <button class="btn boton-primario" @onclick="MostrarFormulario" title="Agregar Proyecto">
+                <i class="bi bi-plus-lg"></i> Agregar
                 </button>
             </div>
         }
@@ -61,33 +61,31 @@
                         <td width="10%">@p.Deparment.Name</td>
                         <td width="10%">@p.Categories.Name</td>
                         <td width="20%" class="text-end">
+
+                            <button class="btn boton-secundario text-dark btn-sm me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
+                                <i class="bi bi-person-add"></i>
+                            </button>
+                            <button class="btn boton-secundario text-dark btn-sm me-1" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
+                                <i class="bi bi-ui-checks"></i>
+                            </button>
+                            <button class="btn boton-secundario text-dark btn-sm me-2" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
+                                <i class="bi bi-kanban"></i>
+                            </button>
                             @if (UserRol > 0 && UserRol < 3)
                             {
-
                                 @if (p.StatusProject == 1)
                                 {
-                                    <button class="btn btn-success btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-primary btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
                                 }
-                            }
-                            <button class="btn btn-secondary btn-sm me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
-                                <i class="bi bi-person-add"></i>
-                            </button>
-                            <button class="btn btn-secondary btn-sm me-1" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
-                                <i class="bi bi-ui-checks"></i>
-                            </button>
-                            <button class="btn btn-secondary btn-sm me-2" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
-                                <i class="bi bi-kanban"></i>
-                            </button>
-                            @if (UserRol > 0 && UserRol < 3)
-                            {
+
                                 <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -156,11 +154,11 @@
                         <div class="d-flex justify-content-end">
                             @if (proyectoActual.StatusProject != 2)
                             {
-                                <button type="submit" class="btn btn-success me-2">
+                                <button type="submit" class="btn boton-primario me-2">
                                     <i class="bi bi-save"></i> Guardar
                                 </button>
                             }
-                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                            <button type="button" class="btn btn-danger" @onclick="Cancelar">
                                 <i class="bi bi-times"></i> Cancelar
                             </button>
                         </div>
@@ -186,10 +184,10 @@
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary me-2" @onclick="CerrarProyecto">
+                        <button type="button" class="btn boton-primario me-2" @onclick="CerrarProyecto">
                             <i class="bi bi-times"></i> Abrir
                         </button>
-                        <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                        <button type="button" class="btn btn-danger" @onclick="Cancelar">
                             <i class="bi bi-times"></i> Cancelar
                         </button>
                     </div>
@@ -554,7 +552,3 @@
         }
     }
 }
-<script>
-    // Intentamos correrlo inmediatamente por si el HTML ya existe
-    window.initSidebarState();
-</script>

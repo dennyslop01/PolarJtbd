@@ -1,6 +1,14 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
+    width: 100%;
+    margin: 0; /* Elimina márgenes por defecto */
+    padding: 0;
+}
+
+.mud-main-content mud-container {
+    margin-top: 1rem;
+    margin: 0; /* Centra el contenido */
 }
 
 a, .btn-link {
@@ -43,9 +51,9 @@ h1:focus {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
@@ -96,33 +104,12 @@ h1:focus {
     background: transparent;
 }
 
-/*.sidebar {
-    width: 250px;*/ /* Define el ancho fijo para el menú */
-    /*position: fixed;*/ /* Lo fija en la posición */
-    /*height: 100vh;
-    overflow-y: hidden;*/ /* Permite el scroll si el contenido es largo */
-/*}*/
-
 .toast-container {
     position: fixed; /* Fija la posición en la ventana */
     top: 20px; /* Distancia desde la parte superior */
     right: 20px; /* Distancia desde la derecha */
     z-index: 1000; /* Asegura que esté por encima de otros elementos */
     /* Estilos adicionales para apariencia si no usas Bootstrap */
-}
-
-.sidebar {
-    width: 230px; /* Ancho completo original */
-    background-color: #001f3f; /* Color azul oscuro de la imagen */
-    transition: width 0.5s ease; /* Transición suave del ancho */
-    overflow-x: hidden; /* Oculta el contenido que se desborde horizontalmente */
-    position: fixed;
-    height: 100%;
-    overflow: hidden;
-}
-
-.sidebar.collapsed {
-    width: 100px !important;
 }
 
 /* 1. Obligamos a la tabla a tener un comportamiento rígido y ocupar el 100% */
@@ -139,4 +126,32 @@ h1:focus {
     text-overflow: ellipsis; /* Poner los "..." */
     /* Opcional: un padding para que no se vea pegado */
     padding: 8px;
+}
+
+.boton-primario {
+    background-color: #007bff;
+    color: white;
+    border: solid;
+    border-color: #007bff;
+}
+
+.boton-secundario {
+    background-color: #ffffff;
+    color: black;
+    border: solid;
+    border-color: #D3D3D3;    
+}
+
+.boton-secundario:hover {
+    background-color: #d3d3d3 !important; /* Gris claro */
+    color: white !important;
+}
+
+/* Asegura que el icono también cambie de color */
+.boton-secundario:hover i {
+    color: white !important;
+}
+
+.modal-dialog {
+    top: 45px;
 }

@@ -1,87 +1,84 @@
-﻿@using Jtbd.Application.Interfaces
-@using Jtbd.Domain.Entities
-@using Jtbd.Webapp.Service
-@using Microsoft.AspNetCore.Components.Authorization
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject IJSRuntime JS
+﻿@inject AuthenticationStateProvider authenticationStateProvider
 
 @inherits LayoutComponentBase
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
 
-@if (!string.IsNullOrEmpty(username))
-{
-    <div class="page">
-        <div class="sidebar" id="sidebardemo">
-            <div class="sidebar-content">
-                @if (!string.IsNullOrEmpty(username))
-                {
-                    <NavMenu @key="sessionKey" />
-                }
-            </div>            
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="5" Class="navbar-top" Style="background: linear-gradient(150deg, #00338D  0%, #00338D  100%);">
+
+        <!-- Contenido de la izquierda -->
+        <a href="/"><MudImage Src="LogoInnova.png" Alt="Empresas Polar" /></a>
+
+        <!-- Opcional: Si quieres un título junto al logo principal -->
+        @* <MudText Typo="Typo.h4" Style="color: white; margin-left: 10px;">Tu Título</MudText> *@
+
+        <!-- El Spacer empuja todo lo que sigue hacia la derecha -->
+        <MudSpacer />
+        @if (!string.IsNullOrEmpty(username))
+        {
+            <!-- Contenido de la derecha -->
+            <MudText Typo="Typo.body1" Style="color: white; margin-right: 16px;">
+                <MudStack Row="true" Spacing="4" Class="ml-6">
+                    <MudButton Variant="Variant.Text" Style="color: white;" href="proyect/proyectos"><i class="bi bi-clipboard-data m-1"></i> Proyectos</MudButton>
+                    @if (userrol == 1)
+                    {
+                        <MudButton Variant="Variant.Text" Style="color: white;" href="admin/categorias"><i class="bi bi-bezier2 m-1"></i> Categorías</MudButton>
+                        <MudButton Variant="Variant.Text" Style="color: white;" href="admin/departamentos"><i class="bi bi-bezier m-1"></i> Departamentos</MudButton>
+                        <MudButton Variant="Variant.Text" Style="color: white;" href="admin/usuarios"><i class="bi bi-person m-1"></i> Usuarios</MudButton>
+                    }
+                </MudStack>
+            </MudText>
+        }
+        <div class="col-lg-5 d-flex justify-content-end mb-3">
+            <strong>@usernamelargo</strong>
         </div>
 
-        <div class="main-content" id="maindemo" style="width:100%">
-            <main>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <p>
-                            <h5><strong>&nbsp;&nbsp;&nbsp;&nbsp;JTBD WEB APP – Empresas Polar</strong></h5>
-                        </p>
-                    </div>
-                    <div class="col-lg-5 d-flex justify-content-end mb-3">
-                        <strong>@usernamelargo</strong>
+    </MudAppBar>
+    @* Needed for snackbars *@
+    <MudSnackbarProvider />
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Style="margin-top: 3rem">
+            @if (!string.IsNullOrEmpty(username))
+            {       
+                @Body
+            }
+            else
+            {
+                <PageTitle>No Autorizado</PageTitle>
+                <div class="row align-content-center">
+                    <div class="col-lg-11">
+                        <div class="col-lg-11">
+                            <h3 class="text-center mt-4">No Autorizado</h3>
+                            <h6>@usernamelargo</h6>
+                            <h6>@username</h6>
+                        </div>
                     </div>
                 </div>
+            }
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
-                <article class="content px-4">
-                    @Body
-                </article>
-            </main>
-        </div>
-    </div>
-
-    <div id="blazor-error-ui" data-nosnippet>
-        An unhandled error has occurred.
-        <a href="." class="reload">Reload</a>
-        <span class="dismiss">🗙</span>
-    </div>
-
-    @if (mostrarAlerta)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert" id="divAlerta">
-            @mensajeAlerta
-            <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
-        </div>
-    }
-}
-else
-{
-    <PageTitle>No Autorizado</PageTitle>
-    <div class="row align-content-center">
-        <div class="col-lg-11">
-             <div class="col-lg-11">
-                <h3 class="text-center mt-4">No Autorizado</h3>
-                <h6>@usernamelargo</h6>
-                <h6>@username</h6>
-            </div>
-        </div>
-    </div>
-}
-
-@code{
+@code {
+    bool _drawerOpen = false;
     private string username = "dusa-user"; // Ojo: esto hardcodeado hará que se renderice antes de auth
     private string usernamelargo = "dusa-user";
-    private int userdepart = 0;
-    private int userrol = 0;
-    private string? mensajeAlerta;
-    private bool mostrarAlerta = false;
-    private bool cargando = false;
-    private Guid sessionKey = Guid.NewGuid();
+    public int userrol = 0;
+    [Inject] private IEmployee repouser { get; set; } = null!;
 
-    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        cargando = true;
         try
         {
             var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -92,138 +89,31 @@ else
                 if (splitName != null && splitName.Length > 1)
                 {
                     username = splitName[1].Trim();
-                    NotificarCambio();
+                }
+                if (!string.IsNullOrEmpty(username))
+                {
+                    Employee user = await repouser.GetByUsernameAsync(username);
+                    if (user != null)
+                    {
+                        userrol = user.EmployeeRol;
+                    }
                 }
             }
         }
-        catch (Exception ex)
-        {
-            mensajeAlerta = ex.Message;
-            mostrarAlerta = true;
-        }
-        cargando = false;
-    }
-
-    private void NotificarCambio()
-    {
-        sessionKey = Guid.NewGuid(); // Cambiamos la clave
-        StateHasChanged();           // Forzamos el render del Layout
+        catch { }
     }
 }
+<style>
+    .navbar-top {
+        width: 100vw !important;
+        /* Ajusta la posición si es necesario */
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
+</style>
 
-<script>
-    window.initSidebarState = function() {
-        var estado = localStorage.getItem('sidebarState');
-        var sidebar = document.getElementById("sidebardemo");
-        var mainContent = document.getElementById("maindemo");
-
-        if (sidebar && mainContent) {
-            // Obtenemos el contenedor del botón y el botón mismo
-            var contenedorBoton = document.getElementById('slideBoton');
-            var boton = document.getElementById('menuToggle');
-
-            if (estado === "collapsed") {
-                sidebar.classList.add("collapsed");
-                mainContent.classList.add("expanded");
-
-                // --- AJUSTE PARA EL BOTÓN CENTRADO ---
-                if (contenedorBoton) {
-                    // Forzamos el centrado con Flexbox eliminando paddings
-                    contenedorBoton.classList.add('d-flex', 'justify-content-center', 'p-0');
-                    contenedorBoton.style.width = '100%';
-                }
-                if (boton) {
-                    // Quitamos el posicionamiento absoluto y cualquier margen lateral
-                    boton.style.position = 'static';
-                    boton.style.margin = '0 auto';
-                }
-                // -------------------------------------
-
-                var miDiv = document.getElementById('divtexto');
-                var miDiv2 = document.getElementById('diviconos');
-                var miDiv3 = document.getElementById('imgLogo');
-
-                if(miDiv) miDiv.style.display = 'none';
-                if(miDiv2) miDiv2.style.display = 'block';
-                if(miDiv3) miDiv3.style.display = 'none';
-
-            } else {
-                sidebar.classList.remove("collapsed");
-                mainContent.classList.remove("expanded");
-
-                // Revertir estilos cuando NO esté colapsado
-                if (contenedorBoton) {
-                    contenedorBoton.classList.remove('justify-content-center');
-                    contenedorBoton.classList.add('d-flex', 'justify-content-end', 'p-0');
-                }
-                if (boton) {
-                    boton.style.position = ''; // Vuelve al estilo original del CSS
-                    boton.style.margin = '';
-                }
-            }
-        }
-    };
-
-
-    // Intentamos correrlo inmediatamente por si el HTML ya existe
-    window.initSidebarState();
-
-    window.toggleBootstrapCollapse = function() {
-        var sidebar = document.getElementById("sidebardemo");
-        var mainContent = document.getElementById("maindemo");
-        var contenedorBoton = document.getElementById('slideBoton');
-        var boton = document.getElementById('menuToggle'); // Necesitamos el botón
-
-        var miDiv = document.getElementById('divtexto');
-        var miDiv2 = document.getElementById('diviconos');
-        var miDiv3 = document.getElementById('imgLogo');
-
-        if (sidebar && mainContent) {
-            sidebar.classList.toggle("collapsed");
-            mainContent.classList.toggle("expanded");
-
-            var isCollapsed = sidebar.classList.contains('collapsed');
-
-            // Guardar estado
-            localStorage.setItem('sidebarState', isCollapsed ? 'collapsed' : 'expanded');
-
-            // Visibilidad de elementos
-            if(miDiv) miDiv.style.display = isCollapsed ? 'none' : 'block';
-            if(miDiv2) miDiv2.style.display = isCollapsed ? 'block' : 'none';
-            if(miDiv3) miDiv3.style.display = isCollapsed ? 'none' : 'block';
-
-            // ALINEACIÓN ACORDE AL INIT
-            if (contenedorBoton) {
-                // Aseguramos que el padre ocupe el 100%
-                // if (contenedorBoton.parentElement) {
-                //     contenedorBoton.parentElement.style.width = '100%';
-                //     contenedorBoton.parentElement.classList.remove('ps-3'); // Quita padding de Blazor
-                // }
-
-                if (isCollapsed) {
-                    // Mismo comportamiento que tu Init: CENTRADO
-                    contenedorBoton.classList.remove('justify-content-end');
-                    contenedorBoton.classList.add('d-flex', 'justify-content-center', 'p-0');
-
-                    if (boton) {
-                        boton.style.position = 'static';
-                        boton.style.margin = '0 auto';
-                    }
-                } else {
-                    // Mismo comportamiento que tu Init: DERECHA
-                    contenedorBoton.classList.remove('justify-content-center');
-                    contenedorBoton.classList.add('d-flex', 'justify-content-end', 'p-0', 'm-2');
-
-                    if (boton) {
-                        boton.style.position = 'static';
-                        boton.style.margin = '0';
-                    }
-                }
-            }
-        }
-    };
-
-
+<script language="javascript">
     // Helper para timeouts
     window.TimeoutHelper = {
         showAndHide: function (elementId, timeoutMs) {
@@ -237,3 +127,4 @@ else
         }
     };
 </script>
+

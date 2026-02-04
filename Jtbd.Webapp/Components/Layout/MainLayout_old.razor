@@ -1,0 +1,113 @@
+﻿@inject AuthenticationStateProvider authenticationStateProvider
+@inject IJSRuntime JS
+
+@inherits LayoutComponentBase
+
+@if (!string.IsNullOrEmpty(username))
+{
+    <div class="page">
+        <div class="sidebar" id="sidebardemo">
+            <div class="sidebar-content">
+                @if (!string.IsNullOrEmpty(username))
+                {
+                    <NavMenu />
+                }
+            </div>            
+        </div>
+
+        <div class="main-content" id="maindemo" style="width:100%">
+            <main>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <p>
+                            <h5><strong>&nbsp;&nbsp;&nbsp;&nbsp;JTBD WEB APP – Empresas Polar</strong></h5>
+                        </p>
+                    </div>
+                    <div class="col-lg-5 d-flex justify-content-end mb-3">
+                        <strong>@usernamelargo</strong>
+                    </div>
+                </div>
+
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" data-nosnippet>
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">🗙</span>
+    </div>
+
+    @if (mostrarAlerta)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" id="divAlerta">
+            @mensajeAlerta
+            <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+        </div>
+    }
+}
+else
+{
+    <PageTitle>No Autorizado</PageTitle>
+    <div class="row align-content-center">
+        <div class="col-lg-11">
+             <div class="col-lg-11">
+                <h3 class="text-center mt-4">No Autorizado</h3>
+                <h6>@usernamelargo</h6>
+                <h6>@username</h6>
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+    private string username = "dusa-user"; // Ojo: esto hardcodeado hará que se renderice antes de auth
+    private string usernamelargo = "dusa-user";
+    private string? mensajeAlerta;
+    private bool mostrarAlerta = false;
+    private bool cargando = false;
+
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cargando = true;
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+            {
+                usernamelargo = authState.User.Identity.Name ?? "";
+                var splitName = authState.User.Identity.Name?.Split(@"\");
+                if (splitName != null && splitName.Length > 1)
+                {
+                    username = splitName[1].Trim();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeAlerta = ex.Message;
+            mostrarAlerta = true;
+        }
+        cargando = false;
+    }
+}
+
+<script>
+    // Helper para timeouts
+    window.TimeoutHelper = {
+        showAndHide: function (elementId, timeoutMs) {
+            const divElement = document.getElementById(elementId);
+            if (divElement) {
+                divElement.style.display = 'block';
+                setTimeout(function () {
+                    divElement.style.display = 'none';
+                }, timeoutMs);
+            }
+        }
+    };
+</script>
