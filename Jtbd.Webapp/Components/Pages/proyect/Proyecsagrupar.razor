@@ -41,10 +41,10 @@
     <div class="col-12">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="push-tab" data-bs-toggle="tab" data-bs-target="#push" type="button" role="tab" aria-controls="push" aria-selected="true"><h6><strong>Historias - Pushes</strong></h6></button>
+                <button class="nav-link active" id="push-tab" data-bs-toggle="tab" data-bs-target="#push" type="button" role="tab" aria-controls="push" aria-selected="true"><strong>Historias - Pushes</strong></button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pull-tab" data-bs-toggle="tab" data-bs-target="#pull" type="button" role="tab" aria-controls="pull" aria-selected="false"><h6><strong>Historias - Pulls</strong></h6></button>
+                <button class="nav-link" id="pull-tab" data-bs-toggle="tab" data-bs-target="#pull" type="button" role="tab" aria-controls="pull" aria-selected="false"><strong>Historias - Pulls</strong></button>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
@@ -52,15 +52,6 @@
                 <div class="row align-content-center">
                     <div class="col-lg-4">
                         <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList1" style="width: 100%; height: 50%; overflow: auto; overflow-x:hidden">
-                            @* <h5>Historias - Pushes</h5>
-                    @foreach (var item in List1)
-                    {
-                        <div class="draggable-item" draggable="true"
-                             @ondragstart="() => HandleDragStart(item, null)"
-                             @ondragend="HandleDragEnd">
-                            @item.Name
-                        </div>
-                    } *@
                             <PaginationComponent2 TItem="Item" Items="List1" DefaultPageSize="10">
                                 <ChildContentHeader>
                                     <tr>
@@ -86,41 +77,44 @@
                             @foreach (var group in grupospush)
                             {
                                 <div class="col-lg-6">
-                                    <div id="@group.IdGroup+@group.GroupName" class="list-container" style="width: 100%; height: 150px; overflow:scroll; resize:none; overflow-x:hidden"
-                                         ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
-                                        <div class="row">
-                                            <div class="col-10">
-                                                <strong><h7>@group.GroupName&nbsp;&nbsp;&nbsp;</h7></strong>
-                                            </div>
-                                            <div class="col-1 align-content-end">
-                                                @if (group.GroupName != "Leftovers")
-                                                {
-                                                    @if (proyecto.StatusProject == 1)
+                                    <div class="list-container" style="width: 100%; resize:none; overflow-x:hidden; overflow-y:hidden;">
+                                        <div style="width: 100%; height: 15px;">
+                                            <div class="row">
+                                                <div class="col-10">
+                                                    <strong><h7>@group.GroupName&nbsp;&nbsp;&nbsp;</h7></strong>
+                                                </div>
+                                                <div class="col-1 align-content-end">
+                                                    @if (group.GroupName != "Leftovers")
                                                     {
-                                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                                        @if (proyecto.StatusProject == 1)
                                                         {
-                                                            <button class="btn boton-primario btn-sm" title="Editar" @onclick="() => EditarEntidad(group)">
-                                                                <i class="bi bi-pencil"></i>
-                                                            </button>
+                                                            @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                                            {
+                                                                <button class="btn boton-primario btn-sm" title="Editar" @onclick="() => EditarEntidad(group)">
+                                                                    <i class="bi bi-pencil"></i>
+                                                                </button>
+                                                            }
                                                         }
                                                     }
-                                                }
+                                                </div>
                                             </div>
-                                        </div>
-                                        <br />
-                                        <div class="row">
-                                            <div class="col-12">
-                                                @foreach (var item in List2)
-                                                {
-                                                    if (group.IdGroup == item.IdGroup)
-                                                    {
-                                                        <div class="draggable-item" draggable="true"
-                                                             @ondragstart="() => HandleDragStart(item, group.IdGroup)"
-                                                             @ondragend="HandleDragEnd">
-                                                            @item.Name
-                                                        </div>
-                                                    }
-                                                }
+                                            <div id="@group.IdGroup+@group.GroupName" class="list-container2" style="width: 98%; height: 140px; overflow:scroll; resize:none; overflow-x:hidden"
+                                                 ondragover="event.preventDefault();" @ondrop="() => HandleDropList2(group.IdGroup, new DragEventArgs())">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        @foreach (var item in List2)
+                                                        {
+                                                            if (group.IdGroup == item.IdGroup)
+                                                            {
+                                                                <div class="draggable-item" draggable="true"
+                                                                     @ondragstart="() => HandleDragStart(item, group.IdGroup)"
+                                                                     @ondragend="HandleDragEnd">
+                                                                    @item.Name
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -135,15 +129,6 @@
                 <div class="row align-content-center">
                     <div class="col-lg-4">
                         <div class="list-container" ondragover="event.preventDefault();" @ondrop="HandleDropList3" style="width: 100%; height: 50%; overflow: auto; overflow-x:hidden">
-                            @* <h5>Historias - Pulls</h5>
-                    @foreach (var item in List3)
-                    {
-                        <div class="draggable-item" draggable="true"
-                             @ondragstart="() => HandleDragStart2(item, null)"
-                             @ondragend="HandleDragEnd2">
-                            @item.Name
-                        </div>
-                    } *@
                             <PaginationComponent2 TItem="Item" Items="List3" DefaultPageSize="10">
                                 <ChildContentHeader>
                                     <tr>
@@ -625,7 +610,17 @@
         border-radius: 3px;
         padding: 10px;
         margin: 10px;
-        min-height: 150px;
+        min-height: 200px;
+        flex: 1;
+        /* box-shadow: 4px 4px 8px rgba(150, 150, 150, 0.5); /* Sombra negra con opacidad */
+    }
+
+    .list-container2 {
+        border: 0px solid #D3D3D3; /* Borde sólido de 1px y color negro */
+        border-radius: 3px;
+        padding: 3px;
+        margin: 3px;
+        min-height: 140px;
         flex: 1;
         /* box-shadow: 4px 4px 8px rgba(150, 150, 150, 0.5); /* Sombra negra con opacidad */
     }
