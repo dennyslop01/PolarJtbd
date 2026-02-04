@@ -523,7 +523,7 @@
                         _draggedItem.IdGroup = idGroup;
 
                     _sourceList.Remove(_draggedItem);
-                    List2.Add(_draggedItem);
+                    List2.Insert(0, _draggedItem);
                     await repostorie.UpdatePushesGroupEntityAsync(_draggedItem.Id, _draggedItem.IdGroup);
                     StateHasChanged();
                 }
@@ -582,7 +582,7 @@
                     _draggedItem1.IdGroup = idGroup;
 
                 _sourceList1.Remove(_draggedItem1);
-                List4.Add(_draggedItem1);
+                List4.Insert(0, _draggedItem1);
                 await repostorie.UpdatePullsGroupEntityAsync(_draggedItem1.Id, _draggedItem1.IdGroup);
                 StateHasChanged();
             }
