@@ -27,9 +27,9 @@
                     <MudButton Variant="Variant.Text" Style="color: white;" href="proyect/proyectos"><i class="bi bi-clipboard-data m-1"></i> Proyectos</MudButton>
                     @if (userrol == 1)
                     {
-                        <MudButton Variant="Variant.Text" Style="color: white;" href="admin/categorias"><i class="bi bi-bezier2 m-1"></i> Categorías</MudButton>
-                        <MudButton Variant="Variant.Text" Style="color: white;" href="admin/departamentos"><i class="bi bi-bezier m-1"></i> Departamentos</MudButton>
-                        <MudButton Variant="Variant.Text" Style="color: white;" href="admin/usuarios"><i class="bi bi-person m-1"></i> Usuarios</MudButton>
+                        <MudButton Variant="Variant.Text" Style="color: white;" href="@($"admin/categorias/{userrol}")"><i class="bi bi-bezier2 m-1"></i> Categorías</MudButton>
+                        <MudButton Variant="Variant.Text" Style="color: white;" href="@($"admin/departamentos/{userrol}")"><i class="bi bi-bezier m-1"></i> Departamentos</MudButton>
+                        <MudButton Variant="Variant.Text" Style="color: white;" href="@($"admin/usuarios/{userrol}")"><i class="bi bi-person m-1"></i> Usuarios</MudButton>
                     }
                 </MudStack>
             </MudText>
