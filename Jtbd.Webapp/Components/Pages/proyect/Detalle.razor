@@ -63,16 +63,16 @@
 <div class="row align-content-center" >
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Pushes</strong></label>
             </div>
-            <div class="col-lg-1 justify-content-end">
+            <div class="col-lg-2 justify-content-end">
                 @if (entidadStorie.Project?.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
-                        <button class="btn boton-primario btn-sm" title="Pushes" @onclick="MostrarPushes">
-                            <i class="bi bi-plus-lg"></i>
+                            <button class="btn boton-primario btn-sm" title="Pushes" @onclick="MostrarPushes">
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -111,10 +111,10 @@
                                 {
                                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                     {
-                                        <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
+                                            <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
                                             <i class="bi bi-pencil"></i> 
                                         </button>
-                                        <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" >
+                                        <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" >
                                             <i class="bi bi-trash"></i> 
                                         </button>
                                     }
@@ -128,16 +128,16 @@
     </div>
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Pulls</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (entidadStorie.Project?.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
-                        <button class="btn boton-primario btn-sm" title="Pulls" @onclick="MostrarPulls">
-                            <i class="bi bi-plus-lg"></i>
+                            <button class="btn boton-primario btn-sm" title="Pulls" @onclick="MostrarPulls">
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -177,10 +177,10 @@
                                 {
                                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                     {
-                                        <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
+                                            <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" >
+                                        <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" >
                                             <i class="bi bi-trash"></i> 
                                         </button>
                                     }
@@ -199,16 +199,16 @@
 <div class="row align-content-center" >
     <div class="col-lg-6">
         <div class="row">            
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Hábitos</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (entidadStorie.Project?.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
-                        <button class="btn boton-primario btn-sm" title="Hábitos" @onclick="MostrarHabits">
-                            <i class="bi bi-plus-lg"></i>
+                            <button class="btn boton-primario btn-sm" title="Hábitos" @onclick="MostrarHabits">
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -248,10 +248,10 @@
                                 {
                                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                     {
-                                        <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
+                                            <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" >
+                                        <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" >
                                             <i class="bi bi-trash"></i> 
                                         </button>
                                     }
@@ -265,16 +265,16 @@
     </div>
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Ansiedades</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (entidadStorie.Project?.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
-                        <button class="btn boton-primario btn-sm" title="Ansiedades" @onclick="MostrarAnxies">
-                            <i class="bi bi-plus-lg"></i>
+                            <button class="btn boton-primario btn-sm" title="Ansiedades" @onclick="MostrarAnxies">
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -314,10 +314,10 @@
                                 {
                                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                     {
-                                        <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
+                                            <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" >
+                                        <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" >
                                             <i class="bi bi-trash"></i> 
                                         </button>
                                     }

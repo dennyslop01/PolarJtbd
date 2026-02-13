@@ -41,13 +41,13 @@
             <div class="row align-content-center">
                 <div class="col-lg-12">
                     <div class="d-flex justify-content-end">
-                        <button class="btn boton-primario m-1" @onclick="MostrarFormulario" title="Descargar CSV">
+                        <button class="btn boton-secundario m-1" @onclick="MostrarFormulario" title="Descargar CSV">
                             <i class="bi bi-filetype-csv"></i>
                         </button>
 
                         @if(verClusters)
                         {
-                            <button class="btn boton-primario m-1" @onclick="VerClusteres" title="Ver Clústeres">
+                            <button class="btn boton-secundario m-1" @onclick="VerClusteres" title="Ver Clústeres">
                                 <i class="bi bi-eye-fill"></i> @* Ver Clústeres *@
                             </button>
                         }
@@ -56,7 +56,7 @@
                             @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                             {
                                 <button class="btn boton-primario m-1" @onclick="GenerarClusteres" title="Generar Clústeres">
-                                    <i class="bi bi-plus-lg"></i> @* Generar Clústeres *@
+                                    <i class="bi bi-plus-lg"></i> Agregar@* Generar Clústeres *@
                                 </button>
                             }
                         }
@@ -227,7 +227,7 @@
 @if (mostrarFormulario2)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-xl" style="margin-right: 10%; margin-left: auto;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@(entidadValidar.IdStorie == 0 ? "Agregar" : "Editar") @entidadValidar.Tipo</h5>

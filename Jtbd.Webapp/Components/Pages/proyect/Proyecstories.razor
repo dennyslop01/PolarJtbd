@@ -78,18 +78,18 @@
                             <td width="20%">@p.TitleStorie</td>
                             <td width="55%">@p.ContextStorie</td>
                             <td width="20%" class="text-end">
-                                <button class="btn boton-secundario btn-sm me-1" title="Catalogar" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
+                                <button class="btn boton-secundario btn-fijo me-1" title="Catalogar" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
                                     <i class="bi bi-grid m-1"></i> 
                                 </button>
                                 @if (entrevistado.Project.StatusProject == 1)
                                 {
                                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                     {
-                                        <button class="btn boton-primario btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <button class="btn boton-secundario btn-fijo me-1" title="Editar" @onclick="() => EditarEntidad(p)">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                         
-                                        <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdStorie)">
+                                        <button class="btn btn-danger btn-fijo me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdStorie)">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     }

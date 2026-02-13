@@ -20,7 +20,7 @@
                     <button class="btn boton-secundario m-1" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
                         <i class="bi bi-kanban"></i>
                     </button>
-                    <button class="btn boton-primario m-1" @onclick="MostrarFormulario" title="Imprimir Clústeres">
+                    <button class="btn boton-secundario m-1" @onclick="MostrarFormulario" title="Imprimir Clústeres">
                         <i class="bi bi-filetype-csv"></i>
                     </button>
                     @if (proyecto.StatusProject == 1)
@@ -66,66 +66,64 @@
                 {
                     <div class="col-lg-12">
                         <div class="row align-content-center">
-                            <div class="row">
-                                <div class="col-lg-11">
-                                    <label><strong>Clúster @clus.IdCluster</strong></label>
-                                </div>
-                                <div class="col-lg-1 text-end">
-                                     <button class="btn boton-primario btn-sm" title="Definir Job" @onclick="() => DefinirJob(clus.IdCluster)">
-                                        @if(proyecto.StatusProject == 1)
-                                        {
-                                            <i class="bi bi-plus-lg"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-eye-fill"></i>
-                                        }
-                                    </button>
-                                </div>
+                            <div class="col-lg-10">
+                                <label><strong>Clúster @clus.IdCluster</strong></label>
+                            </div>
+                            <div class="col-lg-2 text-end">
+                                <button class="btn boton-primario btn-sm" title="Definir Job" @onclick="() => DefinirJob(clus.IdCluster)">
+                                    @if(proyecto.StatusProject == 1)
+                                    {
+                                        <i class="bi bi-plus-lg"></i>
+                                        @lblAgregar
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-eye-fill"></i>
+                                    }
+                                </button>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="col-lg-12">
                         <br />
                         <div class="row align-content-center">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <table class="table align-content-center tabla-gral">
-                                        <thead class="table text-center">
-                                            <tr>
-                                                <th>&nbsp;&nbsp;</th>
+                            <div class="col-lg-12">
+                                <table class="table align-content-center tabla-gral">
+                                    <thead class="table text-center">
+                                        <tr>
+                                            <th>&nbsp;&nbsp;</th>
 
-                                                @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdStorie))
+                                            @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdStorie))
+                                            {
+                                                <th style="vertical-align: middle;">@p.StorieName</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-center">
+                                        @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdGroup))
+                                        {
+                                            <tr>
+                                                <td style="text-align:left">@p.GroupName</td>
+
+                                                @foreach (var y in clusterTabla.Where(x => x.IdCluster == p.IdCluster && x.IdGroup == p.IdGroup).DistinctBy(x => x.IdStorie))
                                                 {
-                                                    <th style="vertical-align: middle;">@p.StorieName</th>
+                                                    @if (y.ValorGroup == 1)
+                                                    {
+                                                        <td style="background-color:lightgreen;">
+                                                            <button type="button" class="btn btn-success" style="background-color:lightgreen;color:darkgreen;border:hidden" title="">1</button>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            <button type="button" class="btn btn-light" title="">0</button>
+                                                        </td>
+                                                    }
                                                 }
                                             </tr>
-                                        </thead>
-                                        <tbody class="text-center">
-                                            @foreach (var p in clusterTabla.Where(x => x.IdCluster == clus.IdCluster).DistinctBy(x => x.IdGroup))
-                                            {
-                                                <tr>
-                                                    <td style="text-align:left">@p.GroupName</td>
-
-                                                    @foreach (var y in clusterTabla.Where(x => x.IdCluster == p.IdCluster && x.IdGroup == p.IdGroup).DistinctBy(x => x.IdStorie))
-                                                    {
-                                                        @if (y.ValorGroup == 1)
-                                                        {
-                                                            <td style="background-color:lightgreen;">
-                                                                <button type="button" class="btn btn-success" style="background-color:lightgreen;color:darkgreen;border:hidden" title="">1</button>
-                                                            </td>
-                                                        }
-                                                        else
-                                                        {
-                                                            <td>
-                                                                <button type="button" class="btn btn-light" title="">0</button>
-                                                            </td>
-                                                        }
-                                                    }
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        }
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -133,6 +131,7 @@
             </div>
             <br />
         }
+    
     </div>
 
     @if (mostrarFormulario)
@@ -241,7 +240,7 @@
     private bool mostrarFormulario = false;
     private bool mostrarFormulario2 = false;
     private bool cargando = false;
-
+    private string? lblAgregar = "Agregar";
     [Inject] private IProjects repoproyect { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IMatrizWard repomatrix { get; set; } = null!;

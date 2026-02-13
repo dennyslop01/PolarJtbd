@@ -93,18 +93,18 @@
                             <td>@p.InterNSE</td>
                             <td>@p.DateInter</td>
                             <td class="text-end">
-                                <button class="btn boton-secundario btn-sm me-1" title="Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
+                                <button class="btn boton-secundario btn-fijo me-1" title="Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
                                     <i class="bi bi-list-columns-reverse"></i>
                                 </button>
                                 @if (proyecto.StatusProject == 1)
                                 {
                                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                                     {
-                                        <button class="btn boton-primario btn-sm me-1" title="Editar" @onclick="() => EditarEntidad(p)">
+                                        <button class="btn boton-secundario btn-fijo me-1" title="Editar" @onclick="() => EditarEntidad(p)">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                         
-                                        <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
+                                        <button class="btn btn-danger btn-fijo me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     }

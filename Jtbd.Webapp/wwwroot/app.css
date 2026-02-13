@@ -135,6 +135,16 @@ h1:focus {
     border-color: #007bff;
 }
 
+.boton-primario:hover {
+    background-color: #00338D !important; /* Gris claro */
+    color: white !important;
+}
+
+/* Asegura que el icono también cambie de color */
+.boton-primario:hover i {
+    color: white !important;
+}
+
 .boton-secundario {
     background-color: #ffffff;
     color: black;
@@ -154,4 +164,13 @@ h1:focus {
 
 .modal-dialog {
     top: 45px;
+}
+
+.btn-fijo {
+    width: 30px; /* Ajusta según prefieras */
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* Elimina el padding para evitar que el icono se desplace */
 }

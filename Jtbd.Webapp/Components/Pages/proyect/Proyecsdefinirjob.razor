@@ -59,16 +59,16 @@
 <div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>More About</strong></label>
             </div>
-            <div class="col-lg-1 justify-content-end">
+            <div class="col-lg-2 justify-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="More About" @onclick="() => MostrarEntidad(1)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -105,10 +105,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo  me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -121,16 +121,16 @@
     </div>
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Less About</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Less About" @onclick="() => MostrarEntidad(2)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -168,10 +168,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -189,16 +189,16 @@
 <div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Key Tradeoffs</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Key Tradeoffs" @onclick="() => MostrarEntidad(3)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -236,10 +236,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -258,16 +258,16 @@
 <div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Pushes</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Pushes" @onclick="() => MostrarEntidad(4)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -305,10 +305,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -321,16 +321,16 @@
     </div>
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Pulls</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Pulls" @onclick="() => MostrarEntidad(5)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -368,10 +368,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -390,16 +390,16 @@
 <div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Aspectos Funcionales</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Aspectos Funcionales" @onclick="() => MostrarEntidad(6)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -437,10 +437,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -453,16 +453,16 @@
     </div>
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Aspectos Emocionales</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Aspectos Emocionales" @onclick="() => MostrarEntidad(7)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -500,10 +500,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -522,16 +522,16 @@
 <div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Aspectos Sociales</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Aspectos Sociales" @onclick="() => MostrarEntidad(8)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -569,10 +569,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -585,16 +585,16 @@
     </div>
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Ansiedades</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Ansiedades" @onclick="() => MostrarEntidad(9)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -632,10 +632,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -654,16 +654,16 @@
 <div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>Set Competitivo</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="Set Competitivo" @onclick="() => MostrarEntidad(10)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -701,10 +701,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -723,16 +723,16 @@
 <div class="row align-content-center">
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>What we hear when hiring</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="What we hear when hiring" @onclick="() => MostrarEntidad(11)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -770,10 +770,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }
@@ -786,16 +786,16 @@
     </div>
     <div class="col-lg-6">
         <div class="row">
-            <div class="col-lg-11">
+            <div class="col-lg-10">
                 <label><strong>What we hear when firing</strong></label>
             </div>
-            <div class="col-lg-1 align-content-end">
+            <div class="col-lg-2 align-content-end">
                 @if (proyecto.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
                         <button class="btn boton-primario btn-sm" title="What we hear when firing" @onclick="() => MostrarEntidad(12)">
-                            <i class="bi bi-plus-lg"></i>
+                            <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
                 }
@@ -833,10 +833,10 @@
                             <td width="25%" class="text-end">
                                 @if (proyecto.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
+                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 }

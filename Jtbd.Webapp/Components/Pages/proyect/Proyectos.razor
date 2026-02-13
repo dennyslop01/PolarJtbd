@@ -62,31 +62,31 @@
                         <td width="10%">@p.Categories.Name</td>
                         <td width="20%" class="text-end">
 
-                            <button class="btn boton-secundario text-dark btn-sm me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
+                            <button class="btn boton-secundario text-dark btn-fijo me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
                                 <i class="bi bi-person-add"></i>
                             </button>
-                            <button class="btn boton-secundario text-dark btn-sm me-1" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
+                            <button class="btn boton-secundario text-dark btn-fijo me-1" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
                                 <i class="bi bi-ui-checks"></i>
                             </button>
-                            <button class="btn boton-secundario text-dark btn-sm me-2" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
+                            <button class="btn boton-secundario text-dark btn-fijo me-2" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
                                 <i class="bi bi-kanban"></i>
                             </button>
                             @if (UserRol > 0 && UserRol < 3)
                             {
                                 @if (p.StatusProject == 1)
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                 }
                                 else
                                 {
-                                    <button class="btn boton-primario btn-sm me-2" title="Editar" @onclick="() => EditarEntidad(p)">
+                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
                                 }
 
-                                <button class="btn btn-danger btn-sm me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
+                                <button class="btn btn-danger btn-fijo me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             }
