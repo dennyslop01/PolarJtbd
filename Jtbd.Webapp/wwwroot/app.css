@@ -177,7 +177,7 @@ h1:focus {
 
 .modal-matriz {
     position: relative !important;
-    left: 50% !important;
+    left: 55% !important;
     transform: translateX(-50%) !important;
     margin-right: 0 !important;
     margin-left: 0 !important;
