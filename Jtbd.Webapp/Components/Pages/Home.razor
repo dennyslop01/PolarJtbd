@@ -72,7 +72,7 @@
                 }
             }
             catch{}
-            NavigationManager.NavigateTo($"proyect/proyectos");
+            NavigationManager.NavigateTo($"proyect/proyectos/{userrol}");
         }
         // No es necesario devolver base.OnAfterRenderAsync, solo llámalo
         await base.OnAfterRenderAsync(firstRender);

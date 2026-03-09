@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyectos"
+﻿@page "/proyect/proyectos/{userrol}"
 
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
@@ -216,6 +216,9 @@
 
 
 @code {
+    [Parameter]
+    public string userrol { get; set; }
+
     private List<Deparments> departamento = new();
     private List<Categories> categorias = new();
     private List<Projects> proyectos = new();
@@ -288,6 +291,11 @@
             cargando = false;
             StateHasChanged();
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserRol = int.Parse(userrol);
     }
 
     private int BuscarIndex(int idProject)

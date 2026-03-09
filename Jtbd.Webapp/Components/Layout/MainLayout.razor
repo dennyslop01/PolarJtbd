@@ -12,7 +12,7 @@
     <MudAppBar Elevation="5" Class="navbar-top" Style="background: linear-gradient(150deg, #00338D  0%, #00338D  100%);">
 
         <!-- Contenido de la izquierda -->
-        <a href="/"><MudImage Src="LogoInnova.png" Alt="Empresas Polar" /></a>
+        @* <a href="/jtbd/proyect/proyectos"> *@<MudImage Src="LogoInnova.png" Alt="Empresas Polar" />@* </a> *@
 
         <!-- Opcional: Si quieres un título junto al logo principal -->
         @* <MudText Typo="Typo.h4" Style="color: white; margin-left: 10px;">Tu Título</MudText> *@
@@ -24,7 +24,7 @@
             <!-- Contenido de la derecha -->
             <MudText Typo="Typo.body1" Style="color: white; margin-right: 16px;">
                 <MudStack Row="true" Spacing="4" Class="ml-6">
-                    <MudButton Variant="Variant.Text" Style="color: white;" href="proyect/proyectos"><i class="bi bi-clipboard-data m-1"></i> Proyectos</MudButton>
+                    <MudButton Variant="Variant.Text" Style="color: white;" href="@($"proyect/proyectos/{userrol}")"><i class="bi bi-clipboard-data m-1"></i> Proyectos</MudButton>
                     @if (userrol == 1)
                     {
                         <MudButton Variant="Variant.Text" Style="color: white;" href="@($"admin/categorias/{userrol}")"><i class="bi bi-bezier2 m-1"></i> Categorías</MudButton>
