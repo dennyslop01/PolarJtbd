@@ -1,4 +1,4 @@
-using Jtbd.Application.Interfaces;
+ï»¿using Jtbd.Application.Interfaces;
 using Jtbd.Infrastructure.DataContext;
 using Jtbd.Infrastructure.Repositories;
 using Jtbd.Webapp.Components;
@@ -15,12 +15,19 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = "Identity.Application"; // Or your chosen scheme
-    options.DefaultSignInScheme = "Identity.External"; // If using external logins
+    options.DefaultScheme = "Identity.Application";
+    options.DefaultSignInScheme = "Identity.External";
 })
-.AddIdentityCookies(); // Or other authentication methods like AddOpenIdConnect, AddJwtBearer
+.AddIdentityCookies();
 
+// Configure DbContext as Transient to avoid Blazor Server concurrency collisions on the same circuit
 builder.Services.AddDbContext<JtbdDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConn"));
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+}, ServiceLifetime.Transient, ServiceLifetime.Transient);
+
+builder.Services.AddDbContextFactory<JtbdDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConn"));
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
@@ -28,26 +35,27 @@ builder.Services.AddDbContext<JtbdDbContext>(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddDistributedMemoryCache(); // Requerido para almacenar la sesión en memoria
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tiempo de expiración
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddScoped<IAnxieties, AnxietiesRepository>();
-builder.Services.AddScoped<ICategories, CategoriesRepository>();
-builder.Services.AddScoped<IDeparments, DeparmentsRepository>();
-builder.Services.AddScoped<IEmployee, EmployeeRepository>();
-builder.Services.AddScoped<IHabits, HabitsRepository>();
-builder.Services.AddScoped<IInterviews, InterviewsRepository>();
-builder.Services.AddScoped<IProjects, ProjectsRepository>();
-builder.Services.AddScoped<IPullGroups, PullGroupsRepository>();
-builder.Services.AddScoped<IPushesGroups, PushesGroupsRepository>();
-builder.Services.AddScoped<IStories, StoriesRepository>();
-builder.Services.AddScoped<IGroups, GroupsRepository>();
-builder.Services.AddScoped<IMatrizWard, MatrizWardRepository>();
+// Repositories registered as Transient so each gets its own independent DbContext instance
+builder.Services.AddTransient<IAnxieties, AnxietiesRepository>();
+builder.Services.AddTransient<ICategories, CategoriesRepository>();
+builder.Services.AddTransient<IDeparments, DeparmentsRepository>();
+builder.Services.AddTransient<IEmployee, EmployeeRepository>();
+builder.Services.AddTransient<IHabits, HabitsRepository>();
+builder.Services.AddTransient<IInterviews, InterviewsRepository>();
+builder.Services.AddTransient<IProjects, ProjectsRepository>();
+builder.Services.AddTransient<IPullGroups, PullGroupsRepository>();
+builder.Services.AddTransient<IPushesGroups, PushesGroupsRepository>();
+builder.Services.AddTransient<IStories, StoriesRepository>();
+builder.Services.AddTransient<IGroups, GroupsRepository>();
+builder.Services.AddTransient<IMatrizWard, MatrizWardRepository>();
 builder.Services.AddMudServices();
 builder.WebHost.UseStaticWebAssets();
 
@@ -57,7 +65,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @rendermode InteractiveServer
 @inject ILogger<Home> Logger
 @inject IJSRuntime JSRuntime
@@ -72,6 +72,10 @@
                 }
             }
             catch{}
+            if (userrol <= 0)
+            {
+                userrol = 1;
+            }
             NavigationManager.NavigateTo($"proyect/proyectos/{userrol}");
         }
         // No es necesario devolver base.OnAfterRenderAsync, solo llámalo

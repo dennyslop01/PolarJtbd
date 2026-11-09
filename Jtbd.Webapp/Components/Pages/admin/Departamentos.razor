@@ -1,72 +1,95 @@
-﻿@page "/admin/departamentos/{userrol}"
+@page "/admin/departamentos/{userrol}"
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Departamentos> Logger
 @inject AuthenticationStateProvider authenticationStateProvider
 
-<PageTitle>Departamentos</PageTitle>
+<PageTitle>Departamentos | Sales Clusters</PageTitle>
+
 @if (userrol == "1")
 {
-     <div class="row align-content-center">
-        <div class="col-lg-12">
-            <h3 class="text-start mt-4">Gestión de Departamentos</h3>
-            <div class="d-flex justify-content-end mb-3">
+    <!-- Enterprise Breadcrumbs -->
+    <div class="enterprise-breadcrumbs">
+        <a href="@($"proyect/proyectos/{userrol}")" class="breadcrumb-link text-decoration-none">
+            <i class="bi bi-folder2-open"></i> Proyectos
+        </a>
+        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+        <span class="breadcrumb-current text-primary">Gestión de Departamentos</span>
+    </div>
+
+    @if (mostrarAlerta)
+    {
+        <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container shadow" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @mensajeAlerta
+            <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+        </div>
+    }
+
+    <div class="card-enterprise">
+        <div class="card-enterprise-header flex-wrap gap-3">
+            <div>
+                <h4 class="card-enterprise-title">
+                    <i class="bi bi-building-fill text-primary"></i> Estructura Organizacional / Departamentos
+                </h4>
+                <span class="text-muted small">Unidades de negocio y áreas funcionales de Empresas Polar</span>
+            </div>
+            <div>
                 <button class="btn boton-primario" title="Agregar Departamento" @onclick="MostrarFormulario">
-                    <i class="bi bi-plus-lg"></i> Agregar
+                    <i class="bi bi-plus-lg"></i> Nuevo Departamento
                 </button>
             </div>
+        </div>
 
-            @if (mostrarAlerta)
-            {
-                <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container" role="alert" style="display:none;">
-                    @mensajeAlerta
-                    <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
-                </div>
-            }
-
-
-            @if (departamento is null)
-            {
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p>Cargando datos...</p>
-                </div>
-            }
-            else if (!departamento.Any())
-            {
-                <div class="alert alert-info text-center">No hay departamentos disponibles.</div>
-            }
-            else
-            {
-                <table class="table">
-                    <thead class="table">
+        @if (departamento is null)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Cargando departamentos...</p>
+            </div>
+        }
+        else if (!departamento.Any())
+        {
+            <div class="text-center py-5 border rounded bg-light">
+                <i class="bi bi-building-x text-muted" style="font-size: 2.5rem;"></i>
+                <p class="text-muted mt-2 mb-0">No hay departamentos disponibles.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
                         <tr>
-                            <th width="10%">#</th>
-                            <th width="70%">Nombre</th>
-                            <th width="20%"> </th>
+                            <th width="8%">ID</th>
+                            <th width="74%">Nombre de Departamento</th>
+                            <th width="18%" class="text-end">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var (p, index) in departamento.Select((p, i) => (p, i + 1)))
                         {
                             <tr>
-                                <td width="10%">@p.Id</td>
-                                <td width="70%">@p.Name</td>
-                                <td width="20%" class="text-end">
-                                    <button class="btn boton-secundario btn-fijo me-1" title="Editar" @onclick="() => EditarEntidad(p)">
-                                        <i class="bi bi-pencil"></i> 
-                                    </button>
-                                    <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(p.Id)">
-                                        <i class="bi bi-trash"></i> 
-                                    </button>
+                                <td class="text-muted fw-bold">@p.Id</td>
+                                <td class="fw-bold text-dark">
+                                    <i class="bi bi-building me-2 text-secondary"></i>@p.Name
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn boton-secundario btn-fijo" title="Editar Departamento" @onclick="() => EditarEntidad(p)">
+                                            <i class="bi bi-pencil"></i> 
+                                        </button>
+                                        <button class="btn btn-enterprise-danger btn-fijo" title="Eliminar Departamento" @onclick="() => EliminarEntidad(p.Id)">
+                                            <i class="bi bi-trash"></i> 
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
-            }
-        </div>
+            </div>
+        }
     </div>
 
     @if (mostrarFormulario)
@@ -127,7 +150,6 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        mostrarAlerta = true;
         if (firstRender)
         {
             mostrarAlerta = false;

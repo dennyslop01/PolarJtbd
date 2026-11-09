@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyecsmatriz/{IdProyecto}/{userrol}"
+@page "/proyect/proyecsmatriz/{IdProyecto}/{userrol}"
 
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
@@ -6,185 +6,206 @@
 @inject ILogger<Proyecstories> Logger
 
 
-<PageTitle>Historias</PageTitle>
-<div class="row align-content-center">
-    <div class="col-lg-12">
-        <div class="col-lg-12">
-            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
-                @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
-            </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <h3 class="text-start mt-4">Matriz de Historias y Grupos</h3>
+<PageTitle>Matriz de Ward | Sales Clusters</PageTitle>
+
+<!-- Enterprise Breadcrumbs -->
+<div class="enterprise-breadcrumbs">
+    <button class="breadcrumb-link" @onclick="Regresar2">
+        <i class="bi bi-folder2-open"></i> Proyectos
+    </button>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <span class="breadcrumb-current">@(proyecto?.ProjectName ?? "Proyecto")</span>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <span class="breadcrumb-current text-primary">Matriz de Fuerzas y Clustering Ward</span>
+</div>
+
+<!-- Header Card with Ward Methodology Context & Actions -->
+<div class="card-enterprise mb-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h3 class="mb-0">Matriz de Fuerzas de Decisión (JTBD)</h3>
+                <span class="badge-enterprise badge-cluster">
+                    <i class="bi bi-calculator me-1"></i> Método de Ward
+                </span>
+            </div>
+            <p class="text-muted small mb-0">
+                Correlación matricial binaria de historias de clientes frente a las fuerzas detonantes (Pushes) y de atracción (Pulls). Base cuantitativa para el clustering jerárquico de varianza mínima.
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn boton-secundario" @onclick="MostrarFormulario" title="Exportar Matriz a CSV">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Descargar CSV
+            </button>
+            @if (verClusters)
+            {
+                <button class="btn boton-secundario" @onclick="VerClusteres" title="Ver Clústeres Generados">
+                    <i class="bi bi-diagram-3-fill text-primary"></i> Ver Clústeres
+                </button>
+            }
+            @if (proyecto?.StatusProject == 1)
+            {
+                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                {
+                    <button class="btn boton-primario" @onclick="GenerarClusteres" title="Generar Clústeres mediante el Método de Ward">
+                        <i class="bi bi-cpu"></i> Generar Clústeres
+                    </button>
+                }
+            }
         </div>
     </div>
-    <div class="col-lg-12">
-        @if (mostrarAlerta)
-        {
-            <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container" role="alert" style="display:none;">
-                @mensajeAlerta
-                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
-            </div>
-        }
+</div>
 
-        @if (grupospush is null && grupospull is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!grupospush.Any() && !grupospull.Any())
-        {
-            <div class="alert alert-info text-center">No hay datos disponibles.</div>
-        }
-        else
-        {
-            <div class="row align-content-center">
-                <div class="col-lg-12">
-                    <div class="d-flex justify-content-end">
-                        <button class="btn boton-secundario m-1" @onclick="MostrarFormulario" title="Descargar CSV">
-                            <i class="bi bi-filetype-csv"></i>
-                        </button>
+@if (mostrarAlerta)
+{
+    <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container shadow" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @mensajeAlerta
+        <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+    </div>
+}
 
-                        @if(verClusters)
+@if (grupospush is null && grupospull is null)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2">Cargando matriz matemática de datos...</p>
+    </div>
+}
+else if (!grupospush.Any() && !grupospull.Any())
+{
+    <div class="card-enterprise text-center py-5">
+        <i class="bi bi-kanban text-muted" style="font-size: 2.5rem;"></i>
+        <p class="text-muted mt-2 mb-0">No hay grupos de fuerzas disponibles para construir la matriz de Ward.</p>
+    </div>
+}
+else
+{
+    <div class="card-enterprise p-3">
+        <div class="table-responsive">
+            <table class="table table-bordered tabla-matriz align-middle">
+                <thead>
+                    <tr>
+                        <th style="background-color: var(--polar-navy) !important; color: white; vertical-align: middle; text-align: left; padding: 12px 16px; min-width: 250px;">
+                            <i class="bi bi-person-lines-fill me-1"></i> Historia / Entrevistado
+                        </th>
+                        @if (grupospush.Any(p => p.GroupName != "Leftovers"))
                         {
-                            <button class="btn boton-secundario m-1" @onclick="VerClusteres" title="Ver Clústeres">
-                                <i class="bi bi-eye-fill"></i> @* Ver Clústeres *@
-                            </button>
+                            <th colspan="@grupospush.Count(p => p.GroupName != "Leftovers")" style="background-color: var(--force-push) !important; color: white; text-align: center; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;">
+                                <i class="bi bi-box-arrow-right me-1"></i> Fuerzas Push (Detonantes)
+                            </th>
                         }
-                        @if (proyecto.StatusProject == 1)
+                        @if (grupospull.Any(p => p.GroupName != "Leftovers"))
                         {
-                            @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                            <th colspan="@grupospull.Count(p => p.GroupName != "Leftovers")" style="background-color: var(--force-pull) !important; color: white; text-align: center; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Fuerzas Pull (Atracción)
+                            </th>
+                        }
+                    </tr>
+                    <tr>
+                        <th style="background-color: var(--slate-100) !important; text-align: left; padding: 8px 16px;">
+                            <span class="small text-muted fw-bold">TOTAL HISTORIAS: @stories.Count</span>
+                        </th>
+                        @foreach (var (p, index) in grupospush.Select((p, i) => (p, i + 1)))
+                        {
+                            if (p.GroupName != "Leftovers")
                             {
-                                <button class="btn boton-primario m-1" @onclick="GenerarClusteres" title="Generar Clústeres">
-                                    <i class="bi bi-plus-lg"></i> Agregar@* Generar Clústeres *@
-                                </button>
+                                <th style="vertical-align: middle; background-color: var(--force-push-bg); color: var(--force-push); font-size: 0.76rem;" title="@p.GroupName">
+                                    @p.GroupName
+                                </th>
                             }
                         }
-                    </div>
-                </div>
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table class="table table-bordered tabla-matriz">
-                            <thead>
-                                <tr>
-                                    <th>&nbsp;&nbsp;</th>
-                                    @foreach (var (p, index) in grupospush.Select((p, i) => (p, i + 1)))
-                                    {
-                                        if (p.GroupName != "Leftovers")
-                                        {
-                                            <th style="vertical-align: middle;text-align:left">Push</th>
-                                        }
-                                    }
 
-                                    @foreach (var (p, index) in grupospull.Select((p, i) => (p, i + 1)))
-                                    {
-                                        if (p.GroupName != "Leftovers")
-                                        {
-                                            <th style="vertical-align: middle;text-align:left">Pull</th>
-                                        }
-                                    }
-                                </tr>
-                                <tr>
-                                    <th>&nbsp;&nbsp;</th>
-                                    @foreach (var (p, index) in grupospush.Select((p, i) => (p, i + 1)))
-                                    {
-                                        if (p.GroupName != "Leftovers")
-                                        {
-                                            <th style="vertical-align: middle;" title="@p.GroupName">@p.GroupName</th>
-                                        }
-                                    }
-
-                                    @foreach (var (p, index) in grupospull.Select((p, i) => (p, i + 1)))
-                                    {
-                                        if (p.GroupName != "Leftovers")
-                                        {
-                                            <th style="vertical-align: middle;" title="@p.GroupName">@p.GroupName</th>
-                                        }
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody class="text-center">
-                                @foreach (var (p, index) in stories.Select((p, i) => (p, i + 1)))
+                        @foreach (var (p, index) in grupospull.Select((p, i) => (p, i + 1)))
+                        {
+                            if (p.GroupName != "Leftovers")
+                            {
+                                <th style="vertical-align: middle; background-color: var(--force-pull-bg); color: var(--force-pull); font-size: 0.76rem;" title="@p.GroupName">
+                                    @p.GroupName
+                                </th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @foreach (var (p, index) in stories.Select((p, i) => (p, i + 1)))
+                    {
+                        <tr>
+                            <td style="text-align:left; font-weight: 600; padding: 8px 14px;">
+                                <span class="badge bg-light text-dark border me-1">@(p.IdInter?.InterName ?? "Entrevistado")</span>
+                                <span class="text-dark">@p.TitleStorie</span>
+                            </td>
+                            @foreach (var (p1, index1) in grupospush.Select((p, i) => (p, i + 1)))
+                            {
+                                try
                                 {
-                                    <tr>
-                                        <td style="text-align:left">@p.IdInter.InterName - @p.TitleStorie</td>
-                                        @foreach (var (p1, index1) in grupospush.Select((p, i) => (p, i + 1)))
+                                    if (p1.GroupName != "Leftovers")
+                                    {
+                                        var entidad = storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).FirstOrDefault();
+                                        if (entidad == null)
                                         {
-                                            try
-                                            {
-                                                if (p1.GroupName != "Leftovers")
-                                                {
-                                                    var entidad = storiespush.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).FirstOrDefault();
-                                                    if (entidad == null)
-                                                    {
-                                                        <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">
-                                                            <button type="button" class="btn btn-light" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">-</button>
-                                                        </td>
-                                                    }
-                                                    else
-                                                    {
-                                                        @if (entidad.ValorPush == 1)
-                                                        {
-                                                            <td style="background-color:lightgreen;color:darkgreen;" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">
-                                                                <button type="button" class="btn btn-success" style="background-color:lightgreen;color:darkgreen;border:hidden" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">1</button>
-                                                            </td>
-                                                        }
-                                                        else
-                                                        {
-                                                            <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">
-                                                                <button type="button" class="btn btn-light" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">0</button>
-                                                            </td>
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            catch { }
+                                            <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)" style="cursor: pointer;" title="Modificar">
+                                                <span class="text-muted small">-</span>
+                                            </td>
                                         }
-
-                                        @foreach (var (p1, index1) in grupospull.Select((p, i) => (p, i + 1)))
+                                        else
                                         {
-                                            try
+                                            @if (entidad.ValorPush == 1)
                                             {
-                                                if (p1.GroupName != "Leftovers")
-                                                {
-                                                    var entidad = storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).FirstOrDefault();
-                                                    if (entidad == null)
-                                                    {
-                                                        <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">
-                                                            <button type="button" class="btn btn-light" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">-</button>
-                                                        </td>
-                                                    }
-                                                    else
-                                                    {
-                                                        @if (entidad.ValorPull == 1)
-                                                        {
-                                                            <td style="background-color:lightgreen;color:darkgreen;" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">
-                                                                <button type="button" class="btn btn-success" style="background-color:lightgreen;color:darkgreen;border:hidden" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">1</button>
-                                                            </td>
-                                                        }
-                                                        else
-                                                        {
-                                                            <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">
-                                                                <button type="button" class="btn btn-light" title="Editar" @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)">0</button>
-                                                            </td>
-                                                        }
-                                                    }
-                                                }
+                                                <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)" style="cursor: pointer; background-color: rgba(16, 185, 129, 0.12);" title="Valor: 1">
+                                                    <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-check-lg"></i> 1</span>
+                                                </td>
                                             }
-                                            catch { }
+                                            else
+                                            {
+                                                <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)" style="cursor: pointer;" title="Valor: 0">
+                                                    <span class="text-muted small">0</span>
+                                                </td>
+                                            }
                                         }
-                                    </tr>
+                                    }
                                 }
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                </div>
-            </div>
-            <br />
-        }
+                                catch { }
+                            }
+
+                            @foreach (var (p1, index1) in grupospull.Select((p, i) => (p, i + 1)))
+                            {
+                                try
+                                {
+                                    if (p1.GroupName != "Leftovers")
+                                    {
+                                        var entidad = storiespull.Where(c => c.Stories?.IdStorie == p.IdStorie && c.Groups?.IdGroup == p1.IdGroup).FirstOrDefault();
+                                        if (entidad == null)
+                                        {
+                                            <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)" style="cursor: pointer;" title="Modificar">
+                                                <span class="text-muted small">-</span>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            @if (entidad.ValorPull == 1)
+                                            {
+                                                <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)" style="cursor: pointer; background-color: rgba(16, 185, 129, 0.12);" title="Valor: 1">
+                                                    <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-check-lg"></i> 1</span>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td @onclick="() => EditarEntidad(p.IdStorie, p1.IdGroup)" style="cursor: pointer;" title="Valor: 0">
+                                                    <span class="text-muted small">0</span>
+                                                </td>
+                                            }
+                                        }
+                                    }
+                                }
+                                catch { }
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+}
 
 @if (mostrarFormulario)
 {

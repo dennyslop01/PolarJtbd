@@ -1,58 +1,72 @@
-﻿@typeparam TItem
+@typeparam TItem
 
-<div>
-    <table class="table">
-        <thead>
-            @ChildContentHeader
-        </thead>
-        <tbody>
-            @foreach (var item in PaginatedData)
-            {
-                @ChildContentRow(item)
-            }
-        </tbody>
-    </table>
+<div class="enterprise-datagrid-wrapper">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                @ChildContentHeader
+            </thead>
+            <tbody>
+                @foreach (var item in PaginatedData)
+                {
+                    @ChildContentRow(item)
+                }
+            </tbody>
+        </table>
+    </div>
 
     <div class="pagination-controls">
-        <!-- Page Size Dropdown -->
-       @* <label for="pageSize">Size: </label>
-         <select @bind="PageSize" id="pageSize">
-            @foreach (var size in PageSizes)
+        <div class="pagination-page-size">
+            <span class="text-muted">Mostrando <strong>@StartRecord</strong> a <strong>@EndRecord</strong> de <strong>@TotalCount</strong></span>
+            <span class="mx-2 text-muted">•</span>
+            <label for="pageSize" class="mb-0 text-muted">Filas:</label>
+            <select @bind="PageSize" id="pageSize" class="form-select form-select-sm d-inline-block w-auto">
+                @foreach (var size in PageSizes)
+                {
+                    <option value="@size">@size</option>
+                }
+            </select>
+        </div>
+
+        <div class="pagination-buttons-group">
+            <button @onclick="PreviousPage" disabled="@IsPreviousDisabled" title="Página Anterior">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+
+            @foreach (var pageNumber in GetVisiblePageNumbers())
             {
-            <option value="@size">@size</option>
+                <button @onclick="() => GoToPage(pageNumber)" class="@(CurrentPage == pageNumber ? "active" : "")">
+                    @pageNumber
+                </button>
             }
-        </select> *@
 
-        <!-- Previous Page Button -->
-        <button @onclick="PreviousPage" disabled="@IsPreviousDisabled"><i class="bi bi-chevron-double-left"></i></button>
-
-        <!-- Page Number Buttons -->
-        @foreach (var pageNumber in Enumerable.Range(1, TotalPages))
-        {
-        <button @onclick="() => GoToPage(pageNumber)" class="@(CurrentPage == pageNumber ? " active" : "" )">
-            @pageNumber
-        </button>
-        }
-
-        <!-- Next Page Button -->
-        <button @onclick="NextPage" disabled="@IsNextDisabled"><i class="bi bi-chevron-double-right"></i></button>
+            <button @onclick="NextPage" disabled="@IsNextDisabled" title="Página Siguiente">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
     </div>
 </div>
 
 @code {
-    [Parameter] public IEnumerable<TItem>
-    Items { get; set; }
+    [Parameter] public IEnumerable<TItem> Items { get; set; } = Enumerable.Empty<TItem>();
     [Parameter] public int DefaultPageSize { get; set; } = 10;
-    [Parameter] public RenderFragment ChildContentHeader { get; set; }
-    [Parameter] public RenderFragment<TItem>
-    ChildContentRow { get; set; }
+    [Parameter] public RenderFragment? ChildContentHeader { get; set; }
+    [Parameter] public RenderFragment<TItem> ChildContentRow { get; set; } = null!;
 
     private int PageSize { get; set; }
-    private List<TItem>
-    PaginatedData => Items.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
     private int CurrentPage { get; set; } = 1;
 
     private readonly int[] PageSizes = new[] { 5, 10, 20, 50 };
+
+    private int TotalCount => Items?.Count() ?? 0;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(TotalCount / (double)PageSize));
+    private int StartRecord => TotalCount == 0 ? 0 : ((CurrentPage - 1) * PageSize) + 1;
+    private int EndRecord => Math.Min(CurrentPage * PageSize, TotalCount);
+
+    private List<TItem> PaginatedData => (Items ?? Enumerable.Empty<TItem>())
+        .Skip((CurrentPage - 1) * PageSize)
+        .Take(PageSize)
+        .ToList();
 
     protected override void OnInitialized()
     {
@@ -77,61 +91,20 @@
 
     private void GoToPage(int pageNumber)
     {
-        CurrentPage = pageNumber;
+        CurrentPage = Math.Clamp(pageNumber, 1, TotalPages);
     }
 
-    private int TotalPages => (int)Math.Ceiling(Items.Count() / (double)PageSize);
+    private bool IsPreviousDisabled => CurrentPage <= 1;
+    private bool IsNextDisabled => CurrentPage >= TotalPages;
 
-    private bool IsPreviousDisabled => CurrentPage == 1;
-    private bool IsNextDisabled => CurrentPage == TotalPages;
-}
-<style>
-    .pagination-controls
+    private IEnumerable<int> GetVisiblePageNumbers()
     {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 20px;
+        int start = Math.Max(1, CurrentPage - 2);
+        int end = Math.Min(TotalPages, start + 4);
+        if (end - start < 4)
+        {
+            start = Math.Max(1, end - 4);
+        }
+        return Enumerable.Range(start, end - start + 1);
     }
-
-    .pagination-controls button {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        color: #007bff;
-        padding: 5px 10px;
-        margin: 0 5px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    .pagination-controls button:hover {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .pagination-controls button.active {
-        background-color: #007bff;
-        color: white;
-        font-weight: bold;
-    }
-
-    .pagination-controls button:disabled {
-        background-color: #e9ecef;
-        color: #6c757d;
-        cursor: not-allowed;
-        border-color: #ced4da;
-    }
-
-    .pagination-controls select {
-        margin-right: 15px;
-        padding: 5px;
-        border-radius: 4px;
-        border: 1px solid #dee2e6;
-    }
-
-    .pagination-controls label {
-        margin-right: 5px;
-        font-weight: bold;
-    }
-</style>
+}

@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyectos/{userrol}"
+@page "/proyect/proyectos/{userrol}"
 
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
@@ -6,213 +6,330 @@
 @inject ILogger<Proyectos> Logger
 @inject AuthenticationStateProvider authenticationStateProvider
 
-<PageTitle>Proyectos</PageTitle>
+<PageTitle>Proyectos | Sales Clusters</PageTitle>
 
-<div class="row align-content-center">
-    <div class="col-lg-12">
-        <h3 class="text-start mt-4">Gestión de proyectos</h3>
-        @if (UserRol > 0 && UserRol < 3)
-        {
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn boton-primario" @onclick="MostrarFormulario" title="Agregar Proyecto">
-                <i class="bi bi-plus-lg"></i> Agregar
-                </button>
-            </div>
-        }
+<!-- Ward Clustering Methodology Hero Banner -->
+<div class="ward-banner">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+        <div class="ward-banner-title">
+            <i class="bi bi-diagram-3-fill"></i>
+            <span>Segmentación de Clientes y Mercados • Método de Ward</span>
+        </div>
+        <span class="ward-tag-pill">
+            <i class="bi bi-calculator"></i> Varianza Mínima
+        </span>
+    </div>
+    <p class="ward-banner-desc">
+        Técnica de análisis de conglomerados (clustering jerárquico) aplicada a la gestión comercial y mercadeo de
+        Empresas Polar. Minimiza la varianza interna entre grupos para clasificar de manera matemática y objetiva las
+        motivaciones y fuerzas de decisión de compra (Jobs to be Done).
+    </p>
+</div>
 
-        @if (mostrarAlerta)
-        {
-            <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container" role="alert" style="display:none;">
-                @mensajeAlerta
-                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
-            </div>
-        }
-
-
-        @if (proyectos is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!proyectos.Any())
-        {
-            <div class="alert alert-info text-center">No hay proyectos disponibles.</div>
-        }
-        else
-        {
-            <PaginationComponentEdit TItem="Projects" Items="proyectos" DefaultPageSize="10">
-                <ChildContentHeader>
-                    <tr>
-                        <th width="5%">#</th>
-                        <th width="40%">Nombre</th>
-                        <th width="15%">Fecha</th>
-                        <th width="10%">Departamento</th>
-                        <th width="10%">Categoría</th>
-                        <th width="20%"> </th>
-                    </tr>
-                </ChildContentHeader>
-                <ChildContentRow Context="p">
-                    <tr>
-                        <td width="5%">@BuscarIndex(p.IdProject)</td>
-                        <td width="40%">@p.ProjectName</td>
-                        <td width="15%">@p.ProjectDate</td>
-                        <td width="10%">@p.Deparment.Name</td>
-                        <td width="10%">@p.Categories.Name</td>
-                        <td width="20%" class="text-end">
-
-                            <button class="btn boton-secundario text-dark btn-fijo me-1" title="Agregar Entrevistados" @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
-                                <i class="bi bi-person-add"></i>
-                            </button>
-                            <button class="btn boton-secundario text-dark btn-fijo me-1" title="Agrupar Historias" @onclick="() => AgruparHistorias(p.IdProject.ToString())">
-                                <i class="bi bi-ui-checks"></i>
-                            </button>
-                            <button class="btn boton-secundario text-dark btn-fijo me-2" title="Matriz Historias" @onclick="() => MostrarMatriz(p.IdProject.ToString())">
-                                <i class="bi bi-kanban"></i>
-                            </button>
-                            @if (UserRol > 0 && UserRol < 3)
-                            {
-                                @if (p.StatusProject == 1)
-                                {
-                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarEntidad(p)">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </button>
-                                }
-
-                                <button class="btn btn-danger btn-fijo me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdProject)">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            }
-                        </td>
-                    </tr>
-                </ChildContentRow>
-            </PaginationComponentEdit>
-        }
+<!-- Executive KPIs -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon-wrap kpi-icon-blue">
+            <i class="bi bi-folder2"></i>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">Proyectos Totales</span>
+            <span class="kpi-value">@(proyectos?.Count ?? 0)</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon-wrap kpi-icon-green">
+            <i class="bi bi-check2-circle"></i>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">Proyectos Activos</span>
+            <span class="kpi-value">@(proyectos?.Count(p => p.StatusProject == 1) ?? 0)</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon-wrap kpi-icon-purple">
+            <i class="bi bi-pie-chart-fill"></i>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">Proyectos Concluidos</span>
+            <span class="kpi-value">@(proyectos?.Count(p => p.StatusProject == 2) ?? 0)</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon-wrap kpi-icon-amber">
+            <i class="bi bi-cpu"></i>
+        </div>
+        <div class="kpi-content">
+            <span class="kpi-label">Algoritmo de Agrupación</span>
+            <span class="kpi-value" style="font-size: 1.05rem; padding-top: 4px;">Ward Hierarchical</span>
+        </div>
     </div>
 </div>
 
-@if (mostrarFormulario)
+@if (mostrarAlerta)
 {
-    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@(proyectoActual.IdProject == 0 ? "Agregar" : "Editar")</h5>
-                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
-                </div>
-                <div class="modal-body">
-                    <EditForm Model="@proyectoActual" OnValidSubmit="GuardarEntidad">
-                        <DataAnnotationsValidator />
+    <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container shadow" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @mensajeAlerta
+        <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+    </div>
+}
 
-                        <div class="mb-3">
-                            <label class="form-label">Nombre:</label>
-                            <InputText class="form-control" @bind-Value="proyectoActual.ProjectName" disabled="@(proyectoActual.StatusProject != 1)" />
-                            <ValidationMessage For="@(() => proyectoActual.ProjectName)" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Fecha:</label>
-                            <InputDate class="form-control" @bind-Value="proyectoActual.ProjectDate" disabled="@(proyectoActual.StatusProject != 1)" />
-                            <ValidationMessage For="@(() => proyectoActual.ProjectDate)" />
-                        </div>
-                        @if (UserRol == 1)
-                        {
-                            <div class="mb-3">
-                                <label class="form-label">Departamentos:</label>
-                                <InputSelect class="form-select" @bind-Value="proyectoActual.IdDeparmento" disabled="@(proyectoActual.StatusProject != 1)">
-                                    <option value="-1">-- Seleccione uno --</option>
-                                    @foreach (var item in departamento)
-                                    {
-                                        <option value="@item.Id">@item.Name</option>
-                                    }
-                                </InputSelect>
-                                <ValidationMessage For="@(() => proyectoActual.IdDeparmento)" />
-                            </div>
-                        }
-                        <div class="mb-3">
-                            <label class="form-label">Categorías:</label>
-                            <InputSelect class="form-select" @bind-Value="proyectoActual.idCategoria" disabled="@(proyectoActual.StatusProject != 1)">
-                                <option value="-1">-- Seleccione uno --</option>
-                                @foreach (var item in categorias)
+<div class="card-enterprise">
+    <div class="card-enterprise-header flex-wrap gap-3">
+        <div>
+            <h4 class="card-enterprise-title">
+                <i class="bi bi-collection-fill"></i> Gestión de Proyectos de Segmentación
+            </h4>
+            <span class="text-muted small">Iniciativas estratégicas de investigación cuantitativa y cualitativa
+                JTBD</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <div class="input-group input-group-sm" style="max-width: 280px;">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0" placeholder="Buscar proyecto o área..."
+                           @bind="busqueda" @bind:event="oninput" />
+                </div>
+                @if (UserRol > 0 && UserRol < 3)
+                {
+                    <button class="btn boton-primario" @onclick="MostrarFormulario" title="Agregar Proyecto">
+                        <i class="bi bi-plus-lg"></i> Nuevo Proyecto
+                    </button>
+                }
+            </div>
+        </div>
+
+        @if (proyectos is null)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Cargando portafolio de proyectos...</p>
+            </div>
+        }
+        else if (!proyectosFiltrados.Any())
+        {
+            <div class="text-center py-5 border rounded bg-light">
+                <i class="bi bi-inbox text-muted" style="font-size: 2.5rem;"></i>
+                <p class="text-muted mt-2 mb-0">No se encontraron proyectos @(string.IsNullOrWhiteSpace(busqueda) ?
+                     "disponibles" : $"que coincidan con '{busqueda}'").</p>
+                </div>
+            }
+    else
+            {
+                <PaginationComponentEdit TItem="Projects" Items="proyectosFiltrados" DefaultPageSize="10">
+                    <ChildContentHeader>
+                        <tr>
+                            <th width="4%">#</th>
+                            <th width="32%">Iniciativa / Proyecto</th>
+                            <th width="12%">Fecha</th>
+                            <th width="14%">Departamento</th>
+                            <th width="14%">Categoría</th>
+                            <th width="10%">Estatus</th>
+                            <th width="14%" class="text-end">Acciones</th>
+                        </tr>
+                    </ChildContentHeader>
+                    <ChildContentRow Context="p">
+                        <tr>
+                            <td class="text-muted fw-bold">@BuscarIndex(p.IdProject)</td>
+                            <td>
+                                <div class="fw-bold text-dark">@p.ProjectName</div>
+                                @if (!string.IsNullOrWhiteSpace(p.ProjectDescription))
                                 {
-                                    <option value="@item.Id">@item.Name</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="@(() => proyectoActual.idCategoria)" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Descripcion:</label>
-                            <InputText class="form-control" @bind-Value="proyectoActual.ProjectDescription" disabled="@(proyectoActual.StatusProject != 1)" />
-                            <ValidationMessage For="@(() => proyectoActual.ProjectDescription)" />
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            @if (proyectoActual.StatusProject != 2)
-                            {
-                                <button type="submit" class="btn boton-primario me-2">
-                                    <i class="bi bi-save"></i> Guardar
-                                </button>
-                            }
-                            <button type="button" class="btn btn-danger" @onclick="Cancelar">
-                                <i class="bi bi-times"></i> Cancelar
-                            </button>
-                        </div>
-                    </EditForm>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+                                    <div class="small text-muted text-truncate" style="max-width: 320px;" title="@p.ProjectDescription">
+                                        @p.ProjectDescription</div>
+                                    }
+                                </td>
+                                <td>
+                                    <i class="bi bi-calendar3 me-1 text-muted"></i>
+                                    <span>@(p.ProjectDate.ToString("yyyy-MM-dd"))</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-building me-1 text-secondary"></i>@(p.Deparment?.Name ?? "-")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-primary border">
+                                        <i class="bi bi-tag me-1 text-primary"></i>@(p.Categories?.Name ?? "-")
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (p.StatusProject == 1)
+                                    {
+                                        <span class="badge-enterprise badge-active">
+                                            <i class="bi bi-record-fill" style="font-size: 0.6rem;"></i> Activo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-enterprise badge-closed">
+                                            <i class="bi bi-lock-fill" style="font-size: 0.6rem;"></i> Concluido
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn boton-secundario text-dark btn-fijo" title="Gestionar Entrevistados"
+                                                @onclick="() => AgrgarEntrvistado(p.IdProject.ToString())">
+                                            <i class="bi bi-people"></i>
+                                        </button>
+                                        <button class="btn boton-secundario text-dark btn-fijo" title="Agrupar Fuerzas e Historias"
+                                                @onclick="() => AgruparHistorias(p.IdProject.ToString())">
+                                            <i class="bi bi-ui-checks-grid"></i>
+                                        </button>
+                                        <button class="btn boton-secundario text-primary btn-fijo" title="Matriz y Clustering de Ward"
+                                                @onclick="() => MostrarMatriz(p.IdProject.ToString())">
+                                            <i class="bi bi-diagram-3"></i>
+                                        </button>
+                                        @if (UserRol > 0 && UserRol < 3)
+                                        {
+                                            @if (p.StatusProject == 1)
+                                            {
+                                                <button class="btn boton-secundario btn-fijo" title="Editar Proyecto"
+                                                        @onclick="() => EditarEntidad(p)">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn boton-secundario btn-fijo" title="Ver Proyecto"
+                                                        @onclick="() => EditarEntidad(p)">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            }
 
-@if (mostrarFormulario2)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Abrir Proyecto</h5>
-                    <button type="button" class="btn-close" @onclick="Cancelar"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-warning" role="alert">
-                        ¿Está seguro? Desea volver abrir el proyecto.
-                    </div>
-
-                    <div class="d-flex justify-content-end">
-                        <button type="button" class="btn boton-primario me-2" @onclick="CerrarProyecto">
-                            <i class="bi bi-times"></i> Abrir
-                        </button>
-                        <button type="button" class="btn btn-danger" @onclick="Cancelar">
-                            <i class="bi bi-times"></i> Cancelar
-                        </button>
-                    </div>
-                </div>
+                                            <button class="btn btn-enterprise-danger btn-fijo" title="Eliminar Proyecto"
+                                                    @onclick="() => EliminarEntidad(p.IdProject)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        </ChildContentRow>
+                    </PaginationComponentEdit>
+                }
             </div>
-        </div>
-    </div>
-}
 
-@if (cargando)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); align-content:center">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="modal-cargando text-lg-center">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
+            @if (mostrarFormulario)
+            {
+                <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">@(proyectoActual.IdProject == 0 ? "Agregar" : "Editar")</h5>
+                                <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <EditForm Model="@proyectoActual" OnValidSubmit="GuardarEntidad">
+                                    <DataAnnotationsValidator />
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Nombre:</label>
+                                        <InputText class="form-control" @bind-Value="proyectoActual.ProjectName"
+                                                   disabled="@(proyectoActual.StatusProject != 1)" />
+                                        <ValidationMessage For="@(() => proyectoActual.ProjectName)" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Fecha:</label>
+                                        <InputDate class="form-control" @bind-Value="proyectoActual.ProjectDate"
+                                                   disabled="@(proyectoActual.StatusProject != 1)" />
+                                        <ValidationMessage For="@(() => proyectoActual.ProjectDate)" />
+                                    </div>
+                                    @if (UserRol == 1)
+                                    {
+                                        <div class="mb-3">
+                                            <label class="form-label">Departamentos:</label>
+                                            <InputSelect class="form-select" @bind-Value="proyectoActual.IdDeparmento"
+                                                         disabled="@(proyectoActual.StatusProject != 1)">
+                                                <option value="-1">-- Seleccione uno --</option>
+                                                @foreach (var item in departamento)
+                                                {
+                                                    <option value="@item.Id">@item.Name</option>
+                                                }
+                                            </InputSelect>
+                                            <ValidationMessage For="@(() => proyectoActual.IdDeparmento)" />
+                                        </div>
+                                    }
+                                    <div class="mb-3">
+                                        <label class="form-label">Categorías:</label>
+                                        <InputSelect class="form-select" @bind-Value="proyectoActual.idCategoria"
+                                                     disabled="@(proyectoActual.StatusProject != 1)">
+                                            <option value="-1">-- Seleccione uno --</option>
+                                            @foreach (var item in categorias)
+                                            {
+                                                <option value="@item.Id">@item.Name</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => proyectoActual.idCategoria)" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Descripcion:</label>
+                                        <InputText class="form-control" @bind-Value="proyectoActual.ProjectDescription"
+                                                   disabled="@(proyectoActual.StatusProject != 1)" />
+                                        <ValidationMessage For="@(() => proyectoActual.ProjectDescription)" />
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        @if (proyectoActual.StatusProject != 2)
+                                        {
+                                            <button type="submit" class="btn boton-primario me-2">
+                                                <i class="bi bi-save"></i> Guardar
+                                            </button>
+                                        }
+                                        <button type="button" class="btn btn-danger" @onclick="Cancelar">
+                                            <i class="bi bi-times"></i> Cancelar
+                                        </button>
+                                    </div>
+                                </EditForm>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-}
+            }
+
+            @if (mostrarFormulario2)
+            {
+                <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Abrir Proyecto</h5>
+                                <button type="button" class="btn-close" @onclick="Cancelar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-warning" role="alert">
+                                    ¿Está seguro? Desea volver abrir el proyecto.
+                                </div>
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn boton-primario me-2" @onclick="CerrarProyecto">
+                                        <i class="bi bi-times"></i> Abrir
+                                    </button>
+                                    <button type="button" class="btn btn-danger" @onclick="Cancelar">
+                                        <i class="bi bi-times"></i> Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (cargando)
+            {
+                <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); align-content:center">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <div class="modal-cargando text-lg-center">
+                                    <div class="spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
 
 
 @code {
@@ -222,6 +339,14 @@
     private List<Deparments> departamento = new();
     private List<Categories> categorias = new();
     private List<Projects> proyectos = new();
+    private string busqueda = "";
+    private IEnumerable<Projects> proyectosFiltrados =>
+        string.IsNullOrWhiteSpace(busqueda)
+            ? proyectos
+            : proyectos.Where(p =>
+                (!string.IsNullOrEmpty(p.ProjectName) && p.ProjectName.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
+                (p.Deparment?.Name != null && p.Deparment.Name.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
+                (p.Categories?.Name != null && p.Categories.Name.Contains(busqueda, StringComparison.OrdinalIgnoreCase)));
     private CreateProject proyectoActual = new();
     private bool mostrarFormulario = false;
     private bool mostrarFormulario2 = false;
@@ -242,7 +367,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        mostrarAlerta = true;
         if (firstRender)
         {
             mostrarAlerta = false;
@@ -379,22 +503,22 @@
         try
         {
             proyectoActual = new CreateProject
-                {
-                    IdProject = proyecto.IdProject,
-                    ProjectName = proyecto.ProjectName,
-                    ProjectDate = proyecto.ProjectDate,
-                    IdDeparmento = proyecto.Deparment.Id,
-                    idCategoria = proyecto.Categories.Id,
-                    ProjectDescription = proyecto.ProjectDescription,
-                    MaxPushes = proyecto.MaxPushes,
-                    MaxPulls = proyecto.MaxPulls,
-                    RutaImage = proyecto.RutaImage,
-                    CreatedDate = proyecto.CreatedDate,
-                    CreatedUser = proyecto.CreatedUser,
-                    UpdatedDate = DateTime.Now,
-                    UpdatedUser = username,
-                    StatusProject = 1
-                };
+            {
+                IdProject = proyecto.IdProject,
+                ProjectName = proyecto.ProjectName,
+                ProjectDate = proyecto.ProjectDate,
+                IdDeparmento = proyecto.Deparment.Id,
+                idCategoria = proyecto.Categories.Id,
+                ProjectDescription = proyecto.ProjectDescription,
+                MaxPushes = proyecto.MaxPushes,
+                MaxPulls = proyecto.MaxPulls,
+                RutaImage = proyecto.RutaImage,
+                CreatedDate = proyecto.CreatedDate,
+                CreatedUser = proyecto.CreatedUser,
+                UpdatedDate = DateTime.Now,
+                UpdatedUser = username,
+                StatusProject = 1
+            };
             mostrarFormulario2 = true;
         }
         catch (Exception ex)
@@ -420,7 +544,7 @@
             mostrarAlerta = true;
             await JSRuntime.InvokeVoidAsync("TimeoutHelper.showAndHide", "divAlerta", 8000);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             mensajeAlerta = ex.Message;
             mostrarAlerta = true;

@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyecstories/{IdInter}/{userrol}"
+@page "/proyect/proyecstories/{IdInter}/{userrol}"
 
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
@@ -6,101 +6,117 @@
 @inject ILogger<Proyecstories> Logger
 @inject AuthenticationStateProvider authenticationStateProvider
 
-<PageTitle>Historias</PageTitle>
-<div class="row align-content-center">
-    <div class="col-lg-11">
-        <div class="col-lg-11">
-            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
-                @(entrevistado.Project == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
-            </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                @(entrevistado == null ? "-" : "Entrevistados")  <i class="bi bi-arrow-return-left"></i>
-            </button>
-            <h3 class="text-start mt-4">@(entrevistado == null ? "-" : entrevistado.InterName)@* Gestión de Historias *@</h3>
+<PageTitle>Historias | Sales Clusters</PageTitle>
+
+<!-- Enterprise Breadcrumbs -->
+<div class="enterprise-breadcrumbs">
+    <button class="breadcrumb-link" @onclick="Regresar2">
+        <i class="bi bi-folder2-open"></i> Proyectos
+    </button>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <button class="breadcrumb-link" @onclick="Regresar">
+        <i class="bi bi-people"></i> Entrevistados
+    </button>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <span class="breadcrumb-current text-primary">Historias de @(entrevistado?.InterName ?? "Entrevistado")</span>
+</div>
+
+<div class="card-enterprise">
+    <div class="card-enterprise-header flex-wrap gap-3">
+        <div>
+            <h4 class="card-enterprise-title">
+                <i class="bi bi-journal-text text-primary"></i> Historias de Usuario & Fuerzas JTBD
+            </h4>
+            <span class="text-muted small">Relatos de consumo, fricciones y motivaciones vinculadas al sujeto: <strong>@(entrevistado?.InterName ?? "-")</strong></span>
         </div>
-    </div>
-    <div class="col-lg-12">        
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn boton-secundario me-3" @onclick="() => AgruparHistorias(entrevistado.Project.IdProject.ToString())" title="Agrupar Historias">
-                <i class="bi bi-ui-checks"></i>
+        
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn boton-secundario" @onclick="() => AgruparHistorias(entrevistado?.Project?.IdProject.ToString() ?? string.Empty)" title="Agrupar Fuerzas">
+                <i class="bi bi-ui-checks-grid"></i> Agrupar Fuerzas
             </button>
-            <button class="btn boton-secundario me-3" @onclick="() => MostrarMatriz(entrevistado.Project.IdProject.ToString())" title="Matriz Historias">
-                <i class="bi bi-kanban"></i>
+            <button class="btn boton-secundario" @onclick="() => MostrarMatriz(entrevistado?.Project?.IdProject.ToString() ?? string.Empty)" title="Ver Matriz de Ward">
+                <i class="bi bi-diagram-3"></i> Matriz de Ward
             </button>
             
-            @if (entrevistado.Project?.StatusProject == 1)
+            @if (entrevistado?.Project?.StatusProject == 1)
             {
                 @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                 {
-                    <button class="btn boton-primario me-3" title="Agregar Historia" @onclick="MostrarFormulario">
-                        <i class="bi bi-plus-lg"></i> Agregar
+                    <button class="btn boton-primario" title="Registrar nueva historia" @onclick="MostrarFormulario">
+                        <i class="bi bi-plus-lg"></i> Nueva Historia
                     </button>
                 }
             }
-
         </div>
+    </div>
 
-        @if (mostrarAlerta)
-        {
-            <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container" role="alert" style="display:none;">
-                @mensajeAlerta
-                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
-            </div>
-        }
+    @if (mostrarAlerta)
+    {
+        <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container shadow" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @mensajeAlerta
+            <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+        </div>
+    }
 
-        @if (stories is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!stories.Any())
-        {
-            <div class="alert alert-info text-center">No hay historias disponibles.</div>
-        }
-        else
-        {
-            <table class="table">
-                <thead class="table">
+    @if (stories is null)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2">Cargando historias del entrevistado...</p>
+        </div>
+    }
+    else if (!stories.Any())
+    {
+        <div class="text-center py-5 border rounded bg-light">
+            <i class="bi bi-journal-x text-muted" style="font-size: 2.5rem;"></i>
+            <p class="text-muted mt-2 mb-0">No hay historias registradas para este entrevistado.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="20%">Titulo</th>
-                        <th width="55%">Contexto</th>
-                        <th width="20%"> </th>
+                        <th width="25%">Título de la Historia</th>
+                        <th width="52%">Contexto de Consumo / Decisión</th>
+                        <th width="18%" class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var (p, index) in stories.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td width="5%">@index</td>
-                            <td width="20%">@p.TitleStorie</td>
-                            <td width="55%">@p.ContextStorie</td>
-                            <td width="20%" class="text-end">
-                                <button class="btn boton-secundario btn-fijo me-1" title="Catalogar" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
-                                    <i class="bi bi-grid m-1"></i> 
-                                </button>
-                                @if (entrevistado.Project.StatusProject == 1)
-                                {
-                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                            <td class="text-muted fw-bold">@index</td>
+                            <td class="fw-bold text-dark">@p.TitleStorie</td>
+                            <td class="text-muted small">@p.ContextStorie</td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <button class="btn boton-secundario text-primary btn-fijo" title="Catalogar Fuerzas (Pushes, Pulls, Hábitos, Ansiedades)" @onclick="() => AgrgarCaracteristicas(p.IdStorie.ToString())">
+                                        <i class="bi bi-sliders2-vertical"></i>
+                                    </button>
+                                    @if (entrevistado?.Project?.StatusProject == 1)
                                     {
-                                        <button class="btn boton-secundario btn-fijo me-1" title="Editar" @onclick="() => EditarEntidad(p)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                        
-                                        <button class="btn btn-danger btn-fijo me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdStorie)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                        {
+                                            <button class="btn boton-secundario btn-fijo" title="Editar Historia" @onclick="() => EditarEntidad(p)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                            
+                                            <button class="btn btn-enterprise-danger btn-fijo" title="Eliminar Historia" @onclick="() => EliminarEntidad(p.IdStorie)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
                                     }
-                                }
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-    </div>
+        </div>
+    }
 </div>
 
 @if (mostrarFormulario)

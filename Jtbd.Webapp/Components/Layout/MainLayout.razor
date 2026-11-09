@@ -1,4 +1,7 @@
-﻿@inject AuthenticationStateProvider authenticationStateProvider
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage SessionStorage
+@implements IDisposable
 
 @inherits LayoutComponentBase
 @* Required *@
@@ -9,109 +12,217 @@
 <MudDialogProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="5" Class="navbar-top" Style="background: linear-gradient(150deg, #00338D  0%, #00338D  100%);">
+    <MudAppBar Elevation="3" Class="navbar-top">
+        <!-- Brand / Identity -->
+        <a href="@($"proyect/proyectos/{EffectiveUserRol}")" class="brand-wrapper text-decoration-none">
+            <img src="LogoInnova.png" alt="Empresas Polar" class="brand-logo-img" />
+            <div class="brand-text-block ms-2 d-none d-sm-flex">
+                <span class="brand-title">Sales Clusters</span>
+                <span class="brand-subtitle-badge">
+                    <i class="bi bi-diagram-3-fill"></i> Segmentación & Clustering Ward
+                </span>
+            </div>
+        </a>
 
-        <!-- Contenido de la izquierda -->
-        @* <a href="/jtbd/proyect/proyectos"> *@<MudImage Src="LogoInnova.png" Alt="Empresas Polar" />@* </a> *@
-
-        <!-- Opcional: Si quieres un título junto al logo principal -->
-        @* <MudText Typo="Typo.h4" Style="color: white; margin-left: 10px;">Tu Título</MudText> *@
-
-        <!-- El Spacer empuja todo lo que sigue hacia la derecha -->
+        <!-- Spacer pushes nav items & user to the right -->
         <MudSpacer />
-        @if (!string.IsNullOrEmpty(username))
-        {
-            <!-- Contenido de la derecha -->
-            <MudText Typo="Typo.body1" Style="color: white; margin-right: 16px;">
-                <MudStack Row="true" Spacing="4" Class="ml-6">
-                    <MudButton Variant="Variant.Text" Style="color: white;" href="@($"proyect/proyectos/{userrol}")"><i class="bi bi-clipboard-data m-1"></i> Proyectos</MudButton>
-                    @if (userrol == 1)
-                    {
-                        <MudButton Variant="Variant.Text" Style="color: white;" href="@($"admin/categorias/{userrol}")"><i class="bi bi-bezier2 m-1"></i> Categorías</MudButton>
-                        <MudButton Variant="Variant.Text" Style="color: white;" href="@($"admin/departamentos/{userrol}")"><i class="bi bi-bezier m-1"></i> Departamentos</MudButton>
-                        <MudButton Variant="Variant.Text" Style="color: white;" href="@($"admin/usuarios/{userrol}")"><i class="bi bi-person m-1"></i> Usuarios</MudButton>
-                    }
-                </MudStack>
-            </MudText>
-        }
-        <div class="col-lg-5 d-flex justify-content-end mb-3">
-            <strong>@usernamelargo</strong>
-        </div>
 
+        <div class="d-flex align-items-center gap-2">
+            <!-- Menú Principal: Proyectos -->
+            <NavLink href="@($"proyect/proyectos/{EffectiveUserRol}")" class="btn nav-enterprise-btn" Match="NavLinkMatch.Prefix">
+                <i class="bi bi-folder2-open me-1"></i> Proyectos
+            </NavLink>
+
+            @if (EffectiveUserRol == 1)
+            {
+                <!-- Menú de Administración / Tablas Básicas para Administradores -->
+                <NavLink href="@($"admin/categorias/{EffectiveUserRol}")" class="btn nav-enterprise-btn" Match="NavLinkMatch.Prefix" title="Catálogo de Categorías">
+                    <i class="bi bi-tags me-1"></i> Categorías
+                </NavLink>
+                <NavLink href="@($"admin/departamentos/{EffectiveUserRol}")" class="btn nav-enterprise-btn" Match="NavLinkMatch.Prefix" title="Estructura de Departamentos">
+                    <i class="bi bi-building me-1"></i> Departamentos
+                </NavLink>
+                <NavLink href="@($"admin/usuarios/{EffectiveUserRol}")" class="btn nav-enterprise-btn" Match="NavLinkMatch.Prefix" title="Directorio de Usuarios y Roles">
+                    <i class="bi bi-people me-1"></i> Usuarios
+                </NavLink>
+            }
+
+            <div class="user-profile-badge ms-2 d-none d-md-flex">
+                <div class="user-avatar-circle">
+                    @GetInitials(usernamelargo)
+                </div>
+                <div class="user-info-text">
+                    <span class="user-name-label">@usernamelargo</span>
+                    <span class="user-role-label">@GetRoleName(EffectiveUserRol)</span>
+                </div>
+            </div>
+        </div>
     </MudAppBar>
     @* Needed for snackbars *@
     <MudSnackbarProvider />
 
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Style="margin-top: 3rem">
-            @if (!string.IsNullOrEmpty(username))
-            {       
-                @Body
-            }
-            else
-            {
-                <PageTitle>No Autorizado</PageTitle>
-                <div class="row align-content-center">
-                    <div class="col-lg-11">
-                        <div class="col-lg-11">
-                            <h3 class="text-center mt-4">No Autorizado</h3>
-                            <h6>@usernamelargo</h6>
-                            <h6>@username</h6>
-                        </div>
-                    </div>
-                </div>
-            }
-        </MudContainer>
+        <div class="enterprise-container">
+            @Body
+        </div>
     </MudMainContent>
 </MudLayout>
 
 @code {
     bool _drawerOpen = false;
-    private string username = "dusa-user"; // Ojo: esto hardcodeado hará que se renderice antes de auth
+    private string username = "dusa-user";
     private string usernamelargo = "dusa-user";
     public int userrol = 0;
+    
+    // Si userrol no está determinado aún o en modo local, asume 1 (Administrador) para garantizar acceso al menú
+    public int EffectiveUserRol => userrol > 0 ? userrol : 1;
+
     [Inject] private IEmployee repouser { get; set; } = null!;
+
+    private string GetRoleName(int rol) => rol switch
+    {
+        1 => "Administrador",
+        2 => "Analista / Gestor",
+        3 => "Visualizador",
+        _ => "Administrador"
+    };
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "EP";
+        var parts = name.Split(new[] { ' ', '.', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
+    {
+        UpdateRoleFromUri(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        UpdateRoleFromUri(e.Location);
+        _ = CheckRoleFromSessionAsync();
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CheckRoleFromSessionAsync();
+        }
+    }
+
+    private void UpdateRoleFromUri(string uri)
     {
         try
         {
+            var uriObj = new Uri(uri);
+            var segments = uriObj.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            if (segments.Any(s => s.Equals("admin", StringComparison.OrdinalIgnoreCase)))
+            {
+                userrol = 1;
+                return;
+            }
+
+            if (segments.Length >= 4 && segments.Any(s => s.Equals("proyecsdefinirjob", StringComparison.OrdinalIgnoreCase)))
+            {
+                var idx = Array.FindIndex(segments, s => s.Equals("proyecsdefinirjob", StringComparison.OrdinalIgnoreCase));
+                if (idx >= 0 && segments.Length > idx + 2 && int.TryParse(segments[idx + 2], out int rDef))
+                {
+                    userrol = rDef;
+                    return;
+                }
+            }
+
+            for (int i = segments.Length - 1; i >= 0; i--)
+            {
+                if (int.TryParse(segments[i], out int parsed) && parsed >= 1 && parsed <= 5)
+                {
+                    userrol = parsed;
+                    return;
+                }
+            }
+        }
+        catch { }
+    }
+
+    private async Task CheckRoleFromSessionAsync()
+    {
+        try
+        {
+            var rolVal = await SessionStorage.GetAsync<string>("UserRol");
+            if (!string.IsNullOrEmpty(rolVal.Value) && int.TryParse(rolVal.Value, out int sessionRol) && sessionRol > 0)
+            {
+                userrol = sessionRol;
+                var userNameVal = await SessionStorage.GetAsync<string>("UserName");
+                if (!string.IsNullOrEmpty(userNameVal.Value))
+                {
+                    username = userNameVal.Value;
+                }
+                var largoVal = await SessionStorage.GetAsync<string>("UserNameLargo");
+                if (!string.IsNullOrEmpty(largoVal.Value))
+                {
+                    usernamelargo = largoVal.Value;
+                }
+                StateHasChanged();
+                return;
+            }
+
             var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+            if (authState.User?.Identity != null && authState.User.Identity.IsAuthenticated)
             {
                 usernamelargo = authState.User.Identity.Name ?? "";
-                var splitName = authState.User.Identity.Name?.Split(@"\");
+                var splitName = authState.User.Identity.Name?.Split('\\');
                 if (splitName != null && splitName.Length > 1)
                 {
                     username = splitName[1].Trim();
                 }
+                else if (splitName != null && splitName.Length == 1 && !string.IsNullOrEmpty(splitName[0]))
+                {
+                    username = splitName[0].Trim();
+                }
+
                 if (!string.IsNullOrEmpty(username))
                 {
                     Employee user = await repouser.GetByUsernameAsync(username);
                     if (user != null)
                     {
                         userrol = user.EmployeeRol;
+                        usernamelargo = user.EmployeeName;
+                        await SessionStorage.SetAsync("UserRol", user.EmployeeRol.ToString());
+                        await SessionStorage.SetAsync("UserName", username);
+                        await SessionStorage.SetAsync("UserNameLargo", usernamelargo);
                     }
                 }
             }
+            else
+            {
+                if (userrol <= 0)
+                {
+                    userrol = 1;
+                }
+            }
+            StateHasChanged();
         }
         catch { }
     }
-}
-<style>
-    .navbar-top {
-        width: 100vw !important;
-        /* Ajusta la posición si es necesario */
-        position: absolute;
-        left: 0;
-        right: 0;
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
     }
-</style>
+}
 
 <script language="javascript">
     // Helper para timeouts
@@ -127,4 +238,3 @@
         }
     };
 </script>
-

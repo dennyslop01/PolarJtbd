@@ -1,4 +1,4 @@
-﻿@page "/proyect/detalle/{IdStorie}/{userrol}"
+@page "/proyect/detalle/{IdStorie}/{userrol}"
 @rendermode InteractiveServer
 
 @inject IJSRuntime JSRuntime
@@ -6,340 +6,337 @@
 @inject ILogger<Proyecstories> Logger
 @inject AuthenticationStateProvider authenticationStateProvider
 
-<PageTitle>Historia Detalle</PageTitle>
+<PageTitle>Historia Detalle | Sales Clusters</PageTitle>
+
 <EditForm Model="@entidadActual">
-    <div class="row align-content-center">
-        <div class="col-lg-12">
-            <div class="col-lg-11">
-                <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar2">
-                    @(entidadStorie.Project == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
-                </button>&nbsp;/&nbsp;
-                <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar3">
-                    @(entidadStorie.IdInter == null ? "-" : "Entrevistados")  <i class="bi bi-arrow-return-left"></i>
-                </button>&nbsp;/&nbsp;
-                <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                    @(entidadStorie == null ? "-" : "Historias")  <i class="bi bi-arrow-return-left"></i>
-                </button>
-            </div>
-            <h3 class="text-start mt-4">@(entidadStorie.TitleStorie.Length > 30 ? entidadStorie.TitleStorie.Substring(0, 29) : entidadStorie.TitleStorie)</h3>
-                <div class="d-flex justify-content-end mb-3">
-                
-                <button class="btn boton-secundario me-3" @onclick="() => AgruparHistorias(entidadStorie.Project.IdProject.ToString())" title="Agrupar Historias">
-                    <i class="bi bi-ui-checks"></i>
-                </button>
-                <button class="btn boton-secundario me-3" @onclick="() => MostrarMatriz(entidadStorie.Project.IdProject.ToString())" title="Matriz Historias">
-                    <i class="bi bi-kanban"></i>
-                </button>
-                @if (entidadStorie.Project?.StatusProject == 1)
-                {
-                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                    {
-                        <button class="btn boton-primario me-3" @onclick="GuardarEntidad" title="Actualizar Historia">
-                            <i class="bi bi-save"></i>
-                        </button>
-                    }
-                }
-            </div>
-        </div>
+    <!-- Enterprise Breadcrumbs -->
+    <div class="enterprise-breadcrumbs">
+        <button class="breadcrumb-link" @onclick="Regresar2" type="button">
+            <i class="bi bi-folder2-open"></i> Proyectos
+        </button>
+        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+        <button class="breadcrumb-link" @onclick="Regresar3" type="button">
+            <i class="bi bi-people"></i> Entrevistados
+        </button>
+        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+        <button class="breadcrumb-link" @onclick="Regresar" type="button">
+            <i class="bi bi-journal-text"></i> Historias
+        </button>
+        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+        <span class="breadcrumb-current text-primary">@(string.IsNullOrWhiteSpace(entidadStorie.TitleStorie) ? "Detalle" : (entidadStorie.TitleStorie.Length > 35 ? entidadStorie.TitleStorie.Substring(0, 34) + "..." : entidadStorie.TitleStorie))</span>
     </div>
+
     @if (mostrarAlerta)
     {
-        <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container" role="alert" style="display:none;">
-            @mensajeAlerta
+        <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container shadow" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @mensajeAlerta
             <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
         </div>
     }
 
-    <div class="row align-content-center">
-        <div class="mb-6">
-            <label class="form-label"><strong>Contexto:</strong></label>
-            <InputTextArea class="form-control" @bind-Value="entidadActual.ContextStorie" />
-        </div>
-        <div class="mb-6">
-            <label class="form-label"><strong></strong></label>
-        </div>
-    </div>
-<br />
-<div class="row align-content-center" >
-    <div class="col-lg-6">
-        <div class="row">
-            <div class="col-lg-10">
-                <label><strong>Pushes</strong></label>
+    <!-- Header & Context Card -->
+    <div class="card-enterprise mb-4">
+        <div class="card-enterprise-header flex-wrap gap-3">
+            <div>
+                <h4 class="card-enterprise-title">
+                    <i class="bi bi-sliders2-vertical text-primary"></i> @(entidadStorie.TitleStorie)
+                </h4>
+                <span class="text-muted small">Defina el contexto y clasifique las 4 fuerzas que impulsan o restringen el progreso del consumidor (JTBD)</span>
             </div>
-            <div class="col-lg-2 justify-content-end">
+            
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn boton-secundario" @onclick="() => AgruparHistorias(entidadStorie.Project.IdProject.ToString())" title="Agrupar Fuerzas">
+                    <i class="bi bi-ui-checks-grid"></i> Agrupar Fuerzas
+                </button>
+                <button type="button" class="btn boton-secundario" @onclick="() => MostrarMatriz(entidadStorie.Project.IdProject.ToString())" title="Ver Matriz de Ward">
+                    <i class="bi bi-diagram-3"></i> Matriz de Ward
+                </button>
                 @if (entidadStorie.Project?.StatusProject == 1)
                 {
                     @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
-                            <button class="btn boton-primario btn-sm" title="Pushes" @onclick="MostrarPushes">
-                            <i class="bi bi-plus-lg"></i> Agregar
-                        </button>
-                    }
-                }
-            </div>
-        </div>
-        @if (pushstorie is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!pushstorie.Any())
-        {
-            <div class="alert alert-light text-center bg-opacity-25">No hay pushes disponibles.</div>
-        }
-        else
-        {
-            <br />
-            <table class="table">
-                <thead class="table">
-                    <tr>
-                        <th width="3%">#</th>
-                        <th width="80%">Nombre</th>
-                        <th width="15%"> </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var (p, index) in pushstorie.Select((p, i) => (p, i + 1)))
-                    {
-                        <tr>
-                            <td width="3%">@index</td>
-                            <td width="80%">@p.PushesGroups.PushName</td>
-                                <td width="15%" class="text-end">
-                                @if (entidadStorie.Project?.StatusProject == 1)
-                                {
-                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                    {
-                                            <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
-                                            <i class="bi bi-pencil"></i> 
-                                        </button>
-                                        <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)" >
-                                            <i class="bi bi-trash"></i> 
-                                        </button>
-                                    }
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
-    <div class="col-lg-6">
-        <div class="row">
-            <div class="col-lg-10">
-                <label><strong>Pulls</strong></label>
-            </div>
-            <div class="col-lg-2 align-content-end">
-                @if (entidadStorie.Project?.StatusProject == 1)
-                {
-                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                    {
-                            <button class="btn boton-primario btn-sm" title="Pulls" @onclick="MostrarPulls">
-                            <i class="bi bi-plus-lg"></i> Agregar
+                        <button type="button" class="btn boton-primario" @onclick="GuardarEntidad" title="Guardar cambios de la historia">
+                            <i class="bi bi-save"></i> Guardar Historia
                         </button>
                     }
                 }
             </div>
         </div>
 
-        @if (pullstorie is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!pullstorie.Any())
-        {
-            <div class="alert alert-light text-center bg-opacity-25">No hay pulls disponibles.</div>
-        }
-        else
-        {
-            <br />
-            <table class="table">
-                <thead class="table">
-                    <tr>
-                        <th width="3%">#</th>
-                        <th width="80%">Nombre</th>
-                        <th width="15%"> </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var (p, index) in pullstorie.Select((p, i) => (p, i + 1)))
-                    {
-                        <tr>
-                            <td width="3%">@index</td>
-                            <td width="80%">@p.PullGroups.PullName</td>
-                            <td width="15%" class="text-end">
-                                @if (entidadStorie.Project?.StatusProject == 1)
-                                {
-                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                    {
-                                            <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)" >
-                                            <i class="bi bi-trash"></i> 
-                                        </button>
-                                    }
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+        <div class="mb-2">
+            <label class="form-label fw-bold">Contexto de la Historia:</label>
+            <InputTextArea class="form-control" rows="2" placeholder="Describa la situación, momento o detonante de consumo del cliente..." @bind-Value="entidadActual.ContextStorie" />
+        </div>
     </div>
-</div>
-<br />
-<br />
 
-<div class="row align-content-center" >
-    <div class="col-lg-6">
-        <div class="row">            
-            <div class="col-lg-10">
-                <label><strong>Hábitos</strong></label>
-            </div>
-            <div class="col-lg-2 align-content-end">
-                @if (entidadStorie.Project?.StatusProject == 1)
-                {
-                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+    <!-- The 4 Forces of JTBD Dashboard Grid -->
+    <div class="row g-4">
+        <!-- 1. PUSHES -->
+        <div class="col-lg-6">
+            <div class="card-enterprise h-100" style="border-left: 4px solid var(--force-push);">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <div>
+                        <span class="badge-enterprise badge-push">
+                            <i class="bi bi-box-arrow-right me-1"></i> Pushes (Detonantes)
+                        </span>
+                        <div class="text-muted small mt-1">Incomodidad o problemas con la solución actual</div>
+                    </div>
+                    @if (entidadStorie.Project?.StatusProject == 1 && int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
-                            <button class="btn boton-primario btn-sm" title="Hábitos" @onclick="MostrarHabits">
+                        <button type="button" class="btn boton-primario btn-sm" title="Agregar Push" @onclick="MostrarPushes">
                             <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
+                </div>
+
+                @if (pushstorie is null)
+                {
+                    <div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+                }
+                else if (!pushstorie.Any())
+                {
+                    <div class="text-center py-4 text-muted small bg-light rounded">No se han registrado detonantes Push.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="8%">#</th>
+                                    <th width="72%">Detonante Push</th>
+                                    <th width="20%" class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var (p, index) in pushstorie.Select((p, i) => (p, i + 1)))
+                                {
+                                    <tr>
+                                        <td class="text-muted fw-bold">@index</td>
+                                        <td>@p.PushesGroups.PushName</td>
+                                        <td class="text-end">
+                                            @if (entidadStorie.Project?.StatusProject == 1 && int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                            {
+                                                <div class="d-inline-flex gap-1">
+                                                    <button type="button" class="btn boton-secundario btn-fijo" title="Editar" @onclick="() => EditarPush(p.PushesGroups)">
+                                                        <i class="bi bi-pencil"></i> 
+                                                    </button>
+                                                    <button type="button" class="btn btn-enterprise-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(1, p.PushesGroups.IdPush)">
+                                                        <i class="bi bi-trash"></i> 
+                                                    </button>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
             </div>
         </div>
 
-        @if (habitstorie is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!habitstorie.Any())
-        {
-            <div class="alert alert-light text-center bg-opacity-25">No hay hábitos disponibles.</div>
-        }
-        else
-        {
-            <br />
-            <table class="table">
-                <thead class="table">
-                    <tr>
-                        <th width="3%">#</th>
-                        <th width="80%">Nombre</th>
-                        <th width="15%"> </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var (p, index) in habitstorie.Select((p, i) => (p, i + 1)))
+        <!-- 2. PULLS -->
+        <div class="col-lg-6">
+            <div class="card-enterprise h-100" style="border-left: 4px solid var(--force-pull);">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <div>
+                        <span class="badge-enterprise badge-pull">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Pulls (Atracción)
+                        </span>
+                        <div class="text-muted small mt-1">Beneficios y magnetismo hacia la nueva solución</div>
+                    </div>
+                    @if (entidadStorie.Project?.StatusProject == 1 && int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                     {
-                        <tr>
-                            <td width="3%">@index</td>
-                            <td width="80%">@p.Habits.HabitName</td>
-                            <td width="15%" class="text-end">
-                                @if (entidadStorie.Project?.StatusProject == 1)
-                                {
-                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                    {
-                                            <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarHabit(p.Habits)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)" >
-                                            <i class="bi bi-trash"></i> 
-                                        </button>
-                                    }
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
-    <div class="col-lg-6">
-        <div class="row">
-            <div class="col-lg-10">
-                <label><strong>Ansiedades</strong></label>
-            </div>
-            <div class="col-lg-2 align-content-end">
-                @if (entidadStorie.Project?.StatusProject == 1)
-                {
-                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                    {
-                            <button class="btn boton-primario btn-sm" title="Ansiedades" @onclick="MostrarAnxies">
+                        <button type="button" class="btn boton-primario btn-sm" title="Agregar Pull" @onclick="MostrarPulls">
                             <i class="bi bi-plus-lg"></i> Agregar
                         </button>
                     }
+                </div>
+
+                @if (pullstorie is null)
+                {
+                    <div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+                }
+                else if (!pullstorie.Any())
+                {
+                    <div class="text-center py-4 text-muted small bg-light rounded">No se han registrado fuerzas Pull.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="8%">#</th>
+                                    <th width="72%">Atracción Pull</th>
+                                    <th width="20%" class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var (p, index) in pullstorie.Select((p, i) => (p, i + 1)))
+                                {
+                                    <tr>
+                                        <td class="text-muted fw-bold">@index</td>
+                                        <td>@p.PullGroups.PullName</td>
+                                        <td class="text-end">
+                                            @if (entidadStorie.Project?.StatusProject == 1 && int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                            {
+                                                <div class="d-inline-flex gap-1">
+                                                    <button type="button" class="btn boton-secundario btn-fijo" title="Editar" @onclick="() => EditarPull(p.PullGroups)">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-enterprise-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(2, p.PullGroups.IdPull)">
+                                                        <i class="bi bi-trash"></i> 
+                                                    </button>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
             </div>
         </div>
-        
-        @if (anxiestorie is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!anxiestorie.Any())
-        {
-            <div class="alert alert-light text-center bg-opacity-25">No hay ansiedades disponibles.</div>
-        }
-        else
-        {
-            <br />
-            <table class="table">
-                <thead class="table">
-                    <tr>
-                        <th width="3%">#</th>
-                        <th width="80%">Nombre</th>
-                        <th width="15%"> </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var (p, index) in anxiestorie.Select((p, i) => (p, i + 1)))
-                    {
-                        <tr>
-                            <td width="3%">@index</td>
-                            <td width="80%">@p.Anxieties.AnxieName</td>
-                            <td width="15%" class="text-end">
-                                @if (entidadStorie.Project?.StatusProject == 1)
-                                {
-                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                    {
-                                            <button class="btn boton-secundario btn-fijo me-2" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)" >
-                                            <i class="bi bi-trash"></i> 
-                                        </button>
-                                    }
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
-</div>
 
-<div class="row align-content-center">
-    <div class="mb-6">
-        <label class="form-label"><strong></strong></label>
+        <!-- 3. HABITS -->
+        <div class="col-lg-6">
+            <div class="card-enterprise h-100" style="border-left: 4px solid var(--force-habit);">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <div>
+                        <span class="badge-enterprise badge-habit">
+                            <i class="bi bi-arrow-repeat me-1"></i> Hábitos (Inercia)
+                        </span>
+                        <div class="text-muted small mt-1">Costumbres y apegos que frenan la adopción</div>
+                    </div>
+                    @if (entidadStorie.Project?.StatusProject == 1 && int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button type="button" class="btn boton-primario btn-sm" title="Agregar Hábito" @onclick="MostrarHabits">
+                            <i class="bi bi-plus-lg"></i> Agregar
+                        </button>
+                    }
+                </div>
+
+                @if (habitstorie is null)
+                {
+                    <div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+                }
+                else if (!habitstorie.Any())
+                {
+                    <div class="text-center py-4 text-muted small bg-light rounded">No se han registrado hábitos.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="8%">#</th>
+                                    <th width="72%">Inercia del Hábito</th>
+                                    <th width="20%" class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var (p, index) in habitstorie.Select((p, i) => (p, i + 1)))
+                                {
+                                    <tr>
+                                        <td class="text-muted fw-bold">@index</td>
+                                        <td>@p.Habits.HabitName</td>
+                                        <td class="text-end">
+                                            @if (entidadStorie.Project?.StatusProject == 1 && int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                            {
+                                                <div class="d-inline-flex gap-1">
+                                                    <button type="button" class="btn boton-secundario btn-fijo" title="Editar" @onclick="() => EditarHabit(p.Habits)">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-enterprise-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(3, p.Habits.IdHabit)">
+                                                        <i class="bi bi-trash"></i> 
+                                                    </button>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- 4. ANXIETIES -->
+        <div class="col-lg-6">
+            <div class="card-enterprise h-100" style="border-left: 4px solid var(--force-anxiety);">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <div>
+                        <span class="badge-enterprise badge-anxiety">
+                            <i class="bi bi-exclamation-triangle me-1"></i> Ansiedades (Fricción)
+                        </span>
+                        <div class="text-muted small mt-1">Dudas, miedos y riesgos percibidos al cambiar</div>
+                    </div>
+                    @if (entidadStorie.Project?.StatusProject == 1 && int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button type="button" class="btn boton-primario btn-sm" title="Agregar Ansiedad" @onclick="MostrarAnxies">
+                            <i class="bi bi-plus-lg"></i> Agregar
+                        </button>
+                    }
+                </div>
+
+                @if (anxiestorie is null)
+                {
+                    <div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+                }
+                else if (!anxiestorie.Any())
+                {
+                    <div class="text-center py-4 text-muted small bg-light rounded">No se han registrado ansiedades.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="8%">#</th>
+                                    <th width="72%">Fricción / Ansiedad</th>
+                                    <th width="20%" class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var (p, index) in anxiestorie.Select((p, i) => (p, i + 1)))
+                                {
+                                    <tr>
+                                        <td class="text-muted fw-bold">@index</td>
+                                        <td>@p.Anxieties.AnxieName</td>
+                                        <td class="text-end">
+                                            @if (entidadStorie.Project?.StatusProject == 1 && int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                            {
+                                                <div class="d-inline-flex gap-1">
+                                                    <button type="button" class="btn boton-secundario btn-fijo" title="Editar" @onclick="() => EditarAnxie(p.Anxieties)">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-enterprise-danger btn-fijo" title="Eliminar" @onclick="() => EliminarEntidad(4, p.Anxieties.IdAnxie)">
+                                                        <i class="bi bi-trash"></i> 
+                                                    </button>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
-    <div class="mb-6">
-        <label class="form-label"><strong>Observación:</strong></label>
-        <InputTextArea class="form-control" @bind-Value="entidadActual.ObservacionStorie" />
+
+    <!-- Observaciones Adicionales -->
+    <div class="card-enterprise mt-4">
+        <label class="form-label fw-bold">Observaciones Generales de la Historia:</label>
+        <InputTextArea class="form-control" rows="2" placeholder="Notas cualitativas adicionales o consideraciones del entrevistador..." @bind-Value="entidadActual.ObservacionStorie" />
     </div>
-</div>
 </EditForm>
 <br />
 <br />

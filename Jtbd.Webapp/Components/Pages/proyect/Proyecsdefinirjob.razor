@@ -1,4 +1,4 @@
-﻿@page "/proyect/proyecsdefinirjob/{IdCluster}/{IdProyecto}"
+@page "/proyect/proyecsdefinirjob/{IdCluster}/{IdProyecto}"
 @rendermode InteractiveServer
 
 @inject IJSRuntime JSRuntime
@@ -6,53 +6,67 @@
 @inject ILogger<Proyecstories> Logger
 @inject AuthenticationStateProvider authenStateProvider
 
-<PageTitle>Definir Jobs</PageTitle>
-<div class="row align-content-center">
-    <div class="col-lg-12">
-        <div class="col-lg-11">
-            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
-            </button>&nbsp;/&nbsp;
-            <button class="btn btn-link btn-sm me-2 align-content-end" @onclick="MostrarMatriz" title="Regresar">
-                @(proyecto == null ? "-" : "Matriz Historias")  <i class="bi bi-arrow-return-left"></i>
-            </button>
-        </div>
-        <h3 class="text-start mt-4">Definir Jobs Cluster @IdCluster</h3>
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn boton-secundario me-3" @onclick="MostrarClusteres" title="Ver Clusteres">
-                <i class="bi bi-building"></i>
-            </button>
-            @if (proyecto.StatusProject == 1)
-            {
-                @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                {
-                    <button class="btn boton-primario me-3" @onclick="GuardarEntidad2" title="Actualizar Historia">
-                        <i class="bi bi-save"></i>
-                    </button>
-                }
-            }
-        </div>
-    </div>
+<PageTitle>Definir Job Statement | Sales Clusters</PageTitle>
+
+<!-- Enterprise Breadcrumbs -->
+<div class="enterprise-breadcrumbs">
+    <button class="breadcrumb-link" @onclick="Regresar" type="button">
+        <i class="bi bi-folder2-open"></i> Proyectos
+    </button>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <button class="breadcrumb-link" @onclick="MostrarMatriz" type="button">
+        <i class="bi bi-diagram-3"></i> Matriz de Ward
+    </button>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <button class="breadcrumb-link" @onclick="MostrarClusteres" type="button">
+        <i class="bi bi-pie-chart"></i> Clústeres
+    </button>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <span class="breadcrumb-current text-primary">Job Statement (Clúster @IdCluster)</span>
 </div>
+
 @if (mostrarAlerta)
 {
-    <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container" role="alert" style="display:none;">
-        @mensajeAlerta
+    <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container shadow" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @mensajeAlerta
         <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
     </div>
 }
 
 <EditForm Model="@entidadActual2" OnValidSubmit="GuardarEntidad2">
-    <div class="row align-content-center">
-        <div class="mb-6">
-            <label class="form-label"><strong>Enunciado :</strong></label>
-            <InputTextArea class="form-control" @bind-Value="entidadActual2.Descripcion" />
+    <!-- Job Statement Executive Card -->
+    <div class="card-enterprise mb-4">
+        <div class="card-enterprise-header flex-wrap gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h4 class="card-enterprise-title mb-0">
+                        <i class="bi bi-award-fill text-primary"></i> Job Statement — Segmento Clúster @IdCluster
+                    </h4>
+                    <span class="badge-enterprise badge-cluster">JTBD Core</span>
+                </div>
+                <span class="text-muted small">Estructure el trabajo fundamental que este conglomerado de clientes busca resolver objetivamente</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn boton-secundario" @onclick="MostrarClusteres" title="Ver Clústeres">
+                    <i class="bi bi-pie-chart"></i> Ver Clústeres
+                </button>
+                @if (proyecto?.StatusProject == 1)
+                {
+                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                    {
+                        <button type="submit" class="btn boton-primario" title="Guardar Enunciado de Job">
+                            <i class="bi bi-save"></i> Guardar Enunciado
+                        </button>
+                    }
+                }
+            </div>
         </div>
-        <div class="mb-6">
-            <label class="form-label"><strong></strong></label>
+
+        <div class="mb-2">
+            <label class="form-label fw-bold">Enunciado Principal del Job to be Done:</label>
+            <InputTextArea class="form-control" rows="3" placeholder="Ej: Cuando [situación de mercado], el cliente quiere [objetivo clave] para lograr [beneficio de progreso]..." @bind-Value="entidadActual2.Descripcion" />
         </div>
     </div>
-    <br />
 </EditForm>
 
 

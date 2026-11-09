@@ -1,121 +1,147 @@
-﻿@page "/proyect/interview/{IdProyecto}/{userrol}"
+@page "/proyect/interview/{IdProyecto}/{userrol}"
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
 @inject IConfiguration configuration
 @inject ILogger<Interview> Logger
 @inject AuthenticationStateProvider authenticationStateProvider
 
-<PageTitle>Entrevistados</PageTitle>
-<div class="row align-content-center">
-    <div class="col-lg-12">
-        <div class="col-lg-11">
-            <button class="btn btn-link btn-sm me-2 align-content-end" title="Regresar" @onclick="Regresar">
-                @(proyecto == null ? "-" : "Proyectos")  <i class="bi bi-arrow-return-left"></i>
-            </button>
+<PageTitle>Entrevistados | Sales Clusters</PageTitle>
+
+<!-- Enterprise Breadcrumbs -->
+<div class="enterprise-breadcrumbs">
+    <button class="breadcrumb-link" @onclick="Regresar">
+        <i class="bi bi-folder2-open"></i> Proyectos
+    </button>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <span class="breadcrumb-current">@(proyecto?.ProjectName ?? "Proyecto")</span>
+    <i class="bi bi-chevron-right breadcrumb-separator"></i>
+    <span class="breadcrumb-current text-primary">Gestión de Entrevistados</span>
+</div>
+
+<div class="card-enterprise">
+    <div class="card-enterprise-header flex-wrap gap-3">
+        <div>
+            <h4 class="card-enterprise-title">
+                <i class="bi bi-people-fill"></i> Panel de Entrevistados (Sujetos de Estudio JTBD)
+            </h4>
+            <span class="text-muted small">Registro demográfico y recopilación de historias de consumidores para la segmentación</span>
         </div>
-        <h3 class="text-start mt-4">Gestión de Entrevistados</h3>
         
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn boton-secundario me-3" @onclick="() => AgruparHistorias(IdProyecto)" title="Agrupar Historias">
-                <i class="bi bi-ui-checks"></i>
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn boton-secundario" @onclick="() => AgruparHistorias(IdProyecto)" title="Agrupar Fuerzas e Historias">
+                <i class="bi bi-ui-checks-grid"></i> Agrupar Fuerzas
             </button>
-            <button class="btn boton-secundario me-3" @onclick="() => MostrarMatriz(IdProyecto)" title="Matriz Historias">
-                    <i class="bi bi-kanban"></i>
+            <button class="btn boton-secundario" @onclick="() => MostrarMatriz(IdProyecto)" title="Ver Matriz de Ward">
+                <i class="bi bi-diagram-3"></i> Matriz de Ward
             </button>
-            @if (proyecto.StatusProject == 1)
+            @if (proyecto?.StatusProject == 1)
             {
                 @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
                 {
-                    <button class="btn boton-primario me-3" title="Agregar Entrevistado" @onclick="MostrarFormulario">
-                        <i class="bi bi-plus-lg"></i> Agregar
+                    <button class="btn boton-primario" title="Registrar nuevo entrevistado" @onclick="MostrarFormulario">
+                        <i class="bi bi-person-plus-fill"></i> Nuevo Entrevistado
                     </button>
                 }
             }
         </div>
+    </div>
 
-        @if (mostrarAlerta)
-        {
-            <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container" role="alert" style="display:none;">
-                @mensajeAlerta
-                <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
-            </div>
-        }
+    @if (mostrarAlerta)
+    {
+        <div id="divAlerta" class="alert alert-success alert-dismissible fade show toast-container shadow" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @mensajeAlerta
+            <button type="button" class="btn-close" @onclick="() => mostrarAlerta = false"></button>
+        </div>
+    }
 
-
-        @if (entrevistados is null)
-        {
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Cargando datos...</p>
-            </div>
-        }
-        else if (!entrevistados.Any())
-        {
-            <div class="alert alert-info text-center">No hay entrevistados disponibles.</div>
-        }
-        else
-        {
-            <table class="table">
-                <thead class="table">
+    @if (entrevistados is null)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2">Cargando base de entrevistados...</p>
+        </div>
+    }
+    else if (!entrevistados.Any())
+    {
+        <div class="text-center py-5 border rounded bg-light">
+            <i class="bi bi-person-x text-muted" style="font-size: 2.5rem;"></i>
+            <p class="text-muted mt-2 mb-0">No hay entrevistados registrados en este proyecto.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Nickname</th>
-                        <th>Edad</th>
-                        <th>Sexo</th>
-                        <th>Ocupación</th>
-                        <th>NSE</th>
-                        <th>Fecha Entrevista</th>
-                        <th> </th>
+                        <th width="4%">#</th>
+                        <th width="20%">Nombre / Sujeto</th>
+                        <th width="12%">Alias</th>
+                        <th width="8%">Edad</th>
+                        <th width="10%">Género</th>
+                        <th width="16%">Ocupación</th>
+                        <th width="8%">NSE</th>
+                        <th width="10%">Fecha</th>
+                        <th width="12%" class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var (p, index) in entrevistados.Select((p, i) => (p, i + 1)))
                     {
                         <tr>
-                            <td>@index</td>
-                            <td>@p.InterName</td>
-                            <td>@p.InterNickname</td>
-                            <td>@p.InterAge</td>
-                            @switch (p.InterGender)
-                            {
-                                case 1:
-                                    <td>Masculino</td>
-                                    break;
-                                case 2:
-                                    <td>Femenino</td>
-                                    break;
-                                default:
-                                    <td>&nbsp;&nbsp;</td>
-                                    break;
-                            }
-                            <td>@p.InterOccupation</td>
-                            <td>@p.InterNSE</td>
-                            <td>@p.DateInter</td>
-                            <td class="text-end">
-                                <button class="btn boton-secundario btn-fijo me-1" title="Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
-                                    <i class="bi bi-list-columns-reverse"></i>
-                                </button>
-                                @if (proyecto.StatusProject == 1)
+                            <td class="text-muted fw-bold">@index</td>
+                            <td class="fw-bold text-dark">
+                                <i class="bi bi-person-circle me-1 text-muted"></i>@p.InterName
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@p.InterNickname</span>
+                            </td>
+                            <td>@p.InterAge años</td>
+                            <td>
+                                @switch (p.InterGender)
                                 {
-                                    @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
-                                    {
-                                        <button class="btn boton-secundario btn-fijo me-1" title="Editar" @onclick="() => EditarEntidad(p)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                        
-                                        <button class="btn btn-danger btn-fijo me-1" title="Eliminar" @onclick="() => EliminarEntidad(p.IdInter)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    }
+                                    case 1:
+                                        <span class="badge bg-primary-subtle text-primary border">Masculino</span>
+                                        break;
+                                    case 2:
+                                        <span class="badge bg-info-subtle text-info border">Femenino</span>
+                                        break;
+                                    default:
+                                        <span class="text-muted">-</span>
+                                        break;
                                 }
+                            </td>
+                            <td class="text-muted">@p.InterOccupation</td>
+                            <td>
+                                <span class="badge bg-light text-secondary border fw-bold">@p.InterNSE</span>
+                            </td>
+                            <td class="small text-muted">@p.DateInter.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <button class="btn boton-secundario text-primary btn-fijo" title="Ver y Gestionar Historias" @onclick="() => AgrgarHistorias(p.IdInter.ToString())">
+                                        <i class="bi bi-journal-text"></i>
+                                    </button>
+                                    @if (proyecto?.StatusProject == 1)
+                                    {
+                                        @if (int.Parse(userrol) > 0 && int.Parse(userrol) < 3)
+                                        {
+                                            <button class="btn boton-secundario btn-fijo" title="Editar Información" @onclick="() => EditarEntidad(p)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                            
+                                            <button class="btn btn-enterprise-danger btn-fijo" title="Eliminar Entrevistado" @onclick="() => EliminarEntidad(p.IdInter)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                    }
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-    </div>
+        </div>
+    }
 </div>
 
 @if (mostrarFormulario)
